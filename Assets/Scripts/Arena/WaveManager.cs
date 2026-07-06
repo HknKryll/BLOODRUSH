@@ -24,12 +24,27 @@ public class WaveManager : MonoBehaviour
     [SerializeField] GameObject      victoryPanel;
     [SerializeField] GameObject      defeatPanel;
 
-    int  currentWave;
-    int  aliveEnemies;
-    bool gameEnded;
+    [Header("Ses")]
+    [SerializeField] AudioClip waveStartClip;
+    [SerializeField] [Range(0f,1f)] float waveStartVolume = 0.8f;
+    [SerializeField] AudioClip victoryClip;
+    [SerializeField] [Range(0f,1f)] float victoryVolume = 1f;
+    [SerializeField] AudioClip defeatClip;
+    [SerializeField] [Range(0f,1f)] float defeatVolume = 1f;
+
+    int         currentWave;
+    int         aliveEnemies;
+    bool        gameEnded;
+    AudioSource audioSrc;
+
+    public static bool IsGameOver { get; private set; }
 
     IEnumerator Start()
     {
+        IsGameOver = false;
+        audioSrc = gameObject.AddComponent<AudioSource>();
+        audioSrc.playOnAwake = false;
+
         if (victoryPanel) victoryPanel.SetActive(false);
         if (defeatPanel)  defeatPanel.SetActive(false);
         if (messageText)  messageText.text = "";
@@ -59,6 +74,7 @@ public class WaveManager : MonoBehaviour
             SpawnEnemy();
 
         if (messageText) messageText.text = $"WAVE {currentWave}";
+        Play(waveStartClip, waveStartVolume);
         StartCoroutine(ClearMessage(2f));
         UpdateUI();
     }
@@ -117,13 +133,17 @@ public class WaveManager : MonoBehaviour
 
     void EndGame(bool victory)
     {
-        gameEnded = true;
+        gameEnded  = true;
+        IsGameOver = true;
+        Play(victory ? victoryClip : defeatClip, victory ? victoryVolume : defeatVolume);
         Time.timeScale = 0f;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible   = true;
         if (victoryPanel) victoryPanel.SetActive(victory);
         if (defeatPanel)  defeatPanel.SetActive(!victory);
     }
+
+    void Play(AudioClip clip, float vol = 1f) { if (clip) audioSrc.PlayOneShot(clip, vol); }
 
     public void ReturnToMenu()
     {

@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class AmmoPickup : MonoBehaviour
 {
-    [SerializeField] int minAmmo = 3;
-    [SerializeField] int maxAmmo = 7;
+    [SerializeField] int       minAmmo    = 3;
+    [SerializeField] int       maxAmmo    = 7;
+    [SerializeField] AudioClip pickupClip;
 
     bool collected;
 
@@ -12,6 +13,7 @@ public class AmmoPickup : MonoBehaviour
         if (collected || shoot == null) return;
         collected = true;
         shoot.AddAmmo(Random.Range(minAmmo, maxAmmo + 1));
+        if (pickupClip != null) AudioSource.PlayClipAtPoint(pickupClip, transform.position);
         Destroy(gameObject);
     }
 

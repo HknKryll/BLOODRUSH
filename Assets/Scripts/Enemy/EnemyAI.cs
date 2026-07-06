@@ -12,7 +12,6 @@ public class EnemyAI : MonoBehaviour
     // ───── Algılama ─────
     [Header("Algılama")]
     [SerializeField] float sightRange = 20f;
-    [SerializeField] float fov = 110f;               // görüş açısı (derece)
     [SerializeField] LayerMask obstacleMask;          // duvar/engel katmanı
 
     // ───── Saldırı ─────
@@ -35,6 +34,14 @@ public class EnemyAI : MonoBehaviour
 
     [Header("Drop")]
     [SerializeField] GameObject ammoPickupPrefab;
+
+    [Header("Ses")]
+    [SerializeField] AudioClip deathClip;
+    [SerializeField] [Range(0f,1f)] float deathVolume = 1f;
+    [SerializeField] AudioClip hurtClip;
+    [SerializeField] [Range(0f,1f)] float hurtVolume = 0.7f;
+    [SerializeField] AudioClip attackClip;
+    [SerializeField] [Range(0f,1f)] float attackVolume = 0.8f;
 
     // ───── Stun ─────
     float stunUntil;
@@ -60,6 +67,7 @@ public class EnemyAI : MonoBehaviour
     // ───── Referanslar ─────
     NavMeshAgent agent;
     Transform player;
+    AudioSource audioSrc;
 
     // ─────────────────────────────────────────────
 
@@ -68,7 +76,13 @@ public class EnemyAI : MonoBehaviour
         agent  = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
 
-        GetComponent<Health>().onDeath.AddListener(OnDeath);
+        audioSrc = gameObject.AddComponent<AudioSource>();
+        audioSrc.playOnAwake  = false;
+        audioSrc.spatialBlend = 1f;
+
+        var health = GetComponent<Health>();
+        health.onDeath.AddListener(OnDeath);
+        health.onHealthChanged.AddListener(h => { if (h > 0f) PlayHurt(); });
     }
 
     void Start()
@@ -222,7 +236,7 @@ public class EnemyAI : MonoBehaviour
             HideIndicator();
             lastAttackTime = Time.time;
             player.GetComponent<Health>()?.TakeDamage(attackDamage);
-            Debug.Log($"[EnemyAI] {gameObject.name} oyuncuya {attackDamage} hasar verdi.");
+            if (attackClip != null) audioSrc.PlayOneShot(attackClip, attackVolume);
             state = State.Attack;
         }
     }
@@ -239,9 +253,6 @@ public class EnemyAI : MonoBehaviour
 
         Vector3 origin = transform.position + Vector3.up;
         Vector3 dir    = (player.position - origin).normalized;
-
-        if (Vector3.Angle(transform.forward, dir) > fov * 0.5f)
-        { lastSightResult = false; return false; }
 
         lastSightResult = !Physics.Raycast(origin, dir, dist, obstacleMask);
         return lastSightResult;
@@ -313,10 +324,27 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+    void PlayHurt()
+    {
+        if (hurtClip) audioSrc.PlayOneShot(hurtClip, hurtVolume);
+    }
+
     void OnDeath()
     {
         if (ammoPickupPrefab != null)
             Instantiate(ammoPickupPrefab, transform.position + Vector3.up * 0.3f, Quaternion.identity);
+
+        if (deathClip != null)
+        {
+            var sfxGO = new GameObject("EnemyDeathSFX");
+            sfxGO.transform.position = transform.position;
+            var src = sfxGO.AddComponent<AudioSource>();
+            src.spatialBlend = 0f; // 2D — mesafeden bağımsız
+            src.volume = deathVolume;
+            src.clip = deathClip;
+            src.Play();
+            Destroy(sfxGO, 5f);
+        }
 
         foreach (var r in GetComponentsInChildren<Renderer>())
             r.enabled = false;

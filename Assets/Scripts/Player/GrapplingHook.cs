@@ -7,6 +7,7 @@ public class GrapplingHook : MonoBehaviour
     [SerializeField] float maxRange = 30f;
     [SerializeField] float pullSpeed = 28f;
     [SerializeField] float arrivalDistance = 1.5f;
+    [SerializeField] float pickupArrivalDistance = 0.6f;
     [SerializeField] float launchMultiplier = 0.5f;
     [SerializeField] LayerMask hookMask = ~0;
 
@@ -17,6 +18,13 @@ public class GrapplingHook : MonoBehaviour
     [Header("Referanslar")]
     [SerializeField] Camera playerCamera;
 
+    [Header("Ses")]
+    [SerializeField] AudioClip hookFireClip;
+    [SerializeField] [Range(0f,1f)] float hookFireVolume = 0.9f;
+    [SerializeField] AudioClip hookReleaseClip;
+    [SerializeField] [Range(0f,1f)] float hookReleaseVolume = 0.7f;
+
+    AudioSource audioSrc;
     PlayerMovement movement;
     Vector3 hookPoint;
     bool isHooked;
@@ -25,12 +33,19 @@ public class GrapplingHook : MonoBehaviour
     EnemyAI hookedEnemy;
     bool pullingEnemy;
     ThrowableAnchor hookedAnchor;
+    AmmoPickup hookedPickup;
+    bool pullingPickup;
+    PlayerShoot shoot;
 
     void Start()
     {
         movement = GetComponent<PlayerMovement>();
+        shoot    = GetComponent<PlayerShoot>();
         if (playerCamera == null) playerCamera = Camera.main;
         if (rope != null) rope.gameObject.SetActive(false);
+        audioSrc = gameObject.AddComponent<AudioSource>();
+        audioSrc.playOnAwake  = false;
+        audioSrc.spatialBlend = 0f;
     }
 
     void Update()
@@ -46,6 +61,7 @@ public class GrapplingHook : MonoBehaviour
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
         if (!Physics.Raycast(ray, out RaycastHit hit, maxRange, hookMask)) return;
 
+        if (hookFireClip) audioSrc.PlayOneShot(hookFireClip, hookFireVolume);
         hookPoint         = hit.point;
         isHooked          = true;
         hasLeftGround     = false;
@@ -53,8 +69,14 @@ public class GrapplingHook : MonoBehaviour
         movement.StopMomentum();   // kanca başlarken önceki slide/launch momentumu temizle
         hookedEnemy  = hit.collider.GetComponent<EnemyAI>();
         hookedAnchor = hit.collider.GetComponent<ThrowableAnchor>();
+        hookedPickup = hit.collider.GetComponent<AmmoPickup>();
 
-        if (hookedEnemy != null && !hookedEnemy.IsLarge)
+        if (hookedPickup != null)
+        {
+            pullingPickup = true;
+            movement.DisableGravity = false;
+        }
+        else if (hookedEnemy != null && !hookedEnemy.IsLarge)
         {
             pullingEnemy = true;
             movement.DisableGravity = false;
@@ -85,7 +107,16 @@ public class GrapplingHook : MonoBehaviour
 
     void Pull()
     {
-        if (pullingEnemy && hookedEnemy != null)
+        if (pullingPickup)
+        {
+            if (hookedPickup == null) { ReleaseGrapple(); return; }
+            Vector3 toPlayer = transform.position - hookedPickup.transform.position;
+            float dist = toPlayer.magnitude;
+            if (dist <= pickupArrivalDistance) { hookedPickup.Collect(shoot); ReleaseGrapple(); return; }
+            hookedPickup.transform.position += toPlayer.normalized * pullSpeed * Time.deltaTime;
+            hookPoint = hookedPickup.transform.position;
+        }
+        else if (pullingEnemy && hookedEnemy != null)
         {
             Vector3 toPlayer = transform.position - hookedEnemy.transform.position;
             float dist = toPlayer.magnitude;
@@ -125,6 +156,7 @@ public class GrapplingHook : MonoBehaviour
     void ReleaseGrapple()
     {
         if (!isHooked) return;
+        if (hookReleaseClip) audioSrc.PlayOneShot(hookReleaseClip, hookReleaseVolume);
         isHooked = false;
         movement.DisableGravity = false;
 
@@ -154,9 +186,11 @@ public class GrapplingHook : MonoBehaviour
         }
 
         releasedManually = false;
-        hookedEnemy  = null;
-        hookedAnchor = null;
-        pullingEnemy = false;
+        hookedEnemy   = null;
+        hookedAnchor  = null;
+        hookedPickup  = null;
+        pullingEnemy  = false;
+        pullingPickup = false;
 
         if (rope != null) rope.gameObject.SetActive(false);
     }

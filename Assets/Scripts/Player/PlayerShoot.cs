@@ -15,7 +15,7 @@ public class PlayerShoot : MonoBehaviour
     [Header("Revolver Ammo")]
     [SerializeField] int   magazineSize = 10;
     [SerializeField] int   startingAmmo = 60;
-    [SerializeField] float reloadTime   = 1.2f;
+    [SerializeField] float reloadTime   = 3f;
 
     [Header("Launcher")]
     [SerializeField] LauncherProjectile grenadePrefab;
@@ -28,6 +28,18 @@ public class PlayerShoot : MonoBehaviour
     [Header("Anchor")]
     [SerializeField] GameObject anchorPrefab;
     [SerializeField] float      anchorThrowSpeed = 30f;
+
+    [Header("Ses")]
+    [SerializeField] AudioClip revolverFireClip;
+    [SerializeField] [Range(0f,1f)] float revolverFireVolume = 1f;
+    [SerializeField] AudioClip emptyClickClip;
+    [SerializeField] [Range(0f,1f)] float emptyClickVolume = 0.6f;
+    [SerializeField] AudioClip reloadClip;
+    [SerializeField] [Range(0f,1f)] float reloadVolume = 0.8f;
+    [SerializeField] AudioClip launcherFireClip;
+    [SerializeField] [Range(0f,1f)] float launcherFireVolume = 1f;
+    [SerializeField] AudioClip modeSwitchClip;
+    [SerializeField] [Range(0f,1f)] float modeSwitchVolume = 0.6f;
 
     [Header("References")]
     [SerializeField] Camera                 playerCamera;
@@ -42,6 +54,7 @@ public class PlayerShoot : MonoBehaviour
     bool            isReloading;
     float           nextFireTime;
     ThrowableAnchor activeAnchor;
+    AudioSource     audioSrc;
 
     void Start()
     {
@@ -50,6 +63,10 @@ public class PlayerShoot : MonoBehaviour
         grenadeAmmo = maxGrenadeAmmo;
         flashAmmo   = maxFlashAmmo;
         if (playerCamera == null) playerCamera = Camera.main;
+        audioSrc = GetComponent<AudioSource>();
+        if (audioSrc == null) audioSrc = gameObject.AddComponent<AudioSource>();
+        audioSrc.playOnAwake  = false;
+        audioSrc.spatialBlend = 0f;
     }
 
     void Update()
@@ -74,11 +91,13 @@ public class PlayerShoot : MonoBehaviour
         if (currentAmmo <= 0)
         {
             if (totalAmmo > 0) StartCoroutine(Reload());
+            else Play(emptyClickClip, emptyClickVolume);
             return;
         }
 
         currentAmmo--;
         nextFireTime = Time.time + revolverFireRate;
+        Play(revolverFireClip, revolverFireVolume);
         weaponAnim?.TriggerFire();
         weaponMotion?.ApplyRecoil();
         CameraShake.Shake(0.04f, 0.08f);
@@ -113,6 +132,7 @@ public class PlayerShoot : MonoBehaviour
     {
         if (currentAmmo >= magazineSize || totalAmmo <= 0) yield break;
         isReloading = true;
+        Play(reloadClip, reloadVolume);
         yield return new WaitForSeconds(reloadTime);
         int need    = magazineSize - currentAmmo;
         int take    = Mathf.Min(need, totalAmmo);
@@ -142,6 +162,7 @@ public class PlayerShoot : MonoBehaviour
     void FireLauncher()
     {
         weaponAnim?.TriggerFireLauncher();
+        Play(launcherFireClip, launcherFireVolume);
         switch (mode)
         {
             case LauncherMode.Grenade when grenadeAmmo > 0:
@@ -182,7 +203,10 @@ public class PlayerShoot : MonoBehaviour
             LauncherMode.Flash   => LauncherMode.Anchor,
             _                    => LauncherMode.Grenade,
         };
+        Play(modeSwitchClip, modeSwitchVolume);
     }
+
+    void Play(AudioClip clip, float vol = 1f) { if (clip) audioSrc.PlayOneShot(clip, vol); }
 
     // ───────────────── Public ─────────────────
 

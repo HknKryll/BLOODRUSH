@@ -20,8 +20,19 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Camera")]
     [SerializeField] Transform cameraHolder;
-    [SerializeField] float sensitivity = 2f;
+    [SerializeField] float sensitivityField = 2f;
+    public float sensitivity { get => sensitivityField; set => sensitivityField = value; }
     [SerializeField] float maxPitch    = 85f;
+
+    [Header("Ses")]
+    [SerializeField] AudioClip footstepClip;
+    [SerializeField] [Range(0f,1f)] float footstepVolume = 0.4f;
+    [SerializeField] AudioClip jumpClip;
+    [SerializeField] [Range(0f,1f)] float jumpVolume = 0.8f;
+    [SerializeField] AudioClip landClip;
+    [SerializeField] [Range(0f,1f)] float landVolume = 0.9f;
+    [SerializeField] AudioClip slideClip;
+    [SerializeField] [Range(0f,1f)] float slideVolume = 0.7f;
 
     CharacterController cc;
     Vector3 velocity;
@@ -37,6 +48,10 @@ public class PlayerMovement : MonoBehaviour
     float   slideEndTime     = -1f;
     float   slideJumpDeadline;
 
+    AudioSource audioSrc;
+    float footstepTimer;
+    bool  wasGrounded;
+
     void Start()
     {
         cc           = GetComponent<CharacterController>();
@@ -46,6 +61,13 @@ public class PlayerMovement : MonoBehaviour
         Cursor.visible   = false;
         float saved = PlayerPrefs.GetFloat("Sensitivity", sensitivity);
         if (saved >= 0.5f) sensitivity = saved;
+
+        audioSrc = gameObject.AddComponent<AudioSource>();
+        audioSrc.playOnAwake = false;
+        audioSrc.spatialBlend = 0f;
+
+        var cam = cameraHolder.GetComponentInChildren<Camera>();
+        if (cam) cam.nearClipPlane = 0.05f;
     }
 
     void Update()
@@ -57,6 +79,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Look()
     {
+        if (Time.timeScale == 0f) return;
         float mx = Input.GetAxisRaw("Mouse X") * sensitivity;
         float my = Input.GetAxisRaw("Mouse Y") * sensitivity;
 
@@ -72,6 +95,11 @@ public class PlayerMovement : MonoBehaviour
     void Move()
     {
         bool grounded = cc.isGrounded;
+
+        // İniş sesi
+        if (grounded && !wasGrounded && velocity.y < -2f)
+            Play(landClip, landVolume);
+        wasGrounded = grounded;
 
         if (grounded)
         {
@@ -95,12 +123,28 @@ public class PlayerMovement : MonoBehaviour
             cc.Move(wish * moveSpeed * control * Time.deltaTime);
         }
 
+        // Adım sesi
+        if (grounded && !isSliding && wish.magnitude > 0.1f)
+        {
+            footstepTimer -= Time.deltaTime;
+            if (footstepTimer <= 0f)
+            {
+                Play(footstepClip, footstepVolume);
+                footstepTimer = 0.32f;
+            }
+        }
+        else
+        {
+            footstepTimer = 0f;
+        }
+
         bool jumpAllowed = coyoteTimer > 0f || Time.time < slideJumpDeadline;
         if (Input.GetButtonDown("Jump") && jumpAllowed)
         {
             velocity.y        = jumpForce;
             coyoteTimer       = 0f;
             slideJumpDeadline = 0f;
+            Play(jumpClip, jumpVolume);
         }
 
         if (!DisableGravity)
@@ -129,6 +173,7 @@ public class PlayerMovement : MonoBehaviour
             slideDir   = wish.normalized;
             cc.height  = normalHeight * 0.5f;
             cc.center  = new Vector3(0f, normalCenter.y * 0.5f, 0f);
+            Play(slideClip, slideVolume);
         }
     }
 
@@ -173,4 +218,6 @@ public class PlayerMovement : MonoBehaviour
     }
 
     public void StopMomentum() => launchVelocity = Vector3.zero;
+
+    void Play(AudioClip clip, float vol = 1f) { if (clip) audioSrc.PlayOneShot(clip, vol); }
 }

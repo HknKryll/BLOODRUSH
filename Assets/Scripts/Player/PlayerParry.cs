@@ -7,6 +7,19 @@ public class PlayerParry : MonoBehaviour
     [SerializeField] float          parryStun  = 2f;
     [SerializeField] WeaponAnimator weaponAnim;
 
+    [Header("Ses")]
+    [SerializeField] AudioClip parryClip;
+    [SerializeField] [Range(0f,1f)] float parryVolume = 1f;
+
+    AudioSource audioSrc;
+
+    void Start()
+    {
+        audioSrc = gameObject.AddComponent<AudioSource>();
+        audioSrc.playOnAwake  = false;
+        audioSrc.spatialBlend = 0f;
+    }
+
     void Update()
     {
         if (!Input.GetKeyDown(parryKey)) return;
@@ -20,6 +33,7 @@ public class PlayerParry : MonoBehaviour
                 enemy.Parry(parryStun);
                 CameraShake.Shake(0.2f, 0.15f);
                 weaponAnim?.TriggerParry();
+                if (parryClip) audioSrc.PlayOneShot(parryClip, parryVolume);
                 return;
             }
         }

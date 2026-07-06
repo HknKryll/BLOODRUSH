@@ -179,6 +179,12 @@ MonoBehaviour:
   isLarge: 0
   ammoPickupPrefab: {fileID: 3493876658738239896, guid: cce660c19bd567247922cae9c64d505c,
     type: 3}
+  deathClip: {fileID: 8300000, guid: 8779ee4d9fe70c84faabdc7ba7e8dff1, type: 3}
+  deathVolume: 1
+  hurtClip: {fileID: 8300000, guid: be7559db7991fb746906459891702e2d, type: 3}
+  hurtVolume: 1
+  attackClip: {fileID: 0}
+  attackVolume: 0.8
   stunEffect: {fileID: 7163766061998736921}
   attackIndicator: {fileID: 3006518061844528153}
   telegraphDuration: 0.7

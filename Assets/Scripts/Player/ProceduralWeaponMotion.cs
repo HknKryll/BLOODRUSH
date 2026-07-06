@@ -28,8 +28,14 @@ public class ProceduralWeaponMotion : MonoBehaviour
     [SerializeField] float swayAmount     = 0.06f;
     [SerializeField] float swaySmoothing  = 8f;
 
+    [Header("Duvar Koruması")]
+    [SerializeField] float wallCheckDist   = 1.5f;
+    [SerializeField] float wallRetractDist = 0.45f;
+    [SerializeField] LayerMask wallMask    = ~0;
+
     PlayerMovement movement;
     GrapplingHook  hook;
+    Camera         cam;
 
     Vector3    defaultPos;
     Quaternion defaultRot;
@@ -44,6 +50,8 @@ public class ProceduralWeaponMotion : MonoBehaviour
     {
         movement   = GetComponentInParent<PlayerMovement>();
         hook       = GetComponentInParent<GrapplingHook>();
+        cam        = GetComponentInParent<Camera>();
+        if (cam == null) cam = Camera.main;
         if (weaponHolder == null) weaponHolder = transform;
         defaultPos = weaponHolder.localPosition;
         defaultRot = weaponHolder.localRotation;
@@ -97,9 +105,18 @@ public class ProceduralWeaponMotion : MonoBehaviour
         recoilPosY        = Mathf.Lerp(recoilPosY,        0f, Time.deltaTime * recoilReturn);
         recoilTiltCurrent = Mathf.Lerp(recoilTiltCurrent, 0f, Time.deltaTime * recoilReturn);
 
+        // ── Duvar Koruması ───────────────────
+        float wallPush = 0f;
+        if (cam != null && Physics.Raycast(weaponHolder.position, cam.transform.forward,
+                out RaycastHit wallHit, wallCheckDist, wallMask, QueryTriggerInteraction.Ignore))
+        {
+            float t = 1f - (wallHit.distance / wallCheckDist);
+            wallPush = wallRetractDist * t;
+        }
+
         // ── Uygula ───────────────────────────
         currentPos = Vector3.Lerp(currentPos, target, Time.deltaTime * bobSmoothing);
-        weaponHolder.localPosition = currentPos + Vector3.back * recoilZ + Vector3.up * recoilPosY + swayPos;
+        weaponHolder.localPosition = currentPos + Vector3.back * (recoilZ + wallPush) + Vector3.up * recoilPosY + swayPos;
         weaponHolder.localRotation = defaultRot * Quaternion.Euler(recoilTiltCurrent, 0f, slideRoll);
     }
 
