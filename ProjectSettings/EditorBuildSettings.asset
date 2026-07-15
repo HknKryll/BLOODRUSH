@@ -6,9 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/MainMenu.unity
+    path: Assets/Sahneler/MainMenu.unity
     guid: 49077f3e1c3c305498709f88efd4db82
   - enabled: 1
-    path: Assets/OutdoorsScene.unity
+    path: Assets/Sahneler/CH1.unity
+    guid: c86041cde3f9f57479f3652bd0d00fe9
+  - enabled: 1
+    path: Assets/Sahneler/OutdoorsScene.unity
     guid: 8124e5870f4fd4c779e7a5f994e84ad1
   m_configObjects: {}

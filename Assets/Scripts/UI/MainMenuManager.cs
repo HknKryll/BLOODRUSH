@@ -39,7 +39,14 @@ public class MainMenuManager : MonoBehaviour
 
     // ─── Aksiyonlar ──────────────────────────────────────────────────
 
-    void StartGame()     => SceneManager.LoadScene("OutdoorsScene");
+    [SerializeField] string firstSceneName = "OutdoorsScene"; // kampanya kurulunca "Ch1_Salon" yap
+
+    void StartGame()
+    {
+        GameHUD.ResetProgress();   // yeni oyun = upload sıfır
+        SceneManager.LoadScene(firstSceneName);
+    }
+
     void ExitGame()      => Application.Quit();
 
     void OpenSettings()

@@ -32,4 +32,11 @@ public class Health : MonoBehaviour
         current = Mathf.Min(maxHealth, current + amount);
         onHealthChanged.Invoke(current / maxHealth);
     }
+
+    // Checkpoint respawn — tam canla geri dön
+    public void Revive()
+    {
+        current = maxHealth;
+        onHealthChanged.Invoke(1f);
+    }
 }

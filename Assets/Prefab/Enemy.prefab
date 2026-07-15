@@ -164,14 +164,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffe928c7e107cd5479dbb79b9518aa11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  behavior: 0
+  playerKnockback: 0
   sightRange: 10
-  fov: 110
   obstacleMask:
     serializedVersion: 2
     m_Bits: 64
   attackRange: 3
   attackDamage: 15
   attackCooldown: 0.5
+  projectilePrefab: {fileID: 0}
+  muzzle: {fileID: 0}
+  rangedRange: 15
+  magSize: 10
+  fireRate: 0.15
+  reloadTime: 2
+  projectileSpeed: 22
+  projectileDamage: 5
+  spreadAngle: 0
   patrolPoints:
   - {fileID: 0}
   - {fileID: 0}

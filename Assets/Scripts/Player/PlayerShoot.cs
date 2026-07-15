@@ -74,10 +74,10 @@ public class PlayerShoot : MonoBehaviour
         if (Input.GetMouseButton(0) && Time.time >= nextFireTime && !isReloading)
             FireRevolver();
 
-        if (Input.GetButtonDown("Fire2"))
+        if (LauncherEnabled && Input.GetButtonDown("Fire2"))
             FireLauncher();
 
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (LauncherEnabled && Input.GetKeyDown(KeyCode.Q))
             SwitchMode();
 
         if (Input.GetKeyDown(KeyCode.R) && !isReloading)
@@ -109,7 +109,8 @@ public class PlayerShoot : MonoBehaviour
         }
 
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
-        if (!Physics.Raycast(ray, out RaycastHit hit, revolverRange, hitMask)) return;
+        // Görünmez trigger hacimleri (Arena, TutorialHint, LevelExit) mermiyi emmesin
+        if (!Physics.Raycast(ray, out RaycastHit hit, revolverRange, hitMask, QueryTriggerInteraction.Ignore)) return;
 
         LauncherProjectile proj = hit.collider.GetComponent<LauncherProjectile>();
         if (proj != null) { proj.Detonate(); return; }
@@ -117,7 +118,11 @@ public class PlayerShoot : MonoBehaviour
         var health = hit.collider.GetComponentInParent<Health>();
         if (health != null)
         {
-            health.TakeDamage(revolverDamage);
+            float dmg = revolverDamage * DamageMultiplier;
+            var armor = hit.collider.GetComponentInParent<DirectionalArmor>();
+            if (armor != null) dmg *= armor.Multiplier(ray.direction);  // önden zırh emer
+
+            health.TakeDamage(dmg);
             CrosshairHUD.Instance?.ShowHitMarker();
             CameraShake.Shake(0.08f, 0.12f);
             SpawnHitEffect(hit.point, hit.normal);
@@ -226,6 +231,8 @@ public class PlayerShoot : MonoBehaviour
         if (grenFull && flashFull) AddAmmo(5);
     }
 
+    public float        DamageMultiplier { get; set; } = 1f;
+    public bool         LauncherEnabled  { get; set; } = true;
     public LauncherMode CurrentMode  => mode;
     public int  GrenadeAmmo          => grenadeAmmo;
     public int  FlashAmmo            => flashAmmo;

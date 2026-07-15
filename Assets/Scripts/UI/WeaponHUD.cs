@@ -60,16 +60,24 @@ public class WeaponHUD : MonoBehaviour
                              : ColWhite;
         }
 
-        // Launcher ammo
-        grenText.text  = $"GRN   x{shoot.GrenadeAmmo}";
-        flashText.text = $"FLS   x{shoot.FlashAmmo}";
+        // Launcher göstergeleri — launcher kapalıysa (Ch2) tamamen gizle
+        bool launcher = shoot.LauncherEnabled;
+        if (grenText.gameObject.activeSelf != launcher) grenText.gameObject.SetActive(launcher);
+        if (flashText.gameObject.activeSelf != launcher) flashText.gameObject.SetActive(launcher);
+        if (modeText.gameObject.activeSelf != launcher) modeText.gameObject.SetActive(launcher);
 
-        grenText.color  = m == PlayerShoot.LauncherMode.Grenade ? ColActive : ColDim;
-        flashText.color = m == PlayerShoot.LauncherMode.Flash   ? ColCyan   : ColDim;
+        if (launcher)
+        {
+            grenText.text  = $"GRN   x{shoot.GrenadeAmmo}";
+            flashText.text = $"FLS   x{shoot.FlashAmmo}";
 
-        // Mod göstergesi (anchor aktifken)
-        modeText.text  = m == PlayerShoot.LauncherMode.Anchor ? "[ ANCHOR ]" : "";
-        modeText.color = new Color(0.5f, 1f, 0.5f);
+            grenText.color  = m == PlayerShoot.LauncherMode.Grenade ? ColActive : ColDim;
+            flashText.color = m == PlayerShoot.LauncherMode.Flash   ? ColCyan   : ColDim;
+
+            // Mod göstergesi (anchor aktifken)
+            modeText.text  = m == PlayerShoot.LauncherMode.Anchor ? "[ ANCHOR ]" : "";
+            modeText.color = new Color(0.5f, 1f, 0.5f);
+        }
     }
 
     TextMeshProUGUI MakeText(Vector2 pos, float size, TextAlignmentOptions align)

@@ -1,25 +1,46 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Health))]
-public class EnemyAI : MonoBehaviour
+public class EnemyAI : MonoBehaviour, IParryable
 {
     // ───── Durum makinesi ─────
-    enum State { Patrol, Chase, Attack, Telegraphing, Stunned }
+    enum State { Patrol, Chase, Attack, Telegraphing, Stunned, RangedFire }
     State state = State.Patrol;
+
+    // ───── Davranış ─────
+    enum Behavior { Melee, Ranged }
+    [Header("Davranış")]
+    [SerializeField] Behavior behavior = Behavior.Melee;
+    [SerializeField] float playerKnockback = 0f;   // melee vuruşunda oyuncuyu itme (büyük düşman)
 
     // ───── Algılama ─────
     [Header("Algılama")]
     [SerializeField] float sightRange = 20f;
     [SerializeField] LayerMask obstacleMask;          // duvar/engel katmanı
 
-    // ───── Saldırı ─────
+    // ───── Saldırı (melee) ─────
     [Header("Saldırı")]
     [SerializeField] float attackRange = 2f;
     [SerializeField] float attackDamage = 15f;
     [SerializeField] float attackCooldown = 1.2f;
     float lastAttackTime;
+
+    // ───── Menzilli (behavior = Ranged) ─────
+    [Header("Menzilli")]
+    [SerializeField] EnemyProjectile projectilePrefab;
+    [SerializeField] Transform muzzle;
+    [SerializeField] float rangedRange      = 15f;
+    [SerializeField] int   magSize          = 10;
+    [SerializeField] float fireRate         = 0.15f;
+    [SerializeField] float reloadTime       = 2f;
+    [SerializeField] float projectileSpeed  = 22f;
+    [SerializeField] float projectileDamage = 5f;
+    [SerializeField] float spreadAngle      = 0f;   // makineli için >0
+    int   magLeft;
+    float nextShotTime;
 
     // ───── Devriye ─────
     [Header("Devriye")]
@@ -47,6 +68,7 @@ public class EnemyAI : MonoBehaviour
     float stunUntil;
 
     bool beingPulled;
+    bool knockedBack;
     Vector3 launchVelocity;
 
     // ───── Efektler ─────
@@ -67,6 +89,7 @@ public class EnemyAI : MonoBehaviour
     // ───── Referanslar ─────
     NavMeshAgent agent;
     Transform player;
+    PlayerMovement playerMovement;
     AudioSource audioSrc;
 
     // ─────────────────────────────────────────────
@@ -74,7 +97,9 @@ public class EnemyAI : MonoBehaviour
     void Awake()
     {
         agent  = GetComponent<NavMeshAgent>();
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        var pgo = GameObject.FindGameObjectWithTag("Player");
+        player = pgo ? pgo.transform : null;
+        playerMovement = pgo ? pgo.GetComponent<PlayerMovement>() : null;
 
         audioSrc = gameObject.AddComponent<AudioSource>();
         audioSrc.playOnAwake  = false;
@@ -83,6 +108,11 @@ public class EnemyAI : MonoBehaviour
         var health = GetComponent<Health>();
         health.onDeath.AddListener(OnDeath);
         health.onHealthChanged.AddListener(h => { if (h > 0f) PlayHurt(); });
+
+        // Ölçek büyütülünce (isLarge) skinned mesh sınırları bozulup yanlış
+        // frustum-culling ile görünmez olabiliyor — her kare bounds güncelle
+        foreach (var smr in GetComponentsInChildren<SkinnedMeshRenderer>(true))
+            smr.updateWhenOffscreen = true;
     }
 
     void Start()
@@ -96,6 +126,7 @@ public class EnemyAI : MonoBehaviour
         if (player == null) return;
 
         if (beingPulled) return;
+        if (knockedBack) return;
 
         if (launchVelocity != Vector3.zero)
         {
@@ -118,7 +149,7 @@ public class EnemyAI : MonoBehaviour
             if (Time.time >= stunUntil)
             {
                 state = State.Chase;
-                if (stunEffect) { stunEffect.Stop(); stunEffect.gameObject.SetActive(false); }
+                StopStunEffect();
             }
             return;
         }
@@ -131,6 +162,7 @@ public class EnemyAI : MonoBehaviour
             case State.Chase:        DoChase(dist);       break;
             case State.Attack:       DoAttack(dist);      break;
             case State.Telegraphing: DoTelegraph(dist);   break;
+            case State.RangedFire:   DoRangedFire(dist);  break;
         }
     }
 
@@ -169,6 +201,12 @@ public class EnemyAI : MonoBehaviour
     {
         if (!agent.isOnNavMesh) return;
 
+        if (behavior == Behavior.Ranged)
+        {
+            DoRangedChase(dist);
+            return;
+        }
+
         pathTimer += Time.deltaTime;
         if (pathTimer >= pathInterval)
         {
@@ -189,11 +227,96 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+    // ───────────────── Menzilli ─────────────────
+
+    void DoRangedChase(float dist)
+    {
+        pathTimer += Time.deltaTime;
+        if (pathTimer >= pathInterval)
+        {
+            pathTimer = 0f;
+            if (dist > rangedRange)                       // uzak → yaklaş
+                agent.SetDestination(player.position);
+            else if (dist < rangedRange * 0.5f)           // çok yakın → geri çekil
+            {
+                Vector3 away = transform.position + (transform.position - player.position).normalized * 4f;
+                if (NavMesh.SamplePosition(away, out NavMeshHit h, 4f, NavMesh.AllAreas))
+                    agent.SetDestination(h.position);
+            }
+            else agent.ResetPath();                       // menzilde → dur
+        }
+
+        if (dist <= rangedRange && HasRangedLoS())
+        {
+            state        = State.RangedFire;
+            magLeft      = magSize;
+            nextShotTime = 0f;
+        }
+        else if (dist > sightRange * 1.8f)
+        {
+            state = State.Patrol;
+            agent.ResetPath();
+        }
+    }
+
+    void DoRangedFire(float dist)
+    {
+        if (agent.enabled && agent.isOnNavMesh) agent.ResetPath();
+        FacePlayer();
+
+        if (dist > rangedRange * 1.3f || !HasRangedLoS())
+        {
+            state = State.Chase;
+            return;
+        }
+
+        if (Time.time < nextShotTime) return;
+
+        if (magLeft <= 0) magLeft = magSize;   // reload bitti, şarjör dolu
+
+        FireProjectile();
+        magLeft--;
+        nextShotTime = Time.time + (magLeft <= 0 ? reloadTime : fireRate);
+    }
+
+    void FireProjectile()
+    {
+        if (projectilePrefab == null || player == null) return;
+
+        Vector3 origin = muzzle ? muzzle.position : transform.position + Vector3.up * 1.4f;
+        Vector3 dir    = (player.position + Vector3.up * 0.5f - origin).normalized;
+
+        if (spreadAngle > 0f)   // makineli yayılımı
+            dir = Quaternion.Euler(Random.Range(-spreadAngle, spreadAngle),
+                                   Random.Range(-spreadAngle, spreadAngle), 0f) * dir;
+
+        var proj = Instantiate(projectilePrefab, origin, Quaternion.LookRotation(dir));
+        proj.Launch(dir, projectileSpeed, projectileDamage);
+        if (attackClip != null) audioSrc.PlayOneShot(attackClip, attackVolume);
+    }
+
+    bool HasRangedLoS()
+    {
+        if (player == null) return false;
+        Vector3 origin = muzzle ? muzzle.position : transform.position + Vector3.up * 1.4f;
+        Vector3 target = player.position + Vector3.up * 0.5f;
+        Vector3 dir    = target - origin;
+
+        foreach (var h in Physics.RaycastAll(origin, dir.normalized, dir.magnitude, ~0, QueryTriggerInteraction.Ignore))
+        {
+            if (h.collider.transform.IsChildOf(transform)) continue;             // kendi gövden
+            if (h.collider.GetComponentInParent<PlayerMovement>() != null) continue; // oyuncu engel değil
+            if (h.collider.GetComponentInParent<EnemyAI>() != null) continue;    // diğer düşmanlar engel değil
+            return false;  // duvar
+        }
+        return true;
+    }
+
     // ───────────────── Saldırı ─────────────────
 
     void DoAttack(float dist)
     {
-        agent.ResetPath();
+        if (agent.enabled && agent.isOnNavMesh) agent.ResetPath();
         FacePlayer();
 
         if (dist > attackRange * 1.3f)
@@ -236,6 +359,14 @@ public class EnemyAI : MonoBehaviour
             HideIndicator();
             lastAttackTime = Time.time;
             player.GetComponent<Health>()?.TakeDamage(attackDamage);
+
+            // Büyük düşman: vurunca oyuncuyu geri it
+            if (playerKnockback > 0f && playerMovement != null)
+            {
+                Vector3 away = player.position - transform.position; away.y = 0f;
+                playerMovement.Launch(away.normalized * playerKnockback + Vector3.up * 2f);
+            }
+
             if (attackClip != null) audioSrc.PlayOneShot(attackClip, attackVolume);
             state = State.Attack;
         }
@@ -292,6 +423,69 @@ public class EnemyAI : MonoBehaviour
         attackIndicator.SetActive(false);
     }
 
+    // Yumruk geri itmesi — zeminde kısa, duvar-farkında bir kayma (duvardan geçmez)
+    public void Knockback(Vector3 dir, float force)
+    {
+        if (isLarge || beingPulled) return;
+        if (!isActiveAndEnabled) return;
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.01f) return;
+        HideIndicator();
+        StopStunEffect();          // yumruk stun'ı keser, efekt takılı kalmasın
+        StartCoroutine(KnockbackRoutine(dir.normalized, force));
+    }
+
+    void StopStunEffect()
+    {
+        if (stunEffect)
+        {
+            stunEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            stunEffect.gameObject.SetActive(false);
+        }
+    }
+
+    IEnumerator KnockbackRoutine(Vector3 dir, float force)
+    {
+        knockedBack = true;
+        if (agent.enabled) agent.enabled = false;
+
+        // Yatay fırlatma mesafesi — eğlenceli, force 7 → ~2.5m
+        float distance = force * 0.35f;
+
+        // Duvar kontrolü — yolda engel varsa mesafeyi kırp (kendi yarıçapının ötesinden başla)
+        Vector3 origin = transform.position + Vector3.up * 0.6f + dir * 0.5f;
+        if (Physics.Raycast(origin, dir, out RaycastHit wall, distance, ~0, QueryTriggerInteraction.Ignore))
+            distance = Mathf.Max(0f, wall.distance);
+
+        Vector3 start = transform.position;
+        Vector3 land  = start + dir * distance;
+
+        // İniş noktasını NavMesh'e kelepçele (duvar arkası yürünmez alana taşmasın)
+        if (NavMesh.SamplePosition(land, out NavMeshHit nav, 1.5f, NavMesh.AllAreas))
+            land = nav.position;
+
+        // Yay: yatay start→land + dikey parabol (0 → tepe → 0)
+        float height = Mathf.Clamp(force * 0.12f, 0.4f, 1.5f);
+        const float dur = 0.35f;
+        float t = 0f;
+        while (t < dur)
+        {
+            t += Time.deltaTime;
+            float p = t / dur;
+            Vector3 pos = Vector3.Lerp(start, land, p);
+            pos.y += height * 4f * p * (1f - p);   // parabolik yükseklik
+            transform.position = pos;
+            yield return null;
+        }
+
+        // Zemine/NavMesh'e otur ve agent'ı geri aç
+        if (NavMesh.SamplePosition(transform.position, out NavMeshHit end, 1.5f, NavMesh.AllAreas))
+            transform.position = end.position;
+        agent.enabled = true;
+        state = State.Chase;
+        knockedBack = false;
+    }
+
     public void StartBeingPulled()
     {
         beingPulled = true;
@@ -300,14 +494,21 @@ public class EnemyAI : MonoBehaviour
 
     public void StopBeingPulled(Vector3 momentum = default)
     {
-        beingPulled    = false;
-        launchVelocity = momentum;
+        beingPulled = false;
+
         if (momentum.sqrMagnitude < 0.01f)
         {
-            agent.enabled = true;
-            state         = State.Chase;
+            // Düşmanı en yakın NavMesh noktasına otur (duvar içi/dışı boşlukta kalmasın)
+            if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 3f, NavMesh.AllAreas))
+                transform.position = hit.position;
+            launchVelocity = Vector3.zero;
+            agent.enabled  = true;
+            state          = State.Chase;
         }
-        // momentum varsa agent kapalı kalır, launch fazı bitince Update açar
+        else
+        {
+            launchVelocity = momentum;   // agent kapalı kalır, launch fazı bitince Update açar
+        }
     }
 
     // Flash/stun etkisi (launcher flash modu)
@@ -315,7 +516,7 @@ public class EnemyAI : MonoBehaviour
     {
         state     = State.Stunned;
         stunUntil = Time.time + duration;
-        agent.ResetPath();
+        if (agent.enabled && agent.isOnNavMesh) agent.ResetPath();
         if (stunEffect)
         {
             stunEffect.gameObject.SetActive(true);
@@ -333,6 +534,9 @@ public class EnemyAI : MonoBehaviour
     {
         if (ammoPickupPrefab != null)
             Instantiate(ammoPickupPrefab, transform.position + Vector3.up * 0.3f, Quaternion.identity);
+
+        DamageVignette.OnKill();
+        CameraShake.HitPause();
 
         if (deathClip != null)
         {

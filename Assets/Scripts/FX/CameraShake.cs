@@ -16,6 +16,19 @@ public class CameraShake : MonoBehaviour
         if (Instance) Instance.StartCoroutine(Instance.DoShake(intensity, duration));
     }
 
+    public static void HitPause(float duration = 0.06f, float scale = 0.12f)
+    {
+        if (Instance && Time.timeScale > 0f)
+            Instance.StartCoroutine(Instance.DoHitPause(duration, scale));
+    }
+
+    IEnumerator DoHitPause(float duration, float scale)
+    {
+        Time.timeScale = scale;
+        yield return new WaitForSecondsRealtime(duration);
+        Time.timeScale = 1f;
+    }
+
     IEnumerator DoShake(float intensity, float duration)
     {
         Vector3 origin  = transform.localPosition;
