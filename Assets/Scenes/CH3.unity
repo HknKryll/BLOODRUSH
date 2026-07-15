@@ -236,7 +236,7 @@ GameObject:
   - component: {fileID: 14145872}
   - component: {fileID: 14145871}
   m_Layer: 0
-  m_Name: Isik_3
+  m_Name: Light_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -454,7 +454,7 @@ GameObject:
   - component: {fileID: 19483998}
   - component: {fileID: 19483997}
   m_Layer: 0
-  m_Name: Basamak_7
+  m_Name: Step_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -559,7 +559,7 @@ GameObject:
   - component: {fileID: 24020536}
   - component: {fileID: 24020535}
   m_Layer: 0
-  m_Name: Basamak_7
+  m_Name: Step_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -664,7 +664,7 @@ GameObject:
   - component: {fileID: 32210262}
   - component: {fileID: 32210261}
   m_Layer: 0
-  m_Name: Basamak_1
+  m_Name: Step_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -768,7 +768,7 @@ GameObject:
   - component: {fileID: 39726072}
   - component: {fileID: 39726071}
   m_Layer: 0
-  m_Name: Isik_50
+  m_Name: Light_50
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -983,7 +983,7 @@ GameObject:
   m_Component:
   - component: {fileID: 57165148}
   m_Layer: 0
-  m_Name: Merdiven_0
+  m_Name: Stairs_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1025,7 +1025,7 @@ GameObject:
   - component: {fileID: 70376889}
   - component: {fileID: 70376888}
   m_Layer: 0
-  m_Name: Tavan
+  m_Name: Ceiling
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1131,7 +1131,7 @@ GameObject:
   - component: {fileID: 74266199}
   - component: {fileID: 74266198}
   m_Layer: 0
-  m_Name: Basamak_1
+  m_Name: Step_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1233,7 +1233,7 @@ GameObject:
   m_Component:
   - component: {fileID: 90532921}
   m_Layer: 0
-  m_Name: Merdiven_0
+  m_Name: Stairs_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1612,7 +1612,7 @@ GameObject:
   - component: {fileID: 118442524}
   - component: {fileID: 118442523}
   m_Layer: 0
-  m_Name: Duvar_18
+  m_Name: Wall_18
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1716,7 +1716,7 @@ GameObject:
   - component: {fileID: 124866156}
   - component: {fileID: 124866155}
   m_Layer: 0
-  m_Name: Isik_48
+  m_Name: Light_48
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1934,7 +1934,7 @@ GameObject:
   - component: {fileID: 126460211}
   - component: {fileID: 126460210}
   m_Layer: 0
-  m_Name: Duvar_38
+  m_Name: Wall_38
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2184,7 +2184,7 @@ GameObject:
   - component: {fileID: 147115721}
   - component: {fileID: 147115720}
   m_Layer: 0
-  m_Name: Duvar_39
+  m_Name: Wall_39
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2288,7 +2288,7 @@ GameObject:
   - component: {fileID: 149133513}
   - component: {fileID: 149133512}
   m_Layer: 0
-  m_Name: Isik_36
+  m_Name: Light_36
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2506,7 +2506,7 @@ GameObject:
   - component: {fileID: 153726935}
   - component: {fileID: 153726934}
   m_Layer: 0
-  m_Name: Basamak_6
+  m_Name: Step_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2713,7 +2713,7 @@ GameObject:
   m_Component:
   - component: {fileID: 159009655}
   m_Layer: 0
-  m_Name: Merdiven_180
+  m_Name: Stairs_180
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2920,7 +2920,7 @@ GameObject:
   - component: {fileID: 180972181}
   - component: {fileID: 180972180}
   m_Layer: 0
-  m_Name: Isik_23
+  m_Name: Light_23
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3138,7 +3138,7 @@ GameObject:
   - component: {fileID: 182948200}
   - component: {fileID: 182948199}
   m_Layer: 0
-  m_Name: Duvar_21 (13)
+  m_Name: Wall_21 (13)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3244,7 +3244,7 @@ GameObject:
   - component: {fileID: 184784990}
   - component: {fileID: 184784989}
   m_Layer: 0
-  m_Name: Basamak_0
+  m_Name: Step_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3462,7 +3462,7 @@ GameObject:
   - component: {fileID: 193693582}
   - component: {fileID: 193693581}
   m_Layer: 0
-  m_Name: Isik_28
+  m_Name: Light_28
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3773,7 +3773,7 @@ PrefabInstance:
     - target: {fileID: 8004061199188420018, guid: 7a7018ab3efb8694ea96c76b9c16b46f,
         type: 3}
       propertyPath: m_Name
-      value: Hit_4_Red (1)
+      value: Hit_4_Red
       objectReference: {fileID: 0}
     - target: {fileID: 8004061199188420018, guid: 7a7018ab3efb8694ea96c76b9c16b46f,
         type: 3}
@@ -3810,7 +3810,7 @@ GameObject:
   - component: {fileID: 197545140}
   - component: {fileID: 197545139}
   m_Layer: 0
-  m_Name: Basamak_6
+  m_Name: Step_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3914,7 +3914,7 @@ GameObject:
   - component: {fileID: 218987175}
   - component: {fileID: 218987174}
   m_Layer: 0
-  m_Name: PanelIsik_0_3
+  m_Name: PanelLight_0_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4131,7 +4131,7 @@ GameObject:
   - component: {fileID: 231513869}
   - component: {fileID: 231513868}
   m_Layer: 0
-  m_Name: Isik_1
+  m_Name: Light_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4349,7 +4349,7 @@ GameObject:
   - component: {fileID: 234415990}
   - component: {fileID: 234415989}
   m_Layer: 0
-  m_Name: Duvar_34
+  m_Name: Wall_34
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4453,7 +4453,7 @@ GameObject:
   - component: {fileID: 242233822}
   - component: {fileID: 242233821}
   m_Layer: 0
-  m_Name: Isik_24
+  m_Name: Light_24
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4754,7 +4754,7 @@ GameObject:
   - component: {fileID: 271442031}
   - component: {fileID: 271442030}
   m_Layer: 0
-  m_Name: Duvar_13
+  m_Name: Wall_13
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4859,7 +4859,7 @@ GameObject:
   - component: {fileID: 274531324}
   - component: {fileID: 274531323}
   m_Layer: 0
-  m_Name: Basamak_4
+  m_Name: Step_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4963,7 +4963,7 @@ GameObject:
   - component: {fileID: 278478166}
   - component: {fileID: 278478165}
   m_Layer: 0
-  m_Name: PanelIsik_1_7
+  m_Name: PanelLight_1_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5250,7 +5250,7 @@ GameObject:
   - component: {fileID: 298297733}
   - component: {fileID: 298297732}
   m_Layer: 0
-  m_Name: Basamak_6
+  m_Name: Step_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5355,7 +5355,7 @@ GameObject:
   - component: {fileID: 299537978}
   - component: {fileID: 299537977}
   m_Layer: 0
-  m_Name: Duvar_21 (14)
+  m_Name: Wall_21 (14)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5503,7 +5503,7 @@ GameObject:
   - component: {fileID: 308786840}
   - component: {fileID: 308786839}
   m_Layer: 0
-  m_Name: Isik_47
+  m_Name: Light_47
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5721,7 +5721,7 @@ GameObject:
   - component: {fileID: 315951641}
   - component: {fileID: 315951640}
   m_Layer: 0
-  m_Name: Basamak_6
+  m_Name: Step_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5826,7 +5826,7 @@ GameObject:
   - component: {fileID: 316208913}
   - component: {fileID: 316208912}
   m_Layer: 0
-  m_Name: Basamak_4
+  m_Name: Step_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5931,7 +5931,7 @@ GameObject:
   - component: {fileID: 319966202}
   - component: {fileID: 319966201}
   m_Layer: 0
-  m_Name: Basamak_2
+  m_Name: Step_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6039,7 +6039,7 @@ PrefabInstance:
     - target: {fileID: 7002426034365337885, guid: e1edfa40ff22497438b97eac37139835,
         type: 3}
       propertyPath: m_Name
-      value: kirk
+      value: Enemy2HitEffect
       objectReference: {fileID: 0}
     - target: {fileID: 7666900954800409511, guid: e1edfa40ff22497438b97eac37139835,
         type: 3}
@@ -6124,7 +6124,7 @@ GameObject:
   - component: {fileID: 324513227}
   - component: {fileID: 324513226}
   m_Layer: 0
-  m_Name: Basamak_7
+  m_Name: Step_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6228,7 +6228,7 @@ GameObject:
   - component: {fileID: 327350259}
   - component: {fileID: 327350258}
   m_Layer: 0
-  m_Name: Isik_27
+  m_Name: Light_27
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6445,7 +6445,7 @@ GameObject:
   - component: {fileID: 327647065}
   - component: {fileID: 327647064}
   m_Layer: 0
-  m_Name: Isik_20
+  m_Name: Light_20
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6662,7 +6662,7 @@ GameObject:
   - component: {fileID: 328163965}
   - component: {fileID: 328163964}
   m_Layer: 0
-  m_Name: Isik_30
+  m_Name: Light_30
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6880,7 +6880,7 @@ GameObject:
   - component: {fileID: 331712726}
   - component: {fileID: 331712725}
   m_Layer: 0
-  m_Name: Basamak_4
+  m_Name: Step_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6984,7 +6984,7 @@ GameObject:
   - component: {fileID: 339437592}
   - component: {fileID: 339437591}
   m_Layer: 0
-  m_Name: PanelIsik_0_5
+  m_Name: PanelLight_0_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7199,7 +7199,7 @@ GameObject:
   m_Component:
   - component: {fileID: 346207850}
   m_Layer: 0
-  m_Name: Merdiven_90
+  m_Name: Stairs_90
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7324,7 +7324,7 @@ GameObject:
   - component: {fileID: 349520632}
   - component: {fileID: 349520631}
   m_Layer: 0
-  m_Name: Duvar_2
+  m_Name: Wall_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7460,7 +7460,7 @@ GameObject:
   - component: {fileID: 390150956}
   - component: {fileID: 390150955}
   m_Layer: 0
-  m_Name: Basamak_2
+  m_Name: Step_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7565,7 +7565,7 @@ GameObject:
   - component: {fileID: 410027773}
   - component: {fileID: 410027772}
   m_Layer: 0
-  m_Name: Basamak_6
+  m_Name: Step_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7670,7 +7670,7 @@ GameObject:
   - component: {fileID: 429857520}
   - component: {fileID: 429857519}
   m_Layer: 0
-  m_Name: Basamak_2
+  m_Name: Step_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7775,7 +7775,7 @@ GameObject:
   - component: {fileID: 444741009}
   - component: {fileID: 444741008}
   m_Layer: 0
-  m_Name: Duvar_15
+  m_Name: Wall_15
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7880,7 +7880,7 @@ GameObject:
   - component: {fileID: 453347092}
   - component: {fileID: 453347091}
   m_Layer: 0
-  m_Name: Basamak_0
+  m_Name: Step_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7985,7 +7985,7 @@ GameObject:
   - component: {fileID: 454203803}
   - component: {fileID: 454203802}
   m_Layer: 0
-  m_Name: Duvar_4
+  m_Name: Wall_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8090,7 +8090,7 @@ GameObject:
   - component: {fileID: 458933325}
   - component: {fileID: 458933324}
   m_Layer: 0
-  m_Name: Duvar_16
+  m_Name: Wall_16
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8195,7 +8195,7 @@ GameObject:
   - component: {fileID: 465976540}
   - component: {fileID: 465976539}
   m_Layer: 0
-  m_Name: Duvar_23
+  m_Name: Wall_23
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8300,7 +8300,7 @@ GameObject:
   - component: {fileID: 474032299}
   - component: {fileID: 474032298}
   m_Layer: 0
-  m_Name: Basamak_5
+  m_Name: Step_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8404,7 +8404,7 @@ GameObject:
   - component: {fileID: 474934456}
   - component: {fileID: 474934455}
   m_Layer: 0
-  m_Name: PanelIsik_0_8
+  m_Name: PanelLight_0_8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8652,7 +8652,7 @@ GameObject:
   - component: {fileID: 477527021}
   - component: {fileID: 477527020}
   m_Layer: 0
-  m_Name: Isik_21
+  m_Name: Light_21
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8870,7 +8870,7 @@ GameObject:
   - component: {fileID: 480293639}
   - component: {fileID: 480293638}
   m_Layer: 0
-  m_Name: Basamak_1
+  m_Name: Step_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9058,7 +9058,7 @@ GameObject:
   - component: {fileID: 504042508}
   - component: {fileID: 504042507}
   m_Layer: 0
-  m_Name: Basamak_6
+  m_Name: Step_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9265,7 +9265,7 @@ GameObject:
   m_Component:
   - component: {fileID: 535330451}
   m_Layer: 0
-  m_Name: Merdiven_270
+  m_Name: Stairs_270
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9307,7 +9307,7 @@ GameObject:
   - component: {fileID: 564097016}
   - component: {fileID: 564097015}
   m_Layer: 0
-  m_Name: Basamak_2
+  m_Name: Step_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9412,7 +9412,7 @@ GameObject:
   - component: {fileID: 572383002}
   - component: {fileID: 572383001}
   m_Layer: 0
-  m_Name: Basamak_3
+  m_Name: Step_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9516,7 +9516,7 @@ GameObject:
   - component: {fileID: 613562385}
   - component: {fileID: 613562384}
   m_Layer: 0
-  m_Name: Isik_8
+  m_Name: Light_8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9734,7 +9734,7 @@ GameObject:
   - component: {fileID: 619754809}
   - component: {fileID: 619754808}
   m_Layer: 0
-  m_Name: Basamak_3
+  m_Name: Step_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9994,7 +9994,7 @@ GameObject:
   - component: {fileID: 643393229}
   - component: {fileID: 643393228}
   m_Layer: 0
-  m_Name: Isik_41
+  m_Name: Light_41
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10212,7 +10212,7 @@ GameObject:
   - component: {fileID: 650610292}
   - component: {fileID: 650610291}
   m_Layer: 0
-  m_Name: Basamak_4
+  m_Name: Step_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10317,7 +10317,7 @@ GameObject:
   - component: {fileID: 662173558}
   - component: {fileID: 662173557}
   m_Layer: 0
-  m_Name: Basamak_1
+  m_Name: Step_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10491,7 +10491,7 @@ GameObject:
   - component: {fileID: 689701054}
   - component: {fileID: 689701053}
   m_Layer: 0
-  m_Name: Basamak_5
+  m_Name: Step_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10596,7 +10596,7 @@ GameObject:
   - component: {fileID: 725075246}
   - component: {fileID: 725075245}
   m_Layer: 0
-  m_Name: Duvar_33
+  m_Name: Wall_33
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10701,7 +10701,7 @@ GameObject:
   - component: {fileID: 726343650}
   - component: {fileID: 726343649}
   m_Layer: 0
-  m_Name: Basamak_6
+  m_Name: Step_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10805,7 +10805,7 @@ GameObject:
   - component: {fileID: 730565163}
   - component: {fileID: 730565162}
   m_Layer: 0
-  m_Name: Isik_37
+  m_Name: Light_37
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11023,7 +11023,7 @@ GameObject:
   - component: {fileID: 731483297}
   - component: {fileID: 731483296}
   m_Layer: 0
-  m_Name: Basamak_7
+  m_Name: Step_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11173,7 +11173,7 @@ GameObject:
   - component: {fileID: 755342231}
   - component: {fileID: 755342230}
   m_Layer: 0
-  m_Name: Duvar_19
+  m_Name: Wall_19
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11277,7 +11277,7 @@ GameObject:
   - component: {fileID: 756461805}
   - component: {fileID: 756461804}
   m_Layer: 0
-  m_Name: Isik_31
+  m_Name: Light_31
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11534,7 +11534,7 @@ GameObject:
   - component: {fileID: 763721041}
   - component: {fileID: 763721040}
   m_Layer: 0
-  m_Name: Basamak_5
+  m_Name: Step_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11639,7 +11639,7 @@ GameObject:
   - component: {fileID: 770104138}
   - component: {fileID: 770104137}
   m_Layer: 0
-  m_Name: Duvar_29
+  m_Name: Wall_29
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11744,7 +11744,7 @@ GameObject:
   - component: {fileID: 771621181}
   - component: {fileID: 771621180}
   m_Layer: 0
-  m_Name: Basamak_3
+  m_Name: Step_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11918,7 +11918,7 @@ GameObject:
   - component: {fileID: 785699075}
   - component: {fileID: 785699074}
   m_Layer: 0
-  m_Name: Basamak_4
+  m_Name: Step_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12023,7 +12023,7 @@ GameObject:
   - component: {fileID: 795644662}
   - component: {fileID: 795644661}
   m_Layer: 0
-  m_Name: Basamak_1
+  m_Name: Step_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12128,7 +12128,7 @@ GameObject:
   - component: {fileID: 796803018}
   - component: {fileID: 796803017}
   m_Layer: 0
-  m_Name: Basamak_6
+  m_Name: Step_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12233,7 +12233,7 @@ GameObject:
   - component: {fileID: 801087126}
   - component: {fileID: 801087125}
   m_Layer: 0
-  m_Name: Basamak_1
+  m_Name: Step_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12420,7 +12420,7 @@ GameObject:
   - component: {fileID: 806803582}
   - component: {fileID: 806803581}
   m_Layer: 0
-  m_Name: PanelIsik_1_3
+  m_Name: PanelLight_1_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12637,7 +12637,7 @@ GameObject:
   - component: {fileID: 813469524}
   - component: {fileID: 813469523}
   m_Layer: 0
-  m_Name: Isik_53
+  m_Name: Light_53
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12855,7 +12855,7 @@ GameObject:
   - component: {fileID: 818338484}
   - component: {fileID: 818338483}
   m_Layer: 0
-  m_Name: Basamak_4
+  m_Name: Step_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12960,7 +12960,7 @@ GameObject:
   - component: {fileID: 818519110}
   - component: {fileID: 818519109}
   m_Layer: 0
-  m_Name: Basamak_0
+  m_Name: Step_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13065,7 +13065,7 @@ GameObject:
   - component: {fileID: 818910591}
   - component: {fileID: 818910590}
   m_Layer: 0
-  m_Name: Basamak_6
+  m_Name: Step_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13169,7 +13169,7 @@ GameObject:
   - component: {fileID: 824303813}
   - component: {fileID: 824303812}
   m_Layer: 0
-  m_Name: Isik_34
+  m_Name: Light_34
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13384,7 +13384,7 @@ GameObject:
   m_Component:
   - component: {fileID: 832925841}
   m_Layer: 0
-  m_Name: Merdiven_180
+  m_Name: Stairs_180
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13425,7 +13425,7 @@ GameObject:
   - component: {fileID: 841006312}
   - component: {fileID: 841006311}
   m_Layer: 0
-  m_Name: PanelIsik_1_5
+  m_Name: PanelLight_1_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13643,7 +13643,7 @@ GameObject:
   - component: {fileID: 845585922}
   - component: {fileID: 845585921}
   m_Layer: 0
-  m_Name: Basamak_2
+  m_Name: Step_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13747,7 +13747,7 @@ GameObject:
   - component: {fileID: 848431820}
   - component: {fileID: 848431819}
   m_Layer: 0
-  m_Name: Isik_29
+  m_Name: Light_29
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13965,7 +13965,7 @@ GameObject:
   - component: {fileID: 855430534}
   - component: {fileID: 855430533}
   m_Layer: 0
-  m_Name: Duvar_32
+  m_Name: Wall_32
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14082,7 +14082,7 @@ GameObject:
   - component: {fileID: 861820237}
   - component: {fileID: 861820236}
   m_Layer: 0
-  m_Name: Basamak_0
+  m_Name: Step_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14186,7 +14186,7 @@ GameObject:
   - component: {fileID: 867979781}
   - component: {fileID: 867979780}
   m_Layer: 0
-  m_Name: Isik_52
+  m_Name: Light_52
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14404,7 +14404,7 @@ GameObject:
   - component: {fileID: 869039046}
   - component: {fileID: 869039045}
   m_Layer: 0
-  m_Name: Basamak_0
+  m_Name: Step_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14584,7 +14584,7 @@ GameObject:
   - component: {fileID: 879691504}
   - component: {fileID: 879691503}
   m_Layer: 0
-  m_Name: Basamak_5
+  m_Name: Step_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14784,7 +14784,7 @@ GameObject:
   - component: {fileID: 892874356}
   - component: {fileID: 892874355}
   m_Layer: 0
-  m_Name: Basamak_3
+  m_Name: Step_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14889,7 +14889,7 @@ GameObject:
   - component: {fileID: 899681301}
   - component: {fileID: 899681300}
   m_Layer: 0
-  m_Name: Duvar_21 (10)
+  m_Name: Wall_21 (10)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14994,7 +14994,7 @@ GameObject:
   - component: {fileID: 908578209}
   - component: {fileID: 908578208}
   m_Layer: 0
-  m_Name: Duvar_9
+  m_Name: Wall_9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15099,7 +15099,7 @@ GameObject:
   - component: {fileID: 913009611}
   - component: {fileID: 913009610}
   m_Layer: 0
-  m_Name: Basamak_2
+  m_Name: Step_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15204,7 +15204,7 @@ GameObject:
   - component: {fileID: 925534785}
   - component: {fileID: 925534784}
   m_Layer: 0
-  m_Name: Basamak_7
+  m_Name: Step_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15309,7 +15309,7 @@ GameObject:
   - component: {fileID: 934493442}
   - component: {fileID: 934493441}
   m_Layer: 0
-  m_Name: Basamak_5
+  m_Name: Step_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15420,7 +15420,7 @@ GameObject:
   - component: {fileID: 936642314}
   - component: {fileID: 936642313}
   m_Layer: 0
-  m_Name: Basamak_7
+  m_Name: Step_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15525,7 +15525,7 @@ GameObject:
   - component: {fileID: 938264299}
   - component: {fileID: 938264298}
   m_Layer: 0
-  m_Name: Basamak_4
+  m_Name: Step_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15629,7 +15629,7 @@ GameObject:
   - component: {fileID: 945248074}
   - component: {fileID: 945248073}
   m_Layer: 0
-  m_Name: PanelIsik_0_2
+  m_Name: PanelLight_0_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15847,7 +15847,7 @@ GameObject:
   - component: {fileID: 946691408}
   - component: {fileID: 946691407}
   m_Layer: 0
-  m_Name: Duvar_28
+  m_Name: Wall_28
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15964,7 +15964,7 @@ GameObject:
   - component: {fileID: 968187209}
   - component: {fileID: 968187208}
   m_Layer: 0
-  m_Name: Duvar_24
+  m_Name: Wall_24
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16069,7 +16069,7 @@ GameObject:
   - component: {fileID: 971225922}
   - component: {fileID: 971225921}
   m_Layer: 0
-  m_Name: Basamak_6
+  m_Name: Step_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16173,7 +16173,7 @@ GameObject:
   - component: {fileID: 972608910}
   - component: {fileID: 972608909}
   m_Layer: 0
-  m_Name: Isik_35
+  m_Name: Light_35
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16391,7 +16391,7 @@ GameObject:
   - component: {fileID: 973460805}
   - component: {fileID: 973460804}
   m_Layer: 0
-  m_Name: Basamak_4
+  m_Name: Step_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16496,7 +16496,7 @@ GameObject:
   - component: {fileID: 978576162}
   - component: {fileID: 978576161}
   m_Layer: 0
-  m_Name: Basamak_6
+  m_Name: Step_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16600,7 +16600,7 @@ GameObject:
   - component: {fileID: 991033603}
   - component: {fileID: 991033602}
   m_Layer: 0
-  m_Name: Isik_14
+  m_Name: Light_14
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16864,7 +16864,7 @@ GameObject:
   - component: {fileID: 1021485869}
   - component: {fileID: 1021485868}
   m_Layer: 0
-  m_Name: Isik_42
+  m_Name: Light_42
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17082,7 +17082,7 @@ GameObject:
   - component: {fileID: 1023389915}
   - component: {fileID: 1023389914}
   m_Layer: 0
-  m_Name: Basamak_5
+  m_Name: Step_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17186,7 +17186,7 @@ GameObject:
   - component: {fileID: 1043151426}
   - component: {fileID: 1043151425}
   m_Layer: 0
-  m_Name: Isik_12
+  m_Name: Light_12
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17404,7 +17404,7 @@ GameObject:
   - component: {fileID: 1045016185}
   - component: {fileID: 1045016184}
   m_Layer: 0
-  m_Name: Duvar_21
+  m_Name: Wall_21
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17509,7 +17509,7 @@ GameObject:
   - component: {fileID: 1053215483}
   - component: {fileID: 1053215482}
   m_Layer: 0
-  m_Name: Basamak_2
+  m_Name: Step_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17696,7 +17696,7 @@ GameObject:
   - component: {fileID: 1072646801}
   - component: {fileID: 1072646800}
   m_Layer: 0
-  m_Name: PanelIsik_1_4
+  m_Name: PanelLight_1_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17911,7 +17911,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1083166268}
   m_Layer: 0
-  m_Name: Merdiven_270
+  m_Name: Stairs_270
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17950,7 +17950,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1084322232}
   m_Layer: 0
-  m_Name: Merdiven_0
+  m_Name: Stairs_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17992,7 +17992,7 @@ GameObject:
   - component: {fileID: 1090546746}
   - component: {fileID: 1090546745}
   m_Layer: 0
-  m_Name: Duvar_21 (12)
+  m_Name: Wall_21 (12)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18096,7 +18096,7 @@ GameObject:
   - component: {fileID: 1100661519}
   - component: {fileID: 1100661518}
   m_Layer: 0
-  m_Name: Isik_13
+  m_Name: Light_13
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18314,7 +18314,7 @@ GameObject:
   - component: {fileID: 1101055990}
   - component: {fileID: 1101055989}
   m_Layer: 0
-  m_Name: Basamak_3
+  m_Name: Step_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18493,7 +18493,7 @@ GameObject:
   - component: {fileID: 1110663622}
   - component: {fileID: 1110663621}
   m_Layer: 0
-  m_Name: Isik_5
+  m_Name: Light_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18794,7 +18794,7 @@ GameObject:
   - component: {fileID: 1120030756}
   - component: {fileID: 1120030755}
   m_Layer: 0
-  m_Name: Basamak_0
+  m_Name: Step_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19004,7 +19004,7 @@ GameObject:
   - component: {fileID: 1152822824}
   - component: {fileID: 1152822823}
   m_Layer: 0
-  m_Name: Basamak_0
+  m_Name: Step_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19108,7 +19108,7 @@ GameObject:
   - component: {fileID: 1175046936}
   - component: {fileID: 1175046935}
   m_Layer: 0
-  m_Name: Isik_38
+  m_Name: Light_38
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19325,7 +19325,7 @@ GameObject:
   - component: {fileID: 1183639047}
   - component: {fileID: 1183639046}
   m_Layer: 0
-  m_Name: Isik_33
+  m_Name: Light_33
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19543,7 +19543,7 @@ GameObject:
   - component: {fileID: 1194069753}
   - component: {fileID: 1194069752}
   m_Layer: 0
-  m_Name: Basamak_3
+  m_Name: Step_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19647,7 +19647,7 @@ GameObject:
   - component: {fileID: 1202211851}
   - component: {fileID: 1202211850}
   m_Layer: 0
-  m_Name: Isik_22
+  m_Name: Light_22
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19865,7 +19865,7 @@ GameObject:
   - component: {fileID: 1202871959}
   - component: {fileID: 1202871958}
   m_Layer: 0
-  m_Name: Duvar_35
+  m_Name: Wall_35
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19970,7 +19970,7 @@ GameObject:
   - component: {fileID: 1209814977}
   - component: {fileID: 1209814976}
   m_Layer: 0
-  m_Name: Basamak_5
+  m_Name: Step_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20075,7 +20075,7 @@ GameObject:
   - component: {fileID: 1213595043}
   - component: {fileID: 1213595042}
   m_Layer: 0
-  m_Name: Basamak_5
+  m_Name: Step_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20262,7 +20262,7 @@ GameObject:
   - component: {fileID: 1231897798}
   - component: {fileID: 1231897797}
   m_Layer: 0
-  m_Name: Isik_40
+  m_Name: Light_40
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20480,7 +20480,7 @@ GameObject:
   - component: {fileID: 1233955117}
   - component: {fileID: 1233955116}
   m_Layer: 0
-  m_Name: Basamak_4
+  m_Name: Step_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20585,7 +20585,7 @@ GameObject:
   - component: {fileID: 1240888761}
   - component: {fileID: 1240888760}
   m_Layer: 0
-  m_Name: Duvar_8
+  m_Name: Wall_8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20689,7 +20689,7 @@ GameObject:
   - component: {fileID: 1253387609}
   - component: {fileID: 1253387608}
   m_Layer: 0
-  m_Name: PanelIsik_1_0
+  m_Name: PanelLight_1_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20907,7 +20907,7 @@ GameObject:
   - component: {fileID: 1254457874}
   - component: {fileID: 1254457873}
   m_Layer: 0
-  m_Name: Basamak_5
+  m_Name: Step_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21095,7 +21095,7 @@ GameObject:
   - component: {fileID: 1288532099}
   - component: {fileID: 1288532098}
   m_Layer: 0
-  m_Name: Kat_3
+  m_Name: Floor_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21201,7 +21201,7 @@ GameObject:
   - component: {fileID: 1296876961}
   - component: {fileID: 1296876960}
   m_Layer: 0
-  m_Name: Basamak_3
+  m_Name: Step_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21306,7 +21306,7 @@ GameObject:
   - component: {fileID: 1310198964}
   - component: {fileID: 1310198963}
   m_Layer: 0
-  m_Name: Basamak_5
+  m_Name: Step_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21410,7 +21410,7 @@ GameObject:
   - component: {fileID: 1319462580}
   - component: {fileID: 1319462579}
   m_Layer: 0
-  m_Name: PanelIsik_1_2
+  m_Name: PanelLight_1_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21838,7 +21838,7 @@ GameObject:
   - component: {fileID: 1338817620}
   - component: {fileID: 1338817619}
   m_Layer: 0
-  m_Name: Basamak_6
+  m_Name: Step_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21942,7 +21942,7 @@ GameObject:
   - component: {fileID: 1346757036}
   - component: {fileID: 1346757035}
   m_Layer: 0
-  m_Name: Isik_16
+  m_Name: Light_16
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22159,7 +22159,7 @@ GameObject:
   - component: {fileID: 1352180604}
   - component: {fileID: 1352180603}
   m_Layer: 0
-  m_Name: Isik_51
+  m_Name: Light_51
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22376,7 +22376,7 @@ GameObject:
   - component: {fileID: 1354833746}
   - component: {fileID: 1354833745}
   m_Layer: 0
-  m_Name: Isik_11
+  m_Name: Light_11
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22594,7 +22594,7 @@ GameObject:
   - component: {fileID: 1360851295}
   - component: {fileID: 1360851294}
   m_Layer: 0
-  m_Name: Basamak_5
+  m_Name: Step_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22698,7 +22698,7 @@ GameObject:
   - component: {fileID: 1371947055}
   - component: {fileID: 1371947054}
   m_Layer: 0
-  m_Name: Isik_55
+  m_Name: Light_55
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22915,7 +22915,7 @@ GameObject:
   - component: {fileID: 1375289298}
   - component: {fileID: 1375289297}
   m_Layer: 0
-  m_Name: PanelIsik_1_9
+  m_Name: PanelLight_1_9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23132,7 +23132,7 @@ GameObject:
   - component: {fileID: 1377160556}
   - component: {fileID: 1377160555}
   m_Layer: 0
-  m_Name: PanelIsik_0_1
+  m_Name: PanelLight_0_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23432,7 +23432,7 @@ GameObject:
   - component: {fileID: 1381698129}
   - component: {fileID: 1381698128}
   m_Layer: 0
-  m_Name: Isik_19
+  m_Name: Light_19
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23649,7 +23649,7 @@ GameObject:
   - component: {fileID: 1386742525}
   - component: {fileID: 1386742524}
   m_Layer: 0
-  m_Name: PanelIsik_0_9
+  m_Name: PanelLight_0_9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23866,7 +23866,7 @@ GameObject:
   - component: {fileID: 1388147646}
   - component: {fileID: 1388147645}
   m_Layer: 0
-  m_Name: Isik_32
+  m_Name: Light_32
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24084,7 +24084,7 @@ GameObject:
   - component: {fileID: 1389864095}
   - component: {fileID: 1389864094}
   m_Layer: 0
-  m_Name: Duvar_22
+  m_Name: Wall_22
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24406,7 +24406,7 @@ GameObject:
   - component: {fileID: 1396731246}
   - component: {fileID: 1396731245}
   m_Layer: 0
-  m_Name: Basamak_7
+  m_Name: Step_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24510,7 +24510,7 @@ GameObject:
   - component: {fileID: 1403450878}
   - component: {fileID: 1403450877}
   m_Layer: 0
-  m_Name: PanelIsik_1_8
+  m_Name: PanelLight_1_8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24796,7 +24796,7 @@ GameObject:
   - component: {fileID: 1409693596}
   - component: {fileID: 1409693595}
   m_Layer: 0
-  m_Name: Duvar_7
+  m_Name: Wall_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24900,7 +24900,7 @@ GameObject:
   - component: {fileID: 1411957048}
   - component: {fileID: 1411957047}
   m_Layer: 0
-  m_Name: Isik_2
+  m_Name: Light_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25115,7 +25115,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1419768612}
   m_Layer: 0
-  m_Name: Merdiven_270
+  m_Name: Stairs_270
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25261,7 +25261,7 @@ GameObject:
   - component: {fileID: 1443642091}
   - component: {fileID: 1443642090}
   m_Layer: 0
-  m_Name: Isik_49
+  m_Name: Light_49
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25479,7 +25479,7 @@ GameObject:
   - component: {fileID: 1450782828}
   - component: {fileID: 1450782827}
   m_Layer: 0
-  m_Name: Basamak_1
+  m_Name: Step_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25583,7 +25583,7 @@ GameObject:
   - component: {fileID: 1450810146}
   - component: {fileID: 1450810145}
   m_Layer: 0
-  m_Name: Isik_45
+  m_Name: Light_45
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25801,7 +25801,7 @@ GameObject:
   - component: {fileID: 1455255266}
   - component: {fileID: 1455255265}
   m_Layer: 0
-  m_Name: Duvar_11
+  m_Name: Wall_11
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25905,7 +25905,7 @@ GameObject:
   - component: {fileID: 1461113860}
   - component: {fileID: 1461113859}
   m_Layer: 0
-  m_Name: Isik_18
+  m_Name: Light_18
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26123,7 +26123,7 @@ GameObject:
   - component: {fileID: 1465055530}
   - component: {fileID: 1465055529}
   m_Layer: 0
-  m_Name: Basamak_0
+  m_Name: Step_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26228,7 +26228,7 @@ GameObject:
   - component: {fileID: 1489853544}
   - component: {fileID: 1489853543}
   m_Layer: 0
-  m_Name: Basamak_3
+  m_Name: Step_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26332,7 +26332,7 @@ GameObject:
   - component: {fileID: 1502626496}
   - component: {fileID: 1502626495}
   m_Layer: 0
-  m_Name: Isik_25
+  m_Name: Light_25
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26549,7 +26549,7 @@ GameObject:
   - component: {fileID: 1506983710}
   - component: {fileID: 1506983709}
   m_Layer: 0
-  m_Name: Isik_0
+  m_Name: Light_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26815,7 +26815,7 @@ GameObject:
   - component: {fileID: 1514571928}
   - component: {fileID: 1514571927}
   m_Layer: 0
-  m_Name: Isik_15
+  m_Name: Light_15
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27032,7 +27032,7 @@ GameObject:
   - component: {fileID: 1534494146}
   - component: {fileID: 1534494145}
   m_Layer: 0
-  m_Name: Isik_44
+  m_Name: Light_44
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27250,7 +27250,7 @@ GameObject:
   - component: {fileID: 1561861818}
   - component: {fileID: 1561861817}
   m_Layer: 0
-  m_Name: Duvar_12
+  m_Name: Wall_12
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27355,7 +27355,7 @@ GameObject:
   - component: {fileID: 1573098640}
   - component: {fileID: 1573098639}
   m_Layer: 0
-  m_Name: Basamak_2
+  m_Name: Step_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27565,7 +27565,7 @@ GameObject:
   - component: {fileID: 1589781235}
   - component: {fileID: 1589781234}
   m_Layer: 0
-  m_Name: Basamak_3
+  m_Name: Step_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27682,7 +27682,7 @@ GameObject:
   - component: {fileID: 1594257177}
   - component: {fileID: 1594257176}
   m_Layer: 0
-  m_Name: Basamak_1
+  m_Name: Step_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27787,7 +27787,7 @@ GameObject:
   - component: {fileID: 1611522760}
   - component: {fileID: 1611522759}
   m_Layer: 0
-  m_Name: Basamak_5
+  m_Name: Step_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27892,7 +27892,7 @@ GameObject:
   - component: {fileID: 1619515298}
   - component: {fileID: 1619515297}
   m_Layer: 0
-  m_Name: Basamak_4
+  m_Name: Step_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27996,7 +27996,7 @@ GameObject:
   - component: {fileID: 1628780210}
   - component: {fileID: 1628780209}
   m_Layer: 0
-  m_Name: Isik_46
+  m_Name: Light_46
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28214,7 +28214,7 @@ GameObject:
   - component: {fileID: 1639123936}
   - component: {fileID: 1639123935}
   m_Layer: 0
-  m_Name: Duvar_5
+  m_Name: Wall_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28319,7 +28319,7 @@ GameObject:
   - component: {fileID: 1641624002}
   - component: {fileID: 1641624001}
   m_Layer: 0
-  m_Name: Basamak_0
+  m_Name: Step_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28421,7 +28421,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1645270057}
   m_Layer: 0
-  m_Name: DisDuvar
+  m_Name: OuterWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28677,7 +28677,7 @@ GameObject:
   - component: {fileID: 1664249714}
   - component: {fileID: 1664249713}
   m_Layer: 0
-  m_Name: Basamak_2
+  m_Name: Step_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28813,7 +28813,7 @@ GameObject:
   - component: {fileID: 1677238832}
   - component: {fileID: 1677238831}
   m_Layer: 0
-  m_Name: Duvar_37
+  m_Name: Wall_37
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28918,7 +28918,7 @@ GameObject:
   - component: {fileID: 1687943816}
   - component: {fileID: 1687943815}
   m_Layer: 0
-  m_Name: Basamak_7
+  m_Name: Step_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29022,7 +29022,7 @@ GameObject:
   - component: {fileID: 1689003441}
   - component: {fileID: 1689003440}
   m_Layer: 0
-  m_Name: Isik_10
+  m_Name: Light_10
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29239,7 +29239,7 @@ GameObject:
   - component: {fileID: 1689066127}
   - component: {fileID: 1689066126}
   m_Layer: 0
-  m_Name: PanelIsik_0_0
+  m_Name: PanelLight_0_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29457,7 +29457,7 @@ GameObject:
   - component: {fileID: 1691112974}
   - component: {fileID: 1691112973}
   m_Layer: 0
-  m_Name: Kat_1
+  m_Name: Floor_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29563,7 +29563,7 @@ GameObject:
   - component: {fileID: 1696828993}
   - component: {fileID: 1696828992}
   m_Layer: 0
-  m_Name: Duvar_21 (9)
+  m_Name: Wall_21 (9)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29752,7 +29752,7 @@ GameObject:
   - component: {fileID: 1733065912}
   - component: {fileID: 1733065911}
   m_Layer: 0
-  m_Name: Basamak_1
+  m_Name: Step_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29857,7 +29857,7 @@ GameObject:
   - component: {fileID: 1735562321}
   - component: {fileID: 1735562320}
   m_Layer: 0
-  m_Name: Basamak_3
+  m_Name: Step_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29962,7 +29962,7 @@ GameObject:
   - component: {fileID: 1738603336}
   - component: {fileID: 1738603335}
   m_Layer: 0
-  m_Name: Duvar_14
+  m_Name: Wall_14
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30067,7 +30067,7 @@ GameObject:
   - component: {fileID: 1742229088}
   - component: {fileID: 1742229087}
   m_Layer: 0
-  m_Name: Basamak_2
+  m_Name: Step_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30172,7 +30172,7 @@ GameObject:
   - component: {fileID: 1743748025}
   - component: {fileID: 1743748024}
   m_Layer: 0
-  m_Name: Duvar_31
+  m_Name: Wall_31
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30277,7 +30277,7 @@ GameObject:
   - component: {fileID: 1746140451}
   - component: {fileID: 1746140450}
   m_Layer: 0
-  m_Name: Duvar_17
+  m_Name: Wall_17
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30382,7 +30382,7 @@ GameObject:
   - component: {fileID: 1759031460}
   - component: {fileID: 1759031459}
   m_Layer: 0
-  m_Name: Basamak_2
+  m_Name: Step_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30487,7 +30487,7 @@ GameObject:
   - component: {fileID: 1764626316}
   - component: {fileID: 1764626315}
   m_Layer: 0
-  m_Name: Duvar_36
+  m_Name: Wall_36
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30592,7 +30592,7 @@ GameObject:
   - component: {fileID: 1765525495}
   - component: {fileID: 1765525494}
   m_Layer: 0
-  m_Name: Basamak_4
+  m_Name: Step_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30697,7 +30697,7 @@ GameObject:
   - component: {fileID: 1768972371}
   - component: {fileID: 1768972370}
   m_Layer: 0
-  m_Name: Duvar_6
+  m_Name: Wall_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30802,7 +30802,7 @@ GameObject:
   - component: {fileID: 1769794659}
   - component: {fileID: 1769794658}
   m_Layer: 0
-  m_Name: Duvar_21 (8)
+  m_Name: Wall_21 (8)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30907,7 +30907,7 @@ GameObject:
   - component: {fileID: 1775691849}
   - component: {fileID: 1775691848}
   m_Layer: 0
-  m_Name: Duvar_21 (11)
+  m_Name: Wall_21 (11)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31165,7 +31165,7 @@ GameObject:
   - component: {fileID: 1809900101}
   - component: {fileID: 1809900100}
   m_Layer: 0
-  m_Name: Duvar_25
+  m_Name: Wall_25
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31269,7 +31269,7 @@ GameObject:
   - component: {fileID: 1814876965}
   - component: {fileID: 1814876964}
   m_Layer: 0
-  m_Name: PanelIsik_0_7
+  m_Name: PanelLight_0_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31487,7 +31487,7 @@ GameObject:
   - component: {fileID: 1818875665}
   - component: {fileID: 1818875664}
   m_Layer: 0
-  m_Name: Duvar_27
+  m_Name: Wall_27
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31592,7 +31592,7 @@ GameObject:
   - component: {fileID: 1841389140}
   - component: {fileID: 1841389139}
   m_Layer: 0
-  m_Name: Duvar_1
+  m_Name: Wall_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31696,7 +31696,7 @@ GameObject:
   - component: {fileID: 1842199630}
   - component: {fileID: 1842199629}
   m_Layer: 0
-  m_Name: PanelIsik_1_6
+  m_Name: PanelLight_1_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31914,7 +31914,7 @@ GameObject:
   - component: {fileID: 1842449597}
   - component: {fileID: 1842449596}
   m_Layer: 0
-  m_Name: Kat_0
+  m_Name: Floor_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32019,7 +32019,7 @@ GameObject:
   - component: {fileID: 1845001891}
   - component: {fileID: 1845001890}
   m_Layer: 0
-  m_Name: PanelIsik_0_6
+  m_Name: PanelLight_0_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32237,7 +32237,7 @@ GameObject:
   - component: {fileID: 1848663000}
   - component: {fileID: 1848662999}
   m_Layer: 0
-  m_Name: Kat_2
+  m_Name: Floor_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32499,7 +32499,7 @@ GameObject:
   - component: {fileID: 1876680250}
   - component: {fileID: 1876680249}
   m_Layer: 0
-  m_Name: Isik_39
+  m_Name: Light_39
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32717,7 +32717,7 @@ GameObject:
   - component: {fileID: 1888364491}
   - component: {fileID: 1888364490}
   m_Layer: 0
-  m_Name: Duvar_21 (7)
+  m_Name: Wall_21 (7)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32823,7 +32823,7 @@ GameObject:
   - component: {fileID: 1892103169}
   - component: {fileID: 1892103168}
   m_Layer: 0
-  m_Name: Duvar_26
+  m_Name: Wall_26
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32928,7 +32928,7 @@ GameObject:
   - component: {fileID: 1896936782}
   - component: {fileID: 1896936781}
   m_Layer: 0
-  m_Name: Basamak_7
+  m_Name: Step_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33138,7 +33138,7 @@ GameObject:
   - component: {fileID: 1910153175}
   - component: {fileID: 1910153174}
   m_Layer: 0
-  m_Name: Basamak_0
+  m_Name: Step_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33397,7 +33397,7 @@ GameObject:
   - component: {fileID: 1927733016}
   - component: {fileID: 1927733015}
   m_Layer: 0
-  m_Name: Basamak_4
+  m_Name: Step_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33502,7 +33502,7 @@ GameObject:
   - component: {fileID: 1928867151}
   - component: {fileID: 1928867150}
   m_Layer: 0
-  m_Name: Basamak_3
+  m_Name: Step_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33606,7 +33606,7 @@ GameObject:
   - component: {fileID: 1933117591}
   - component: {fileID: 1933117590}
   m_Layer: 0
-  m_Name: Isik_9
+  m_Name: Light_9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33824,7 +33824,7 @@ GameObject:
   - component: {fileID: 1933123345}
   - component: {fileID: 1933123344}
   m_Layer: 0
-  m_Name: Basamak_1
+  m_Name: Step_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33928,7 +33928,7 @@ GameObject:
   - component: {fileID: 1955222365}
   - component: {fileID: 1955222364}
   m_Layer: 0
-  m_Name: Isik_43
+  m_Name: Light_43
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34145,7 +34145,7 @@ GameObject:
   - component: {fileID: 1961156108}
   - component: {fileID: 1961156107}
   m_Layer: 0
-  m_Name: Isik_54
+  m_Name: Light_54
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34363,7 +34363,7 @@ GameObject:
   - component: {fileID: 1987948278}
   - component: {fileID: 1987948277}
   m_Layer: 0
-  m_Name: Basamak_0
+  m_Name: Step_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34465,7 +34465,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1990350571}
   m_Layer: 0
-  m_Name: TavanPanelleri
+  m_Name: CeilingPanels
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34582,7 +34582,7 @@ PrefabInstance:
     - target: {fileID: 3473529909581181512, guid: bc142210df3ec4545a4e3e1f21e00da7,
         type: 3}
       propertyPath: m_Name
-      value: vfx_Projectile_01 (1)
+      value: vfx_Projectile_01
       objectReference: {fileID: 0}
     - target: {fileID: 3473529909581181512, guid: bc142210df3ec4545a4e3e1f21e00da7,
         type: 3}
@@ -34691,7 +34691,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1990913187}
   m_Layer: 0
-  m_Name: Merdiven_180
+  m_Name: Stairs_180
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34733,7 +34733,7 @@ GameObject:
   - component: {fileID: 1997937734}
   - component: {fileID: 1997937733}
   m_Layer: 0
-  m_Name: Basamak_1
+  m_Name: Step_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34838,7 +34838,7 @@ GameObject:
   - component: {fileID: 2006056327}
   - component: {fileID: 2006056326}
   m_Layer: 0
-  m_Name: Basamak_7
+  m_Name: Step_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34943,7 +34943,7 @@ GameObject:
   - component: {fileID: 2009567251}
   - component: {fileID: 2009567250}
   m_Layer: 0
-  m_Name: Basamak_3
+  m_Name: Step_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35047,7 +35047,7 @@ GameObject:
   - component: {fileID: 2010411974}
   - component: {fileID: 2010411973}
   m_Layer: 0
-  m_Name: Isik_4
+  m_Name: Light_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35265,7 +35265,7 @@ GameObject:
   - component: {fileID: 2013035463}
   - component: {fileID: 2013035462}
   m_Layer: 0
-  m_Name: Basamak_7
+  m_Name: Step_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35369,7 +35369,7 @@ GameObject:
   - component: {fileID: 2022726693}
   - component: {fileID: 2022726692}
   m_Layer: 0
-  m_Name: Isik_17
+  m_Name: Light_17
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35586,7 +35586,7 @@ GameObject:
   - component: {fileID: 2046143428}
   - component: {fileID: 2046143427}
   m_Layer: 0
-  m_Name: Isik_6
+  m_Name: Light_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35804,7 +35804,7 @@ GameObject:
   - component: {fileID: 2052677786}
   - component: {fileID: 2052677785}
   m_Layer: 0
-  m_Name: Basamak_0
+  m_Name: Step_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35909,7 +35909,7 @@ GameObject:
   - component: {fileID: 2064261770}
   - component: {fileID: 2064261769}
   m_Layer: 0
-  m_Name: Basamak_1
+  m_Name: Step_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36044,7 +36044,7 @@ GameObject:
   - component: {fileID: 2071738233}
   - component: {fileID: 2071738232}
   m_Layer: 0
-  m_Name: PanelIsik_1_1
+  m_Name: PanelLight_1_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36261,7 +36261,7 @@ GameObject:
   - component: {fileID: 2079771467}
   - component: {fileID: 2079771466}
   m_Layer: 0
-  m_Name: Isik_26
+  m_Name: Light_26
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36476,7 +36476,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2082059879}
   m_Layer: 0
-  m_Name: Merdiven_90
+  m_Name: Stairs_90
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36517,7 +36517,7 @@ GameObject:
   - component: {fileID: 2087805111}
   - component: {fileID: 2087805110}
   m_Layer: 0
-  m_Name: Isik_7
+  m_Name: Light_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36965,7 +36965,7 @@ GameObject:
   - component: {fileID: 2095748645}
   - component: {fileID: 2095748644}
   m_Layer: 0
-  m_Name: PanelIsik_0_4
+  m_Name: PanelLight_0_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37266,7 +37266,7 @@ GameObject:
   - component: {fileID: 2102728676}
   - component: {fileID: 2102728675}
   m_Layer: 0
-  m_Name: Basamak_7
+  m_Name: Step_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37371,7 +37371,7 @@ GameObject:
   - component: {fileID: 2107836283}
   - component: {fileID: 2107836282}
   m_Layer: 0
-  m_Name: Basamak_2
+  m_Name: Step_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37594,7 +37594,7 @@ GameObject:
   - component: {fileID: 2127417247}
   - component: {fileID: 2127417246}
   m_Layer: 0
-  m_Name: Duvar_3
+  m_Name: Wall_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37696,7 +37696,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2145775563}
   m_Layer: 0
-  m_Name: Merdiven_90
+  m_Name: Stairs_90
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37959,7 +37959,7 @@ PrefabInstance:
     - target: {fileID: 1984937619357302023, guid: 9b76a72c4e68f2843bb3dc689bc504b1,
         type: 3}
       propertyPath: m_Name
-      value: "h\u0131z\u0131 eleman"
+      value: HighSpeedEnemy
       objectReference: {fileID: 0}
     - target: {fileID: 2713358396226797343, guid: 9b76a72c4e68f2843bb3dc689bc504b1,
         type: 3}

@@ -148,7 +148,7 @@ PrefabInstance:
     - target: {fileID: 7002426034365337885, guid: e1edfa40ff22497438b97eac37139835,
         type: 3}
       propertyPath: m_Name
-      value: kirk
+      value: Enemy2HitEffect
       objectReference: {fileID: 0}
     - target: {fileID: 7666900954800409511, guid: e1edfa40ff22497438b97eac37139835,
         type: 3}
@@ -322,7 +322,7 @@ GameObject:
   - component: {fileID: 14565116}
   - component: {fileID: 14565115}
   m_Layer: 0
-  m_Name: Isik_5_3
+  m_Name: Light_5_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -540,7 +540,7 @@ GameObject:
   - component: {fileID: 15708165}
   - component: {fileID: 15708164}
   m_Layer: 0
-  m_Name: Duvar_Dogu
+  m_Name: Wall_Dogu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -645,7 +645,7 @@ GameObject:
   - component: {fileID: 29696242}
   - component: {fileID: 29696241}
   m_Layer: 0
-  m_Name: Duvar_Kuzey (1)
+  m_Name: Wall_Kuzey (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -761,7 +761,7 @@ GameObject:
   - component: {fileID: 71912884}
   - component: {fileID: 71912883}
   m_Layer: 0
-  m_Name: Isik_0_2
+  m_Name: Light_0_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -978,7 +978,7 @@ GameObject:
   - component: {fileID: 82521341}
   - component: {fileID: 82521340}
   m_Layer: 0
-  m_Name: Isik_1_5
+  m_Name: Light_1_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1196,7 +1196,7 @@ GameObject:
   - component: {fileID: 93760144}
   - component: {fileID: 93760143}
   m_Layer: 0
-  m_Name: Duvar_Bati
+  m_Name: Wall_Bati
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1300,7 +1300,7 @@ GameObject:
   - component: {fileID: 99425570}
   - component: {fileID: 99425569}
   m_Layer: 0
-  m_Name: Isik_0_0
+  m_Name: Light_0_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1523,7 +1523,7 @@ GameObject:
   - component: {fileID: 151673506}
   - component: {fileID: 151673505}
   m_Layer: 0
-  m_Name: Isik_2_5
+  m_Name: Light_2_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1740,7 +1740,7 @@ GameObject:
   - component: {fileID: 155146210}
   - component: {fileID: 155146209}
   m_Layer: 0
-  m_Name: Isik_1_0
+  m_Name: Light_1_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1957,7 +1957,7 @@ GameObject:
   - component: {fileID: 160691503}
   - component: {fileID: 160691502}
   m_Layer: 0
-  m_Name: Isik_4_5
+  m_Name: Light_4_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2390,7 +2390,7 @@ PrefabInstance:
     - target: {fileID: 2177804131869703558, guid: 20632351ca6176d45a8bed856d10480d,
         type: 3}
       propertyPath: m_Name
-      value: Hit_4_Red (1)
+      value: Hit_4_Red
       objectReference: {fileID: 0}
     - target: {fileID: 6497009000182176115, guid: 20632351ca6176d45a8bed856d10480d,
         type: 3}
@@ -2472,7 +2472,7 @@ GameObject:
   - component: {fileID: 222826211}
   - component: {fileID: 222826210}
   m_Layer: 0
-  m_Name: "BB_Giri\u015F (1)"
+  m_Name: BB_Entrance (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2576,7 +2576,7 @@ GameObject:
   - component: {fileID: 253492252}
   - component: {fileID: 253492251}
   m_Layer: 0
-  m_Name: Isik_2_1
+  m_Name: Light_2_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2868,7 +2868,7 @@ GameObject:
   - component: {fileID: 270854355}
   - component: {fileID: 270854354}
   m_Layer: 0
-  m_Name: Duvar_Guney (4)
+  m_Name: Wall_Guney (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2973,7 +2973,7 @@ GameObject:
   - component: {fileID: 273079180}
   - component: {fileID: 273079179}
   m_Layer: 0
-  m_Name: Duvar_Bati
+  m_Name: Wall_Bati
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3078,7 +3078,7 @@ GameObject:
   - component: {fileID: 277301987}
   - component: {fileID: 277301986}
   m_Layer: 0
-  m_Name: Duvar_Dogu
+  m_Name: Wall_Dogu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3182,7 +3182,7 @@ GameObject:
   - component: {fileID: 321275584}
   - component: {fileID: 321275583}
   m_Layer: 0
-  m_Name: Isik_3_4
+  m_Name: Light_3_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3710,7 +3710,7 @@ GameObject:
   - component: {fileID: 375236835}
   - component: {fileID: 375236834}
   m_Layer: 0
-  m_Name: Isik_3_0
+  m_Name: Light_3_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3988,7 +3988,7 @@ GameObject:
   - component: {fileID: 403974734}
   - component: {fileID: 403974733}
   m_Layer: 0
-  m_Name: Tavan
+  m_Name: Ceiling
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4091,7 +4091,7 @@ GameObject:
   - component: {fileID: 446426298}
   - component: {fileID: 446426299}
   m_Layer: 0
-  m_Name: "K\xFC\xE7\xFCk Arena"
+  m_Name: SmallArena
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4156,7 +4156,7 @@ GameObject:
   - component: {fileID: 447020722}
   - component: {fileID: 447020721}
   m_Layer: 0
-  m_Name: Tavan
+  m_Name: Ceiling
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4262,7 +4262,7 @@ GameObject:
   - component: {fileID: 450307334}
   - component: {fileID: 450307337}
   m_Layer: 0
-  m_Name: Zemin
+  m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4456,7 +4456,7 @@ GameObject:
   - component: {fileID: 484618952}
   - component: {fileID: 484618951}
   m_Layer: 0
-  m_Name: Duvar_Guney (1)
+  m_Name: Wall_Guney (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4558,7 +4558,7 @@ GameObject:
   m_Component:
   - component: {fileID: 523284357}
   m_Layer: 0
-  m_Name: Odalar
+  m_Name: Rooms
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4599,7 +4599,7 @@ GameObject:
   - component: {fileID: 527763266}
   - component: {fileID: 527763265}
   m_Layer: 0
-  m_Name: Duvar_Guney (2)
+  m_Name: Wall_Guney (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4704,7 +4704,7 @@ GameObject:
   - component: {fileID: 539364594}
   - component: {fileID: 539364593}
   m_Layer: 0
-  m_Name: Duvar_Guney
+  m_Name: Wall_Guney
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4890,7 +4890,7 @@ GameObject:
   - component: {fileID: 550959774}
   - component: {fileID: 550959773}
   m_Layer: 0
-  m_Name: Duvar_Guney (3)
+  m_Name: Wall_Guney (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4994,7 +4994,7 @@ GameObject:
   - component: {fileID: 567208260}
   - component: {fileID: 567208259}
   m_Layer: 0
-  m_Name: Isik_0_5
+  m_Name: Light_0_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5317,7 +5317,7 @@ GameObject:
   - component: {fileID: 612390389}
   - component: {fileID: 612390388}
   m_Layer: 0
-  m_Name: Isik_1_4
+  m_Name: Light_1_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5603,7 +5603,7 @@ GameObject:
   - component: {fileID: 664865852}
   - component: {fileID: 664865851}
   m_Layer: 0
-  m_Name: "gir\u015F"
+  m_Name: Entrance_Alt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5776,7 +5776,7 @@ GameObject:
   - component: {fileID: 697158196}
   - component: {fileID: 697158195}
   m_Layer: 0
-  m_Name: "BB_Giri\u015F"
+  m_Name: BB_Entrance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5881,7 +5881,7 @@ GameObject:
   - component: {fileID: 697504332}
   - component: {fileID: 697504331}
   m_Layer: 0
-  m_Name: Duvar_Bati
+  m_Name: Wall_Bati
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5985,7 +5985,7 @@ GameObject:
   - component: {fileID: 708020150}
   - component: {fileID: 708020149}
   m_Layer: 0
-  m_Name: Isik_4_0
+  m_Name: Light_4_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6202,7 +6202,7 @@ GameObject:
   - component: {fileID: 710826789}
   - component: {fileID: 710826788}
   m_Layer: 0
-  m_Name: Isik_3_5
+  m_Name: Light_3_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6420,7 +6420,7 @@ GameObject:
   - component: {fileID: 718220048}
   - component: {fileID: 718220047}
   m_Layer: 0
-  m_Name: "\u015Faftkap\u0131"
+  m_Name: ShaftDoor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6525,7 +6525,7 @@ GameObject:
   - component: {fileID: 725068772}
   - component: {fileID: 725068771}
   m_Layer: 0
-  m_Name: Tavan
+  m_Name: Ceiling
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6853,7 +6853,7 @@ PrefabInstance:
     - target: {fileID: 7002426034365337885, guid: e1edfa40ff22497438b97eac37139835,
         type: 3}
       propertyPath: m_Name
-      value: kirk (2)
+      value: Enemy2HitEffect (2)
       objectReference: {fileID: 0}
     - target: {fileID: 7666900954800409511, guid: e1edfa40ff22497438b97eac37139835,
         type: 3}
@@ -6949,7 +6949,7 @@ GameObject:
   - component: {fileID: 796863763}
   - component: {fileID: 796863762}
   m_Layer: 0
-  m_Name: Isik_2_3
+  m_Name: Light_2_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7166,7 +7166,7 @@ GameObject:
   - component: {fileID: 800503841}
   - component: {fileID: 800503840}
   m_Layer: 0
-  m_Name: Isik_1_1
+  m_Name: Light_1_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7455,7 +7455,7 @@ GameObject:
   - component: {fileID: 820076561}
   - component: {fileID: 820076564}
   m_Layer: 0
-  m_Name: Zemin
+  m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7591,7 +7591,7 @@ GameObject:
   - component: {fileID: 821394375}
   - component: {fileID: 821394374}
   m_Layer: 0
-  m_Name: Duvar_Kuzey
+  m_Name: Wall_Kuzey
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8001,7 +8001,7 @@ GameObject:
   - component: {fileID: 938410769}
   - component: {fileID: 938410768}
   m_Layer: 0
-  m_Name: Isik_3_1
+  m_Name: Light_3_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8219,7 +8219,7 @@ GameObject:
   - component: {fileID: 944130096}
   - component: {fileID: 944130095}
   m_Layer: 0
-  m_Name: Duvar_Guney
+  m_Name: Wall_Guney
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8391,7 +8391,7 @@ GameObject:
   - component: {fileID: 974150355}
   - component: {fileID: 974150354}
   m_Layer: 0
-  m_Name: Isik_5_1
+  m_Name: Light_5_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8609,7 +8609,7 @@ GameObject:
   - component: {fileID: 1003702443}
   - component: {fileID: 1003702442}
   m_Layer: 0
-  m_Name: Zemin
+  m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8715,7 +8715,7 @@ GameObject:
   - component: {fileID: 1008897601}
   - component: {fileID: 1008897600}
   m_Layer: 0
-  m_Name: Zemin
+  m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8863,7 +8863,7 @@ GameObject:
   - component: {fileID: 1051534956}
   - component: {fileID: 1051534955}
   m_Layer: 0
-  m_Name: Duvar_Bati
+  m_Name: Wall_Bati
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9015,7 +9015,7 @@ GameObject:
   - component: {fileID: 1060541317}
   - component: {fileID: 1060541316}
   m_Layer: 0
-  m_Name: Duvar_Kuzey (1)
+  m_Name: Wall_Kuzey (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9120,7 +9120,7 @@ GameObject:
   - component: {fileID: 1063147623}
   - component: {fileID: 1063147622}
   m_Layer: 0
-  m_Name: "B_Giri\u015F"
+  m_Name: B_Entrance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9398,7 +9398,7 @@ GameObject:
   - component: {fileID: 1187094485}
   - component: {fileID: 1187094484}
   m_Layer: 0
-  m_Name: Tavan
+  m_Name: Ceiling
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9503,7 +9503,7 @@ GameObject:
   - component: {fileID: 1193475458}
   - component: {fileID: 1193475457}
   m_Layer: 0
-  m_Name: "B_\xC7\u0131k\u0131\u015F"
+  m_Name: B_Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9714,7 +9714,7 @@ GameObject:
   - component: {fileID: 1209078291}
   - component: {fileID: 1209078290}
   m_Layer: 0
-  m_Name: Duvar_Dogu
+  m_Name: Wall_Dogu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9982,7 +9982,7 @@ GameObject:
   - component: {fileID: 1247645187}
   - component: {fileID: 1247645186}
   m_Layer: 0
-  m_Name: Tavan
+  m_Name: Ceiling
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10085,7 +10085,7 @@ PrefabInstance:
     - target: {fileID: 133372197488101883, guid: b0f2a226f5b8f7040b1afc1add23a6aa,
         type: 3}
       propertyPath: m_Name
-      value: vfx_Projectile_01 (1)
+      value: vfx_Projectile_01
       objectReference: {fileID: 0}
     - target: {fileID: 1056301102441856993, guid: b0f2a226f5b8f7040b1afc1add23a6aa,
         type: 3}
@@ -10173,7 +10173,7 @@ GameObject:
   - component: {fileID: 1291463543}
   - component: {fileID: 1291463542}
   m_Layer: 0
-  m_Name: Duvar_Dogu
+  m_Name: Wall_Dogu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10278,7 +10278,7 @@ GameObject:
   - component: {fileID: 1291548451}
   - component: {fileID: 1291548450}
   m_Layer: 0
-  m_Name: Duvar_Guney (2)
+  m_Name: Wall_Guney (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10487,7 +10487,7 @@ GameObject:
   - component: {fileID: 1378524165}
   - component: {fileID: 1378524164}
   m_Layer: 0
-  m_Name: Isik_2_0
+  m_Name: Light_2_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10705,7 +10705,7 @@ GameObject:
   - component: {fileID: 1380436822}
   - component: {fileID: 1380436821}
   m_Layer: 0
-  m_Name: Duvar_Bati
+  m_Name: Wall_Bati
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10809,7 +10809,7 @@ GameObject:
   - component: {fileID: 1385900187}
   - component: {fileID: 1385900186}
   m_Layer: 0
-  m_Name: Isik_0_1
+  m_Name: Light_0_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11026,7 +11026,7 @@ GameObject:
   - component: {fileID: 1419680442}
   - component: {fileID: 1419680441}
   m_Layer: 0
-  m_Name: Isik_2_2
+  m_Name: Light_2_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11243,7 +11243,7 @@ GameObject:
   - component: {fileID: 1426767094}
   - component: {fileID: 1426767093}
   m_Layer: 0
-  m_Name: Isik_4_3
+  m_Name: Light_4_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11461,7 +11461,7 @@ GameObject:
   - component: {fileID: 1430037386}
   - component: {fileID: 1430037385}
   m_Layer: 0
-  m_Name: Duvar_Bati
+  m_Name: Wall_Bati
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11566,7 +11566,7 @@ GameObject:
   - component: {fileID: 1435523713}
   - component: {fileID: 1435523712}
   m_Layer: 0
-  m_Name: Duvar_Kuzey (2)
+  m_Name: Wall_Kuzey (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11671,7 +11671,7 @@ GameObject:
   - component: {fileID: 1474411959}
   - component: {fileID: 1474411958}
   m_Layer: 0
-  m_Name: Zemin
+  m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11776,7 +11776,7 @@ GameObject:
   - component: {fileID: 1481019644}
   - component: {fileID: 1481019643}
   m_Layer: 0
-  m_Name: Duvar_Dogu
+  m_Name: Wall_Dogu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11880,7 +11880,7 @@ GameObject:
   - component: {fileID: 1502140431}
   - component: {fileID: 1502140430}
   m_Layer: 0
-  m_Name: Isik_3_3
+  m_Name: Light_3_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12098,7 +12098,7 @@ GameObject:
   - component: {fileID: 1516633724}
   - component: {fileID: 1516633723}
   m_Layer: 0
-  m_Name: Zemin
+  m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12264,7 +12264,7 @@ PrefabInstance:
     - target: {fileID: 7002426034365337885, guid: e1edfa40ff22497438b97eac37139835,
         type: 3}
       propertyPath: m_Name
-      value: kirk (1)
+      value: Enemy2HitEffect (1)
       objectReference: {fileID: 0}
     - target: {fileID: 7666900954800409511, guid: e1edfa40ff22497438b97eac37139835,
         type: 3}
@@ -12360,7 +12360,7 @@ GameObject:
   - component: {fileID: 1582503531}
   - component: {fileID: 1582503530}
   m_Layer: 0
-  m_Name: "B\xFCy\xFCkArena_trigger"
+  m_Name: BigArena_trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12441,7 +12441,7 @@ GameObject:
   - component: {fileID: 1599322444}
   - component: {fileID: 1599322443}
   m_Layer: 0
-  m_Name: Isik_5_4
+  m_Name: Light_5_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12658,7 +12658,7 @@ GameObject:
   - component: {fileID: 1615312232}
   - component: {fileID: 1615312231}
   m_Layer: 0
-  m_Name: Isik_2_4
+  m_Name: Light_2_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12876,7 +12876,7 @@ GameObject:
   - component: {fileID: 1616025554}
   - component: {fileID: 1616025553}
   m_Layer: 0
-  m_Name: Duvar_Kuzey (3)
+  m_Name: Wall_Kuzey (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12981,7 +12981,7 @@ GameObject:
   - component: {fileID: 1618840266}
   - component: {fileID: 1618840265}
   m_Layer: 0
-  m_Name: Duvar_Kuzey
+  m_Name: Wall_Kuzey
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13116,7 +13116,7 @@ GameObject:
   - component: {fileID: 1650786368}
   - component: {fileID: 1650786367}
   m_Layer: 0
-  m_Name: Isik_4_1
+  m_Name: Light_4_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13400,7 +13400,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1723180807}
   m_Layer: 0
-  m_Name: "EnemyB\xFCy\xFCkArena"
+  m_Name: EnemyBigArena
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13454,7 +13454,7 @@ GameObject:
   - component: {fileID: 1730710768}
   - component: {fileID: 1730710767}
   m_Layer: 0
-  m_Name: Tavan
+  m_Name: Ceiling
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13559,7 +13559,7 @@ GameObject:
   - component: {fileID: 1744430610}
   - component: {fileID: 1744430609}
   m_Layer: 0
-  m_Name: Duvar_Dogu
+  m_Name: Wall_Dogu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13663,7 +13663,7 @@ GameObject:
   - component: {fileID: 1778763860}
   - component: {fileID: 1778763859}
   m_Layer: 0
-  m_Name: Isik_5_5
+  m_Name: Light_5_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14051,7 +14051,7 @@ GameObject:
   - component: {fileID: 1834438349}
   - component: {fileID: 1834438348}
   m_Layer: 0
-  m_Name: Isik_0_4
+  m_Name: Light_0_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14334,7 +14334,7 @@ GameObject:
   - component: {fileID: 1844755786}
   - component: {fileID: 1844755785}
   m_Layer: 0
-  m_Name: Isik_4_4
+  m_Name: Light_4_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14563,7 +14563,7 @@ GameObject:
   - component: {fileID: 1873855124}
   - component: {fileID: 1873855123}
   m_Layer: 0
-  m_Name: Isik_3_2
+  m_Name: Light_3_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15069,7 +15069,7 @@ GameObject:
   - component: {fileID: 1927796295}
   - component: {fileID: 1927796294}
   m_Layer: 0
-  m_Name: Isik_1_2
+  m_Name: Light_1_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15313,7 +15313,7 @@ GameObject:
   - component: {fileID: 1949011538}
   - component: {fileID: 1949011537}
   m_Layer: 0
-  m_Name: Isik_1_3
+  m_Name: Light_1_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15530,7 +15530,7 @@ GameObject:
   - component: {fileID: 1950986512}
   - component: {fileID: 1950986511}
   m_Layer: 0
-  m_Name: Isik_4_2
+  m_Name: Light_4_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15747,7 +15747,7 @@ GameObject:
   - component: {fileID: 2008771897}
   - component: {fileID: 2008771896}
   m_Layer: 0
-  m_Name: Isik_0_3
+  m_Name: Light_0_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15964,7 +15964,7 @@ GameObject:
   - component: {fileID: 2018190637}
   - component: {fileID: 2018190636}
   m_Layer: 0
-  m_Name: Isik_5_0
+  m_Name: Light_5_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16182,7 +16182,7 @@ GameObject:
   - component: {fileID: 2019581887}
   - component: {fileID: 2019581886}
   m_Layer: 0
-  m_Name: Duvar_Dogu (1)
+  m_Name: Wall_Dogu (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16456,7 +16456,7 @@ GameObject:
   - component: {fileID: 2032028758}
   - component: {fileID: 2032028757}
   m_Layer: 0
-  m_Name: Duvar_Guney (1)
+  m_Name: Wall_Guney (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16561,7 +16561,7 @@ GameObject:
   - component: {fileID: 2060270152}
   - component: {fileID: 2060270151}
   m_Layer: 0
-  m_Name: Duvar_Kuzey
+  m_Name: Wall_Kuzey
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16665,7 +16665,7 @@ GameObject:
   - component: {fileID: 2115191302}
   - component: {fileID: 2115191301}
   m_Layer: 0
-  m_Name: Isik_5_2
+  m_Name: Light_5_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
