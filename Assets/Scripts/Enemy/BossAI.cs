@@ -66,9 +66,6 @@ public class BossAI : MonoBehaviour, IParryable
     int   phase = 1;              // 1: >66%, 2: 66-33%, 3: <33%
     float fireTimer;
     float farTimer;               // dash tetiği için "uzakta durma" süresi
-    float aimTimer;
-    float meleeTimer;
-    float meleeReadyTime;
     float stunUntil;
     float logTimer;
     bool  dead;
@@ -80,8 +77,10 @@ public class BossAI : MonoBehaviour, IParryable
     PlayerMovement playerMovement;
     SfxPlayer      sfx;
     Renderer[]     renderers;
-    Image          blackoutImg;
-    readonly List<Light> litLights = new();
+
+    BossShotgunAttack     shotgunAttack;
+    BossMeleeAttack       meleeAttack;
+    BossBlackoutSequence  blackout;
 
     void Awake()
     {
@@ -102,6 +101,12 @@ public class BossAI : MonoBehaviour, IParryable
         renderers = GetComponentsInChildren<Renderer>(true);
         foreach (var smr in GetComponentsInChildren<SkinnedMeshRenderer>(true))
             smr.updateWhenOffscreen = true;   // büyük model yanlış culling ile kaybolmasın
+
+        shotgunAttack = new BossShotgunAttack(muzzle, shotgunRange, damageNear, damageFar,
+            coneAngle, aimTime, obstacleMask, muzzleFlash, sfx, fireClip, fireVolume);
+        meleeAttack = new BossMeleeAttack(meleeRange, meleeDamage, meleeKnockback,
+            meleeTelegraph, meleeCooldown, sfx, meleeClip, meleeVolume);
+        blackout = new BossBlackoutSequence(agent, teleportBehindDist, blackoutDuration, renderers);
 
         health.onDeath.AddListener(OnDeath);
 
@@ -137,10 +142,32 @@ public class BossAI : MonoBehaviour, IParryable
 
         switch (state)
         {
-            case State.Chase:          DoChase(dist);          break;
-            case State.ShotgunAim:     DoShotgunAim();          break;
-            case State.MeleeTelegraph: DoMeleeTelegraph(dist);  break;
-            case State.Dash:           DoDash(dist);            break;
+            case State.Chase:
+                DoChase(dist);
+                break;
+
+            case State.ShotgunAim:
+                if (shotgunAttack.TickAim())
+                {
+                    HideIndicator(aimIndicator);
+                    shotgunAttack.Fire(transform, player, playerHealth);
+                    fireTimer = 0f;
+                    state = State.Chase;
+                }
+                break;
+
+            case State.MeleeTelegraph:
+                if (meleeAttack.TickTelegraph())
+                {
+                    HideIndicator(meleeIndicator);
+                    meleeAttack.ResolveTelegraph(transform, player, playerHealth, playerMovement);
+                    state = State.Chase;
+                }
+                break;
+
+            case State.Dash:
+                DoDash(dist);
+                break;
         }
     }
 
@@ -149,8 +176,8 @@ public class BossAI : MonoBehaviour, IParryable
     void CheckPhaseTransition()
     {
         float frac = health.Max > 0f ? health.Current / health.Max : 1f;
-        if (phase == 1 && frac <= 0.66f) { phase = 2; StartCoroutine(BlackoutRoutine()); }
-        else if (phase == 2 && frac <= 0.33f) { phase = 3; StartCoroutine(BlackoutRoutine()); }
+        if (phase == 1 && frac <= 0.66f) { phase = 2; StartCoroutine(RunBlackout()); }
+        else if (phase == 2 && frac <= 0.33f) { phase = 3; StartCoroutine(RunBlackout()); }
     }
 
     float FireInterval => fireInterval[Mathf.Clamp(phase - 1, 0, fireInterval.Length - 1)];
@@ -163,7 +190,7 @@ public class BossAI : MonoBehaviour, IParryable
         if (agent.enabled) agent.speed = moveSpeed * PhaseSpeedMult;
 
         // Yakınsa kabza
-        if (dist <= meleeRange && Time.time >= meleeReadyTime)
+        if (dist <= meleeRange && Time.time >= meleeAttack.ReadyTime)
         {
             StartMelee();
             return;
@@ -178,7 +205,7 @@ public class BossAI : MonoBehaviour, IParryable
 
         // Ateş zamanı
         fireTimer += Time.deltaTime;
-        if (fireTimer >= FireInterval && HasLoS() && dist <= shotgunRange)
+        if (fireTimer >= FireInterval && shotgunAttack.HasLineOfSight(transform, player) && dist <= shotgunRange)
             StartShotgunAim();
     }
 
@@ -220,90 +247,20 @@ public class BossAI : MonoBehaviour, IParryable
 
     void StartShotgunAim()
     {
-        state    = State.ShotgunAim;
-        aimTimer = 0f;
+        state = State.ShotgunAim;
+        shotgunAttack.StartAim();
         if (agent.enabled && agent.isOnNavMesh) agent.ResetPath();
         ShowIndicator(aimIndicator);
-    }
-
-    void DoShotgunAim()
-    {
-        aimTimer += Time.deltaTime;
-        if (aimTimer >= aimTime)
-        {
-            HideIndicator(aimIndicator);
-            FireShotgun();
-            fireTimer = 0f;
-            state = State.Chase;
-        }
-    }
-
-    void FireShotgun()
-    {
-        if (muzzleFlash) { muzzleFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); muzzleFlash.Play(); }
-        sfx.Play(fireClip, fireVolume);
-        CameraShake.Shake(0.08f, 0.1f);
-
-        float dist = Vector3.Distance(transform.position, player.position);
-        if (dist > shotgunRange) return;
-
-        Vector3 flat = player.position - transform.position; flat.y = 0f;
-        if (Vector3.Angle(transform.forward, flat) > coneAngle) return;  // koni dışı → ıska
-        if (!HasLoS()) return;                                           // duvar arkası → ıska
-
-        float dmg = Mathf.Lerp(damageNear, damageFar, Mathf.Clamp01(dist / shotgunRange));
-        playerHealth?.TakeDamage(dmg);
-    }
-
-    bool HasLoS()
-    {
-        if (player == null) return false;
-        Vector3 origin = muzzle ? muzzle.position : transform.position + Vector3.up * 1.5f;
-        Vector3 target = player.position + Vector3.up * 0.5f;
-        Vector3 dir    = target - origin;
-        float   dist   = dir.magnitude;
-
-        // Kendi gövdesini (Cube/Sphere) ve oyuncuyu yok say — sadece gerçek engel (duvar) LoS'u keser
-        foreach (var h in Physics.RaycastAll(origin, dir.normalized, dist, obstacleMask, QueryTriggerInteraction.Ignore))
-        {
-            if (h.collider.transform.IsChildOf(transform)) continue;          // kendi gövden
-            if (h.collider.GetComponentInParent<PlayerMovement>() != null) continue; // oyuncu engel değil
-            return false;   // araya giren gerçek engel
-        }
-        return true;
     }
 
     // ───────── Kabza (melee) ─────────
 
     void StartMelee()
     {
-        state      = State.MeleeTelegraph;
-        meleeTimer = 0f;
+        state = State.MeleeTelegraph;
+        meleeAttack.StartTelegraph();
         if (agent.enabled && agent.isOnNavMesh) agent.ResetPath();
         ShowIndicator(meleeIndicator);
-    }
-
-    void DoMeleeTelegraph(float dist)
-    {
-        meleeTimer += Time.deltaTime;
-        if (meleeTimer >= meleeTelegraph)
-        {
-            HideIndicator(meleeIndicator);
-            // hâlâ menzildeyse vur
-            if (dist <= meleeRange * 1.4f)
-            {
-                playerHealth?.TakeDamage(meleeDamage);
-                if (playerMovement != null)
-                {
-                    Vector3 away = player.position - transform.position; away.y = 0f;
-                    playerMovement.Launch(away.normalized * meleeKnockback + Vector3.up * 3f);
-                }
-                sfx.Play(meleeClip, meleeVolume);
-                CameraShake.Shake(0.3f, 0.2f);
-            }
-            meleeReadyTime = Time.time + meleeCooldown;
-            state = State.Chase;
-        }
     }
 
     // IParryable — sadece kabza telegraph'ında parry'lenir
@@ -319,55 +276,17 @@ public class BossAI : MonoBehaviour, IParryable
 
     // ───────── Karanlık (faz geçişi) ─────────
 
-    IEnumerator BlackoutRoutine()
+    IEnumerator RunBlackout()
     {
         state = State.Blackout;
         HideIndicator(aimIndicator);
         HideIndicator(meleeIndicator);
         if (agent.enabled && agent.isOnNavMesh) agent.ResetPath();
 
-        // Sahne ışıklarını söndür
-        litLights.Clear();
-        foreach (var l in FindObjectsOfType<Light>())
-            if (l.enabled) { litLights.Add(l); l.enabled = false; }
-
-        // Tam siyah overlay (garanti kör)
-        blackoutImg = GameFlow.CreateOverlay(Color.black);
-        blackoutImg.color = Color.black;
-
-        // Boss görünmez
-        SetRenderers(false);
-
-        yield return null;
-
-        // Oyuncunun arkasına ışınla
-        if (player != null)
-        {
-            Vector3 behind = player.position - player.forward * teleportBehindDist;
-            if (NavMesh.SamplePosition(behind, out NavMeshHit hit, 4f, NavMesh.AllAreas))
-            {
-                agent.enabled = false;
-                transform.position = hit.position;
-                agent.enabled = true;
-            }
-            FacePlayer();
-        }
-
-        yield return new WaitForSecondsRealtime(blackoutDuration);
-
-        // Işıkları geri aç, overlay kaldır, boss görünür
-        RestoreLights();
-        SetRenderers(true);
-        if (blackoutImg) { Destroy(blackoutImg.canvas.gameObject); blackoutImg = null; }
+        yield return StartCoroutine(blackout.Run(transform, player, FacePlayer));
 
         fireTimer = 0f;
         state = State.Chase;
-    }
-
-    void RestoreLights()
-    {
-        foreach (var l in litLights) if (l != null) l.enabled = true;
-        litLights.Clear();
     }
 
     // ───────── Yardımcılar ─────────
@@ -392,8 +311,7 @@ public class BossAI : MonoBehaviour, IParryable
         if (dead) return;
         dead = true;
         StopAllCoroutines();
-        RestoreLights();                                   // karanlıkta öldüyse ışıkları geri ver
-        if (blackoutImg) Destroy(blackoutImg.canvas.gameObject);
+        blackout.CleanupOnDeath();                         // karanlıkta öldüyse ışıkları geri ver + overlay'i kaldır
         if (agent.enabled) agent.enabled = false;
         SetRenderers(false);
         enabled = false;
