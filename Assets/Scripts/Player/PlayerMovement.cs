@@ -63,36 +63,16 @@ public class PlayerMovement : MonoBehaviour
     float   pitch;
     float   coyoteTimer;
 
-    bool    isSliding;
-    float   slideTimer;
-    Vector3 slideDir;
-    float   normalHeight;
-    Vector3 normalCenter;
-    float   slideEndTime     = -1f;
-    float   slideJumpDeadline;
+    PlayerWallRun wallRun;
+    PlayerSlide   slide;
 
     SfxPlayer sfx;
     float footstepTimer;
     bool  wasGrounded;
 
-    bool    touchingWall;
-    Vector3 wallNormal;
-    float   wallJumpLockUntil;
-    int      wallJumpsRemaining;
-    Collider lastWallCollider;
-    float    lastWallJumpTime = -999f;
-
-    bool    wallRunning;
-    Vector3 wallRunNormal;
-    int     wallRunSide;    // +1 sağ duvar, -1 sol duvar
-    float   wallRunTimer;
-    static readonly int[] wallSides = { 1, -1 };
-
     void Awake()
     {
         cc           = GetComponent<CharacterController>();
-        normalHeight = cc.height;
-        normalCenter = cc.center;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible   = false;
         float saved = PlayerPrefs.GetFloat("Sensitivity", sensitivity);
@@ -100,17 +80,26 @@ public class PlayerMovement : MonoBehaviour
 
         sfx = SfxPlayer.Create(gameObject, spatialBlend: 0f);
 
+        wallRun = new PlayerWallRun(cc, transform,
+            wallJumpMask, wallJumpCheckDist, wallJumpRefillTime, maxWallJumpsPerWall, wallJumpLockDuration,
+            wallRunMask, wallRunCheckDist, wallRunSpeed, wallRunMaxTime, wallRunGravity, wallRunJumpOut);
+        slide = new PlayerSlide(cc, slideSpeed, slideDuration, moveSpeed);
+
         var cam = cameraHolder.GetComponentInChildren<Camera>();
         if (cam) cam.nearClipPlane = 0.05f;
-
-        wallJumpsRemaining = maxWallJumpsPerWall;
     }
 
     void Update()
     {
         Look();
         Move();
-        UpdateSlide();
+
+        slide.Tick(Input.GetButtonDown("Jump"), out bool slideEnded, out bool slideJumpedOut, out Vector3 slideLaunch);
+        if (slideEnded)
+        {
+            launchVelocity = slideLaunch;
+            if (slideJumpedOut) velocity.y = jumpForce;
+        }
     }
 
     void Look()
@@ -122,103 +111,18 @@ public class PlayerMovement : MonoBehaviour
         pitch -= my;
         pitch = Mathf.Clamp(pitch, -maxPitch, maxPitch);
 
-        float tilt = isSliding    ? -slideTilt
-                   : wallRunning  ? wallRunSide * wallRunTilt
+        float tilt = slide.IsSliding  ? -slideTilt
+                   : wallRun.Running  ? wallRun.Side * wallRunTilt
                    : 0f;
         cameraHolder.localRotation = Quaternion.Euler(pitch, 0f,
             Mathf.LerpAngle(cameraHolder.localEulerAngles.z, tilt, Time.deltaTime * 10f));
         transform.Rotate(Vector3.up * mx);
     }
 
-    void CheckWall()
-    {
-        touchingWall = false;
-        Vector3 origin = transform.position + cc.center;
-        Vector3[] dirs = { transform.forward, -transform.forward, transform.right, -transform.right };
-
-        foreach (var dir in dirs)
-        {
-            if (Physics.Raycast(origin, dir, out RaycastHit hit, wallJumpCheckDist + cc.radius,
-                    wallJumpMask, QueryTriggerInteraction.Ignore))
-            {
-                touchingWall = true;
-                wallNormal   = hit.normal;
-                wallNormal.y = 0f;
-                wallNormal.Normalize();
-
-                // Farklı duvar ya da son zıplamadan bu yana yeterince zaman geçtiyse hakkı yenile
-                if (hit.collider != lastWallCollider || Time.time - lastWallJumpTime >= wallJumpRefillTime)
-                {
-                    wallJumpsRemaining = maxWallJumpsPerWall;
-                    lastWallCollider   = hit.collider;
-                }
-                break;
-            }
-        }
-    }
-
-    // Havadayken yan tarafta işaretli (wallRunMask) bir yüzey varsa wall-run başlat
-    void TryStartWallRun()
-    {
-        if (wallRunMask == 0) return;                       // yapılandırılmamış
-        if (Input.GetAxisRaw("Vertical") <= 0.1f) return;   // ileri gitmiyorsan başlama
-
-        Vector3 origin = transform.position + cc.center;
-        foreach (int side in wallSides)
-        {
-            if (Physics.Raycast(origin, transform.right * side, out RaycastHit hit,
-                    wallRunCheckDist + cc.radius, wallRunMask, QueryTriggerInteraction.Ignore))
-            {
-                wallRunning   = true;
-                wallRunNormal = hit.normal;
-                wallRunSide   = side;
-                wallRunTimer  = wallRunMaxTime;
-                velocity.y    = 0f;
-                return;
-            }
-        }
-    }
-
-    void UpdateWallRun()
-    {
-        wallRunTimer -= Time.deltaTime;
-
-        Vector3 origin = transform.position + cc.center;
-        bool onWall = Physics.Raycast(origin, transform.right * wallRunSide, out RaycastHit hit,
-                        wallRunCheckDist + cc.radius + 0.3f, wallRunMask, QueryTriggerInteraction.Ignore);
-        if (onWall) wallRunNormal = hit.normal;
-
-        // Bitiş: duvar bitti / süre doldu / yere değdi
-        if (!onWall || wallRunTimer <= 0f || cc.isGrounded)
-        {
-            wallRunning = false;
-            return;
-        }
-
-        // Duvardan zıpla (dışa + yukarı)
-        if (Input.GetButtonDown("Jump") && JumpEnabled)
-        {
-            velocity.y = wallRunJumpUp;
-            Launch(wallRunNormal * wallRunJumpOut);
-            wallRunning = false;
-            sfx.Play(jumpClip, jumpVolume);
-            return;
-        }
-
-        // Duvar boyunca yatay yön, oyuncunun baktığı yöne hizalı
-        Vector3 along = Vector3.Cross(wallRunNormal, Vector3.up).normalized;
-        if (Vector3.Dot(along, transform.forward) < 0f) along = -along;
-
-        Vector3 move = along * wallRunSpeed
-                     + (-wallRunNormal) * 2f          // duvara yapış
-                     + Vector3.up * wallRunGravity;   // hafif aşağı kayma
-        cc.Move(move * Time.deltaTime);
-    }
-
     void Move()
     {
         bool grounded = cc.isGrounded;
-        CheckWall();
+        wallRun.CheckWall();
 
         // İniş sesi
         if (grounded && !wasGrounded && velocity.y < -2f)
@@ -242,18 +146,18 @@ public class PlayerMovement : MonoBehaviour
         if (wish.magnitude > 1f) wish.Normalize();
 
         // ── Wall-run (duvarda koşma) ──
-        if (wallRunning) { UpdateWallRun(); return; }
-        if (!grounded && velocity.y < 2f) TryStartWallRun();
-        if (wallRunning) { UpdateWallRun(); return; }
+        if (wallRun.Running) { TickWallRun(); return; }
+        if (!grounded && velocity.y < 2f) wallRun.TryStart(v > 0.1f);
+        if (wallRun.Running) { TickWallRun(); return; }
 
-        if (!isSliding && Time.time >= wallJumpLockUntil)
+        if (!slide.IsSliding && Time.time >= wallRun.WallJumpLockUntil)
         {
             float control = grounded ? 1f : airControl;
             cc.Move(wish * moveSpeed * SpeedMultiplier * control * Time.deltaTime);
         }
 
         // Adım sesi
-        if (grounded && !isSliding && wish.magnitude > 0.1f)
+        if (grounded && !slide.IsSliding && wish.magnitude > 0.1f)
         {
             footstepTimer -= Time.deltaTime;
             if (footstepTimer <= 0f)
@@ -267,21 +171,15 @@ public class PlayerMovement : MonoBehaviour
             footstepTimer = 0f;
         }
 
-        bool canWallJump = touchingWall && wallJumpsRemaining > 0;
-        bool jumpAllowed = coyoteTimer > 0f || Time.time < slideJumpDeadline || canWallJump;
+        bool jumpAllowed = coyoteTimer > 0f || Time.time < slide.SlideJumpDeadline || wallRun.CanWallJump;
         if (Input.GetButtonDown("Jump") && jumpAllowed && JumpEnabled)
         {
-            if (canWallJump)
-            {
-                Launch(wallNormal * wallJumpPushForce); // duvardan yatay itiş
-                wallJumpsRemaining--;
-                lastWallJumpTime  = Time.time;
-                wallJumpLockUntil = Time.time + wallJumpLockDuration;
-            }
+            if (wallRun.CanWallJump)
+                Launch(wallRun.ConsumeWallJump() * wallJumpPushForce); // duvardan yatay itiş
 
-            velocity.y        = jumpForce;
-            coyoteTimer       = 0f;
-            slideJumpDeadline = 0f;
+            velocity.y  = jumpForce;
+            coyoteTimer = 0f;
+            slide.ConsumeJumpDeadline();
             sfx.Play(jumpClip, jumpVolume);
         }
 
@@ -302,50 +200,29 @@ public class PlayerMovement : MonoBehaviour
             if (grounded) coyoteTimer = coyoteTime; // zıplama hakkını geri ver
         }
 
-        bool slideInput = SlideEnabled && (Input.GetKeyDown(slideKey) ||
-                          (Input.GetKey(slideKey) && Time.time - slideEndTime < 0.15f));
-        if (slideInput && grounded && !isSliding && wish.magnitude > 0.1f)
+        bool slideKeyDown = Input.GetKeyDown(slideKey);
+        bool slideKeyHeld = Input.GetKey(slideKey);
+        if (SlideEnabled && slide.CanStart(slideKeyDown, slideKeyHeld, grounded, wish))
         {
-            isSliding  = true;
-            slideTimer = slideDuration;
-            slideDir   = wish.normalized;
-            cc.height  = normalHeight * 0.5f;
-            cc.center  = new Vector3(0f, normalCenter.y * 0.5f, 0f);
+            slide.Start(wish);
             sfx.Play(slideClip, slideVolume);
         }
     }
 
-    void UpdateSlide()
+    void TickWallRun()
     {
-        if (!isSliding) return;
-
-        slideTimer -= Time.deltaTime;
-        cc.Move(slideDir * slideSpeed * Time.deltaTime);
-
-        bool jumpPressed = Input.GetButtonDown("Jump");
-
-        if (slideTimer <= 0f || jumpPressed)
+        wallRun.Update(Input.GetButtonDown("Jump") && JumpEnabled, out bool jumpedOff, out Vector3 jumpOutHorizontal);
+        if (jumpedOff)
         {
-            launchVelocity = slideDir * moveSpeed;
-            StopSlide();
-            if (jumpPressed)
-                velocity.y = jumpForce;
-            else
-                slideJumpDeadline = Time.time + 0.3f;
+            velocity.y = wallRunJumpUp;
+            Launch(jumpOutHorizontal);
+            sfx.Play(jumpClip, jumpVolume);
         }
-    }
-
-    void StopSlide()
-    {
-        isSliding   = false;
-        slideEndTime = Time.time;
-        cc.height   = normalHeight;
-        cc.center   = normalCenter;
     }
 
     public Vector3 Velocity        => cc.velocity;
     public bool    IsGrounded      => cc.isGrounded;
-    public bool    IsSliding       => isSliding;
+    public bool    IsSliding       => slide.IsSliding;
     public bool    DisableGravity  { get; set; }
     public float   SpeedMultiplier { get; set; } = 1f;
     public bool    JumpEnabled     { get; set; } = true;
