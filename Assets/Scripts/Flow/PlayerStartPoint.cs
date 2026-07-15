@@ -2,6 +2,10 @@ using UnityEngine;
 
 // Oyuncuyu sahne başında bu noktaya ışınlar (pozisyon + bakış yönü).
 // ArenaBuilder'ın ürettiği PlayerStart'ta otomatik var; istediğin yere taşı.
+using Bloodrush.Player;
+
+namespace Bloodrush.Flow
+{
 public class PlayerStartPoint : MonoBehaviour
 {
     void Start()
@@ -24,4 +28,5 @@ public class PlayerStartPoint : MonoBehaviour
         Gizmos.DrawRay(transform.position, transform.forward * 1.5f);
     }
 #endif
+}
 }

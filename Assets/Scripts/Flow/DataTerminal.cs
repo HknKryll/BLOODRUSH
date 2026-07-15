@@ -5,6 +5,13 @@ using UnityEngine;
 // ilerletir, WaveDirector'a "escalation basamağı" bildirir ve EMP şok dalgası
 // yayar (yakın düşmanları sersemletir + iter — terminale ulaşmak nefes aldırır).
 // Kullanım: boş GO + BoxCollider (isTrigger) + bu script. Farklı katlara 4 tane koy.
+using Bloodrush.UI;
+using Bloodrush.FX;
+using Bloodrush.Player;
+using Bloodrush.Enemy;
+
+namespace Bloodrush.Flow
+{
 [RequireComponent(typeof(BoxCollider))]
 public class DataTerminal : MonoBehaviour
 {
@@ -120,4 +127,5 @@ public class DataTerminal : MonoBehaviour
     }
 
     void SetGlow(Color c) { if (glow) glow.material.color = c; }
+}
 }

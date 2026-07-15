@@ -1,5 +1,7 @@
 using UnityEngine;
 
+namespace Bloodrush.Player
+{
 public class PlayerPickup : MonoBehaviour
 {
     PlayerShoot shoot;
@@ -25,4 +27,5 @@ public class PlayerPickup : MonoBehaviour
             if (pickup != null) { pickup.Collect(shoot); break; }
         }
     }
+}
 }

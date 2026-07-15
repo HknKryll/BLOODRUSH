@@ -1,7 +1,10 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
+using Bloodrush.Player;
 
+namespace Bloodrush.FX
+{
 public class SceneVolumeSetup : MonoBehaviour
 {
     [Header("PS1 Stil")]
@@ -130,4 +133,5 @@ public class SceneVolumeSetup : MonoBehaviour
         if (grain    != null) grain.intensity.Override(Mathf.Lerp(0.12f, 0.35f, effective));
         if (colorAdj != null) colorAdj.saturation.Override(Mathf.Lerp(-12f, -40f, effective));
     }
+}
 }

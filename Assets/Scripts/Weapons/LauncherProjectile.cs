@@ -1,5 +1,9 @@
 using UnityEngine;
+using Bloodrush.Shared;
+using Bloodrush.Enemy;
 
+namespace Bloodrush.Weapons
+{
 [RequireComponent(typeof(Rigidbody))]
 public class LauncherProjectile : MonoBehaviour
 {
@@ -74,4 +78,5 @@ public class LauncherProjectile : MonoBehaviour
         Gizmos.DrawSphere(transform.position, blastRadius);
     }
 #endif
+}
 }

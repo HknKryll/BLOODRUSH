@@ -1,5 +1,10 @@
 using UnityEngine;
+using Bloodrush.Shared;
+using Bloodrush.Enemy;
+using Bloodrush.FX;
 
+namespace Bloodrush.Player
+{
 public class PlayerParry : MonoBehaviour
 {
     [SerializeField] KeyCode        parryKey   = KeyCode.F;
@@ -76,4 +81,5 @@ public class PlayerParry : MonoBehaviour
         CameraShake.Shake(0.08f, 0.1f);
         if (punchClip) audioSrc.PlayOneShot(punchClip, punchVolume);
     }
+}
 }

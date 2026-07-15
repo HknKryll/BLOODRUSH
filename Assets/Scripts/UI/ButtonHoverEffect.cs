@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+namespace Bloodrush.UI
+{
 public class ButtonHoverEffect : MonoBehaviour,
     IPointerEnterHandler, IPointerExitHandler,
     IPointerDownHandler,  IPointerUpHandler
@@ -23,4 +25,5 @@ public class ButtonHoverEffect : MonoBehaviour,
     public void OnPointerExit(PointerEventData e)  => target = 0f;
     public void OnPointerDown(PointerEventData e)  => target = fillColor.a * 1.6f;
     public void OnPointerUp(PointerEventData e)    => target = fillColor.a;
+}
 }

@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.Events;
 
+namespace Bloodrush.Shared
+{
 public class Health : MonoBehaviour
 {
     [SerializeField] float maxHealth = 100f;
@@ -39,4 +41,5 @@ public class Health : MonoBehaviour
         current = maxHealth;
         onHealthChanged.Invoke(1f);
     }
+}
 }

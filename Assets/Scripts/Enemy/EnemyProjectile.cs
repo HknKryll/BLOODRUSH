@@ -2,6 +2,11 @@ using UnityEngine;
 
 // Menzilli düşmanların attığı kaçılabilir mermi. İleri uçar, oyuncuya değince
 // hasar verir, duvara değince/süresi dolunca yok olur.
+using Bloodrush.Shared;
+using Bloodrush.Player;
+
+namespace Bloodrush.Enemy
+{
 public class EnemyProjectile : MonoBehaviour
 {
     float speed;
@@ -41,4 +46,5 @@ public class EnemyProjectile : MonoBehaviour
         life -= Time.deltaTime;
         if (life <= 0f) Destroy(gameObject);
     }
+}
 }

@@ -3,7 +3,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using Bloodrush.Arena;
+using Bloodrush.Player;
 
+namespace Bloodrush.UI
+{
 public class PauseMenu : MonoBehaviour
 {
     // ─── Palet (MainMenuManager ile aynı) ────────────────────────────
@@ -322,4 +326,5 @@ public class PauseMenu : MonoBehaviour
         rt.offsetMin = minOff;      rt.offsetMax = maxOff;
         return go;
     }
+}
 }

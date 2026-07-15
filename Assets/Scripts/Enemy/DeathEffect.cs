@@ -1,5 +1,8 @@
 using UnityEngine;
+using Bloodrush.Shared;
 
+namespace Bloodrush.Enemy
+{
 public class DeathEffect : MonoBehaviour
 {
     [SerializeField] GameObject effectPrefab;
@@ -16,4 +19,5 @@ public class DeathEffect : MonoBehaviour
         var go = Instantiate(effectPrefab, transform.position + Vector3.up * 0.5f, Quaternion.identity);
         go.transform.localScale = Vector3.one * scale;
     }
+}
 }

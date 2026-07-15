@@ -2,7 +2,10 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
+using Bloodrush.Shared;
 
+namespace Bloodrush.FX
+{
 public class DamageVignette : MonoBehaviour
 {
     public static DamageVignette Instance { get; private set; }
@@ -125,4 +128,5 @@ public class DamageVignette : MonoBehaviour
             if (vignette != null) vignette.intensity.value = collapseVignette;
         }
     }
+}
 }

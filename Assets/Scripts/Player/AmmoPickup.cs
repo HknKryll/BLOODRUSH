@@ -1,5 +1,7 @@
 using UnityEngine;
 
+namespace Bloodrush.Player
+{
 public class AmmoPickup : MonoBehaviour
 {
     [SerializeField] int       minAmmo    = 3;
@@ -22,4 +24,5 @@ public class AmmoPickup : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, 1.5f);
     }
+}
 }

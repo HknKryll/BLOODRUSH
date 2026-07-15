@@ -1,7 +1,12 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using Bloodrush.Shared;
+using Bloodrush.FX;
+using Bloodrush.Player;
 
+namespace Bloodrush.Enemy
+{
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Health))]
 public class EnemyAI : MonoBehaviour, IParryable
@@ -567,4 +572,5 @@ public class EnemyAI : MonoBehaviour, IParryable
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 #endif
+}
 }

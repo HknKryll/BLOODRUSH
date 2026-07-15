@@ -4,6 +4,10 @@ using UnityEngine;
 // zamanla (kamp cezası) hem her terminal tamamlandıkça (ilerleme) yükselir.
 // Heat arttıkça spawn sıklaşır, canlı düşman tavanı ve zor düşman oranı artar.
 // Tüm terminaller bitince spawn durur, çıkış bariyeri açılır.
+using Bloodrush.Shared;
+
+namespace Bloodrush.Flow
+{
 public class WaveDirector : MonoBehaviour
 {
     public static WaveDirector Instance { get; private set; }
@@ -103,4 +107,5 @@ public class WaveDirector : MonoBehaviour
     }
 
     // Null prefab varsa spawn atlar; eksik prefab'lar için güvenli
+}
 }

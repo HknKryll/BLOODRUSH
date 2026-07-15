@@ -7,6 +7,11 @@ using UnityEngine.SceneManagement;
 // zıplama/slide yok, sakin yürüyüş), itiraf metni bitince hedef yazısını
 // gösterir, koltuğa bakınca [E] Otur prompt'u çıkarır; E'ye basınca kamera
 // oturma pozuna kayar → fade → sonraki sahne.
+using Bloodrush.UI;
+using Bloodrush.Player;
+
+namespace Bloodrush.Flow
+{
 public class IntroSalonController : MonoBehaviour
 {
     [Header("Referanslar")]
@@ -182,4 +187,5 @@ public class IntroSalonController : MonoBehaviour
         rt.offsetMin = rt.offsetMax = Vector2.zero;
         return lbl;
     }
+}
 }

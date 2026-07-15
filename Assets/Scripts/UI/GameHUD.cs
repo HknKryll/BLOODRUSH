@@ -1,6 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Bloodrush.Player;
+using Bloodrush.Flow;
 
+namespace Bloodrush.UI
+{
 public class GameHUD : MonoBehaviour
 {
     public static GameHUD Instance { get; private set; }
@@ -171,4 +175,5 @@ public class GameHUD : MonoBehaviour
     }
 
     public static void ResetProgress() => uploadProgress = 0f;
+}
 }

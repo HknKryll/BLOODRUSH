@@ -5,6 +5,11 @@ using UnityEngine;
 // hepsi ölünce çıkış bariyeri açılır.
 // Kullanım: boş GO + BoxCollider (isTrigger) + bu script.
 // Düşmanlar SAHNEYE elle dizilir (prefab değil, instance) ve enemies[]'e sürüklenir.
+using Bloodrush.Shared;
+using Bloodrush.Player;
+
+namespace Bloodrush.Flow
+{
 [RequireComponent(typeof(BoxCollider))]
 public class Arena : MonoBehaviour
 {
@@ -98,4 +103,5 @@ public class Arena : MonoBehaviour
         var shoot = FindObjectOfType<PlayerShoot>();
         shoot?.RefillWave();
     }
+}
 }

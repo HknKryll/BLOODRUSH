@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 
+namespace Bloodrush.FX
+{
 public class CameraShake : MonoBehaviour
 {
     public static CameraShake Instance { get; private set; }
@@ -47,4 +49,5 @@ public class CameraShake : MonoBehaviour
 
         transform.localPosition = origin;
     }
+}
 }

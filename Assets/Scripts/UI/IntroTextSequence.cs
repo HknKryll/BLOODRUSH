@@ -1,7 +1,10 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using Bloodrush.Player;
 
+namespace Bloodrush.UI
+{
 public class IntroTextSequence : MonoBehaviour
 {
     [SerializeField] float charDelay = 0.04f;
@@ -130,4 +133,5 @@ public class IntroTextSequence : MonoBehaviour
         Destroy(cgo);
         Destroy(gameObject);
     }
+}
 }

@@ -1,5 +1,7 @@
 using UnityEngine;
 
+namespace Bloodrush.Player
+{
 public class WeaponAnimator : MonoBehaviour
 {
     [SerializeField] Animator animator;
@@ -29,4 +31,5 @@ public class WeaponAnimator : MonoBehaviour
     public void TriggerFire()         => animator?.SetTrigger("Fire");
     public void TriggerFireLauncher() => animator?.SetTrigger("FireLauncher");
     public void TriggerParry()        => animator?.SetTrigger("Parry");
+}
 }

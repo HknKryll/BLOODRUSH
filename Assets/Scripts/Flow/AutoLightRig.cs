@@ -9,6 +9,9 @@ using UnityEngine.Rendering.HighDefinition;
 // fark etmez — zemini nerede bulursa orayı aydınlatır.
 // Kullanım: boş GO (konumu önemsiz) + bu script → ⋮ → "Işıkları Kur (Analiz)".
 // Sadece kendi child ışıklarını yönetir; geometriye dokunmaz, tekrar çalıştırmak güvenli.
+
+namespace Bloodrush.Flow
+{
 public class AutoLightRig : MonoBehaviour
 {
     [Header("Analiz")]
@@ -116,4 +119,5 @@ public class AutoLightRig : MonoBehaviour
         hd.SetIntensity(lumen, LightUnit.Lumen);
         hd.EnableShadows(shadows);
     }
+}
 }

@@ -3,6 +3,8 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.Experimental.Rendering;
 
+namespace Bloodrush.FX
+{
 [System.Serializable]
 public class PixelatePass : CustomPass
 {
@@ -49,4 +51,5 @@ public class PixelatePass : CustomPass
         CoreUtils.Destroy(mat);
         tempRT?.Release();
     }
+}
 }

@@ -7,6 +7,9 @@ using UnityEngine.Rendering.HighDefinition;
 // ve tavana otomatik point light ızgarası döşer.
 // Kapı boşluğu için: kurulduktan sonra istediğin duvarı silip yerine
 // iki parça duvar koy veya duvarı kapı hizasında ölçekle.
+
+namespace Bloodrush.Flow
+{
 public class RoomBuilder : MonoBehaviour
 {
     [Header("Oda Ölçüleri (metre)")]
@@ -88,4 +91,5 @@ public class RoomBuilder : MonoBehaviour
         go.transform.localScale    = size;
         go.isStatic = true;   // NavMesh bake için
     }
+}
 }

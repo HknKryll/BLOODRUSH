@@ -1,6 +1,10 @@
 using System.Collections;
 using UnityEngine;
+using Bloodrush.Shared;
+using Bloodrush.FX;
 
+namespace Bloodrush.Player
+{
 public class StimulantSystem : MonoBehaviour
 {
     public static StimulantSystem Instance { get; private set; }
@@ -72,4 +76,5 @@ public class StimulantSystem : MonoBehaviour
         if (shoot) shoot.DamageMultiplier = 1f;
         damageRoutine = null;
     }
+}
 }

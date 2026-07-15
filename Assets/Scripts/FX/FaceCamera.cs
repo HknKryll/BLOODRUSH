@@ -1,5 +1,7 @@
 using UnityEngine;
 
+namespace Bloodrush.FX
+{
 public class FaceCamera : MonoBehaviour
 {
     Camera cam;
@@ -10,4 +12,5 @@ public class FaceCamera : MonoBehaviour
     {
         if (cam) transform.forward = cam.transform.forward;
     }
+}
 }

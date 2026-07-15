@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 
+namespace Bloodrush.Player
+{
 public class HitEffect : MonoBehaviour
 {
     void Start()
@@ -82,4 +84,5 @@ public class HitEffect : MonoBehaviour
         mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
         return mat;
     }
+}
 }

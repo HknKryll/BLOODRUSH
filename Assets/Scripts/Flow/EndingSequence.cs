@@ -7,6 +7,11 @@ using UnityEngine.SceneManagement;
 // Final sahnesi (Ch6): son UploadTerminal'in onComplete event'ine
 // Begin() bağlanır. Upload %100 → slow-mo → beyaz fade → kapanış
 // metni → BLOODRUSH → herhangi bir tuş → ana menü.
+using Bloodrush.Player;
+using Bloodrush.Enemy;
+
+namespace Bloodrush.Flow
+{
 public class EndingSequence : MonoBehaviour
 {
     [SerializeField] float slowMoDuration   = 1.5f;
@@ -122,4 +127,5 @@ public class EndingSequence : MonoBehaviour
         Cursor.visible   = true;
         SceneManager.LoadScene("MainMenu");
     }
+}
 }

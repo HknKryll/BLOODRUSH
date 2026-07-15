@@ -1,5 +1,7 @@
 using UnityEngine;
 
+namespace Bloodrush.Player
+{
 public class ProceduralWeaponMotion : MonoBehaviour
 {
     [Header("Silah Objesi")]
@@ -126,4 +128,5 @@ public class ProceduralWeaponMotion : MonoBehaviour
         recoilPosY        += recoilYKick;
         recoilTiltCurrent -= recoilTilt;
     }
+}
 }

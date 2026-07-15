@@ -2,7 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Bloodrush.Player;
 
+namespace Bloodrush.UI
+{
 public class CrosshairHUD : MonoBehaviour
 {
     public static CrosshairHUD Instance { get; private set; }
@@ -127,4 +130,5 @@ public class CrosshairHUD : MonoBehaviour
         yield return new WaitForSecondsRealtime(hitDuration);
         foreach (var l in hitLines) l.SetActive(false);
     }
+}
 }

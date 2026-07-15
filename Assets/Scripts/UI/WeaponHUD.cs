@@ -1,7 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Bloodrush.Player;
 
+namespace Bloodrush.UI
+{
 public class WeaponHUD : MonoBehaviour
 {
     [SerializeField] PlayerShoot shoot;
@@ -100,4 +103,5 @@ public class WeaponHUD : MonoBehaviour
         tmp.characterSpacing = 3f;
         return tmp;
     }
+}
 }

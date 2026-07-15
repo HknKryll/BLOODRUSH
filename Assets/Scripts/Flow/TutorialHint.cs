@@ -4,6 +4,10 @@ using UnityEngine;
 // Kullanım: boş GO + BoxCollider (isTrigger) + bu script.
 // Örn. koridora "[Sol Tık] Ateş et", kanca şaftına "[E] Kancala ve yukarı çık",
 // wall-jump şaftına "Havada [Space] ile duvardan duvara zıpla" yaz.
+using Bloodrush.Player;
+
+namespace Bloodrush.Flow
+{
 [RequireComponent(typeof(BoxCollider))]
 public class TutorialHint : MonoBehaviour
 {
@@ -51,4 +55,5 @@ public class TutorialHint : MonoBehaviour
         hideAt  = -1f;
         if (oneShot) used = true;
     }
+}
 }

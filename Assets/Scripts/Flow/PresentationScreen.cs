@@ -6,6 +6,9 @@ using UnityEngine.UI;
 // Kullanım: boş GO'yu duvarda, ekranın olacağı yere koy; ekran DÜZ karşıya
 // baksın diye GO'yu duvara paralel çevir (yazı +Z yönüne bakar). Bu script'i ekle.
 // Görsel/video istersen aşağıdaki nota bak.
+
+namespace Bloodrush.Flow
+{
 public class PresentationScreen : MonoBehaviour
 {
     [Header("Ekran Boyutu (metre)")]
@@ -108,4 +111,5 @@ public class PresentationScreen : MonoBehaviour
         }
         textGroup.alpha = to;
     }
+}
 }

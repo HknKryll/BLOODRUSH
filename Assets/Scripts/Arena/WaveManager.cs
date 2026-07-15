@@ -2,7 +2,11 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using Bloodrush.Shared;
+using Bloodrush.Player;
 
+namespace Bloodrush.Arena
+{
 public class WaveManager : MonoBehaviour
 {
     [Header("Dalga Ayarları")]
@@ -156,4 +160,5 @@ public class WaveManager : MonoBehaviour
         if (waveText)       waveText.text       = $"WAVE  {currentWave} / {maxWaves}";
         if (enemyCountText) enemyCountText.text  = $"ENEMIES  {aliveEnemies}";
     }
+}
 }

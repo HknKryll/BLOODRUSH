@@ -1,5 +1,8 @@
 using UnityEngine;
+using Bloodrush.Flow;
 
+namespace Bloodrush.Player
+{
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
@@ -372,4 +375,5 @@ public class PlayerMovement : MonoBehaviour
     }
 
     void Play(AudioClip clip, float vol = 1f) { if (clip) audioSrc.PlayOneShot(clip, vol); }
+}
 }

@@ -1,6 +1,14 @@
 using System.Collections;
 using UnityEngine;
+using Bloodrush.Shared;
+using Bloodrush.Flow;
+using Bloodrush.Enemy;
+using Bloodrush.Weapons;
+using Bloodrush.UI;
+using Bloodrush.FX;
 
+namespace Bloodrush.Player
+{
 public class PlayerShoot : MonoBehaviour
 {
     public enum LauncherMode { Grenade, Flash, Anchor }
@@ -242,4 +250,5 @@ public class PlayerShoot : MonoBehaviour
     public int  TotalAmmo            => totalAmmo;
     public int  MagazineSize         => magazineSize;
     public bool IsReloading          => isReloading;
+}
 }

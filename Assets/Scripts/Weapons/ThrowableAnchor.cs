@@ -1,5 +1,7 @@
 using UnityEngine;
 
+namespace Bloodrush.Weapons
+{
 [RequireComponent(typeof(Rigidbody))]
 public class ThrowableAnchor : MonoBehaviour
 {
@@ -24,4 +26,5 @@ public class ThrowableAnchor : MonoBehaviour
     }
 
     void Expire() => Destroy(gameObject);
+}
 }

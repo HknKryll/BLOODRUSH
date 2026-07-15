@@ -5,6 +5,9 @@ using UnityEngine.Rendering.HighDefinition;
 // Var olan bir odaya/koridora ışık eklemek için: boş GO'yu odanın yatay
 // merkezine (zemin hizasına) koy, boyutları ayarla, ⋮ menü → "Işıkları Kur".
 // Sadece kendi ışık child'larını yönetir; tekrar çalıştırmak güvenli.
+
+namespace Bloodrush.Flow
+{
 public class LightGrid : MonoBehaviour
 {
     public enum Layout
@@ -119,4 +122,5 @@ public class LightGrid : MonoBehaviour
         hd.SetIntensity(lumen, LightUnit.Lumen);
         hd.EnableShadows(shadows);
     }
+}
 }

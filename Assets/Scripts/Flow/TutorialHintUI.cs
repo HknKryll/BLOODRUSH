@@ -4,6 +4,10 @@ using UnityEngine.UI;
 // Paylaşılan tutorial ipucu göstergesi. TutorialHint bölgeleri bunu çağırır.
 // İlk çağrıda kendini oluşturur (DamageVignette deseni). Ekranın alt-ortasında
 // yumuşak fade'li bir satır gösterir.
+using Bloodrush.FX;
+
+namespace Bloodrush.Flow
+{
 public class TutorialHintUI : MonoBehaviour
 {
     static TutorialHintUI instance;
@@ -78,4 +82,5 @@ public class TutorialHintUI : MonoBehaviour
         if (group == null) return;
         group.alpha = Mathf.MoveTowards(group.alpha, targetAlpha, Time.deltaTime * 6f);
     }
+}
 }

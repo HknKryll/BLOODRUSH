@@ -4,6 +4,9 @@ using UnityEngine;
 // yere koy (duvardan uzağa, açık alana), GO'yu podyuma dönük çevir (+Z yönü
 // merdivenin çıkış yönü), ⋮ menüsünden "Merdiven Kur" seç.
 // Her basamak zemine kadar dolu bir blok → oyuncu güvenle çıkar (boşluk yok).
+
+namespace Bloodrush.Flow
+{
 public class StairBuilder : MonoBehaviour
 {
     [Header("Basamak")]
@@ -31,4 +34,5 @@ public class StairBuilder : MonoBehaviour
             step.isStatic = true;   // NavMesh bake için
         }
     }
+}
 }

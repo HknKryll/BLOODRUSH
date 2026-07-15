@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 
+namespace Bloodrush.FX
+{
 public class FPSCounter : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI label;
@@ -24,4 +26,5 @@ public class FPSCounter : MonoBehaviour
                         :              Color.red;
         }
     }
+}
 }

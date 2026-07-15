@@ -7,6 +7,13 @@ using UnityEngine.UI;
 // Ch2 Boss: pompalı (hitscan koni), cana bağlı 3 faz, %66/%33'te ışık söndürüp
 // arkaya ışınlanma, uzakta kemp yapılırsa agresif dash, yakında parry'lenebilir
 // kabza vuruşu + oyuncuyu geri itme. Büyük düşman: kanca/yumruk işlemez.
+using Bloodrush.Shared;
+using Bloodrush.FX;
+using Bloodrush.Flow;
+using Bloodrush.Player;
+
+namespace Bloodrush.Enemy
+{
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Health))]
 public class BossAI : MonoBehaviour, IParryable
@@ -396,4 +403,5 @@ public class BossAI : MonoBehaviour, IParryable
 
     // Boss büyük — kanca/yumruk işlemez (kancanın kontrol edeceği bilgi)
     public bool IsLarge => true;
+}
 }

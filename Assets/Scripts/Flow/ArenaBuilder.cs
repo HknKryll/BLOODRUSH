@@ -5,6 +5,9 @@ using UnityEngine.Rendering.HighDefinition;
 // 4 kardinal merdiven + yüksek merkez çekirdek). Boş GO'ya ekle, ⋮ → "Arenayı Kur".
 // Katlar merkeze doğru yükselir; her kat arası 4 kardinal yönde merdivenle bağlı.
 // Oyuncu merdivenle VEYA kanca/wall-jump ile katlar arası çıkar.
+
+namespace Bloodrush.Flow
+{
 public class ArenaBuilder : MonoBehaviour
 {
     [Header("Arena")]
@@ -253,4 +256,5 @@ public class ArenaBuilder : MonoBehaviour
         if (cap) DestroyImmediate(cap);
         go.AddComponent<MeshCollider>();   // düz-tepeli disk collision (non-convex static)
     }
+}
 }

@@ -1,5 +1,11 @@
 using UnityEngine;
+using Bloodrush.Flow;
+using Bloodrush.UI;
+using Bloodrush.Weapons;
+using Bloodrush.Enemy;
 
+namespace Bloodrush.Player
+{
 public class GrapplingHook : MonoBehaviour
 {
     [Header("Kanca")]
@@ -361,4 +367,5 @@ public class GrapplingHook : MonoBehaviour
     }
 
     public bool IsHooked => isHooked;
+}
 }

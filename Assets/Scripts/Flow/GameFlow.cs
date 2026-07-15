@@ -6,6 +6,12 @@ using UnityEngine.SceneManagement;
 // Her kampanya sahnesine boş bir GameObject olarak konur.
 // Checkpoint = sahne başı: ölünce sahne yeniden yüklenir, upload barı sahne
 // başındaki değerine geri çekilir.
+using Bloodrush.Shared;
+using Bloodrush.Player;
+using Bloodrush.UI;
+
+namespace Bloodrush.Flow
+{
 public class GameFlow : MonoBehaviour
 {
     [SerializeField] float deathFadeDuration = 1.5f;
@@ -152,4 +158,5 @@ public class GameFlow : MonoBehaviour
         rt.offsetMin = rt.offsetMax = Vector2.zero;
         return img;
     }
+}
 }

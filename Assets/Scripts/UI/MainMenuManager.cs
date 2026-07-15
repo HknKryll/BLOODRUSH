@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 
+namespace Bloodrush.UI
+{
 public class MainMenuManager : MonoBehaviour
 {
     // ─── Palet ───────────────────────────────────────────────────────
@@ -356,4 +358,5 @@ public class MainMenuManager : MonoBehaviour
         rt.anchoredPosition = Vector2.zero;
         rt.sizeDelta        = size;
     }
+}
 }

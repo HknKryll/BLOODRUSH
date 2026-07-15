@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 
+namespace Bloodrush.FX
+{
 public class HitStop : MonoBehaviour
 {
     public static HitStop Instance { get; private set; }
@@ -24,4 +26,5 @@ public class HitStop : MonoBehaviour
         Time.timeScale       = 1f;
         Time.fixedDeltaTime  = 0.02f;
     }
+}
 }

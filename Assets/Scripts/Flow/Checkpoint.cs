@@ -3,6 +3,10 @@ using UnityEngine;
 // Checkpoint: oyuncu girince respawn noktası olarak kaydedilir.
 // Kullanım: boş GO + BoxCollider (isTrigger) + bu script. GO'nun yönü (Y)
 // respawn'da oyuncunun bakacağı yön olur.
+using Bloodrush.Player;
+
+namespace Bloodrush.Flow
+{
 [RequireComponent(typeof(BoxCollider))]
 public class Checkpoint : MonoBehaviour
 {
@@ -25,4 +29,5 @@ public class Checkpoint : MonoBehaviour
         Debug.Log("[Checkpoint] Oyuncu girdi — checkpoint kaydediliyor.", this);
         GameFlow.SetCheckpoint(transform);
     }
+}
 }

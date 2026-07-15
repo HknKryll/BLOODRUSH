@@ -5,6 +5,11 @@ using UnityEngine.Events;
 // başlar, süre boyunca dalga dalga düşman gelir, HUD'daki YÜKLEME barı dolar.
 // Kendi payı (uploadShare) dolunca spawn durur ve çıkış bariyeri açılır.
 // Kullanım: boş GO + BoxCollider (isTrigger) + bu script.
+using Bloodrush.Player;
+using Bloodrush.UI;
+
+namespace Bloodrush.Flow
+{
 [RequireComponent(typeof(BoxCollider))]
 public class UploadTerminal : MonoBehaviour
 {
@@ -99,4 +104,5 @@ public class UploadTerminal : MonoBehaviour
         if (completeClip) audioSrc.PlayOneShot(completeClip, completeVolume);
         onComplete?.Invoke();
     }
+}
 }

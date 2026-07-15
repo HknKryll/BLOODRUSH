@@ -4,6 +4,11 @@ using UnityEngine.SceneManagement;
 
 // Bölüm sonu geçiş noktası: oyuncu girince fade → sıradaki sahne.
 // Kullanım: boş GO + BoxCollider (isTrigger) + bu script.
+using Bloodrush.Player;
+using Bloodrush.Enemy;
+
+namespace Bloodrush.Flow
+{
 [RequireComponent(typeof(BoxCollider))]
 public class LevelExit : MonoBehaviour
 {
@@ -46,4 +51,5 @@ public class LevelExit : MonoBehaviour
         else
             GameFlow.LoadNext();
     }
+}
 }

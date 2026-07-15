@@ -1,5 +1,7 @@
 using UnityEngine;
 
+namespace Bloodrush.Player
+{
 public class BloodEffect : MonoBehaviour
 {
     void Start()
@@ -29,4 +31,5 @@ public class BloodEffect : MonoBehaviour
 
         Destroy(go, 2.5f);
     }
+}
 }

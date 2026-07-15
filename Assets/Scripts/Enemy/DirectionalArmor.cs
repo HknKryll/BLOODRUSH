@@ -2,6 +2,9 @@ using UnityEngine;
 
 // Yönlü zırh: önden gelen atışlar zırha çarpar (az hasar), yan/arkadan tam hasar.
 // PlayerShoot hasar uygularken bu component'i arayıp çarpanı uygular.
+
+namespace Bloodrush.Enemy
+{
 public class DirectionalArmor : MonoBehaviour
 {
     [Tooltip("Önden gelen atışın hasar çarpanı (0.1 = %90 emilir)")]
@@ -17,4 +20,5 @@ public class DirectionalArmor : MonoBehaviour
         float angle = Vector3.Angle(transform.forward, -shotDir);
         return angle <= frontAngle ? frontMult : 1f;
     }
+}
 }

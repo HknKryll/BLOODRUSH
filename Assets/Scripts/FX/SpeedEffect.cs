@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 
+namespace Bloodrush.FX
+{
 public class SpeedEffect : MonoBehaviour
 {
     [SerializeField] Camera     playerCamera;
@@ -46,4 +48,5 @@ public class SpeedEffect : MonoBehaviour
 
         ca.intensity.value = Mathf.Lerp(ca.intensity.value, t, Time.deltaTime * lerpSpeed);
     }
+}
 }
