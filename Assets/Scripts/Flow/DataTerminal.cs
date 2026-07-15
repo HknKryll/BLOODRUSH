@@ -9,6 +9,7 @@ using Bloodrush.UI;
 using Bloodrush.FX;
 using Bloodrush.Player;
 using Bloodrush.Enemy;
+using Bloodrush.Shared.Audio;
 
 namespace Bloodrush.Flow
 {
@@ -38,14 +39,12 @@ public class DataTerminal : MonoBehaviour
     bool    playerInside;
     bool    done;
     Vector3 fillBaseScale;
-    AudioSource audioSrc;
+    SfxPlayer sfx;
 
     void Start()
     {
         GetComponent<BoxCollider>().isTrigger = true;
-        audioSrc = gameObject.AddComponent<AudioSource>();
-        audioSrc.playOnAwake  = false;
-        audioSrc.spatialBlend = 0f;
+        sfx = SfxPlayer.Create(gameObject, spatialBlend: 0f);
         if (fillBar) { fillBaseScale = fillBar.localScale; var s = fillBaseScale; s.x = 0f; fillBar.localScale = s; }
         SetGlow(IdleColor);
     }
@@ -77,7 +76,7 @@ public class DataTerminal : MonoBehaviour
         if (WaveDirector.Instance != null) WaveDirector.Instance.OnTerminalDone();
         SetGlow(DoneColor);
         UpdateFill(1f);
-        if (completeClip) audioSrc.PlayOneShot(completeClip);
+        sfx.Play(completeClip);
         FireEMP();
     }
 

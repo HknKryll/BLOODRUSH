@@ -7,6 +7,7 @@ using UnityEngine.Events;
 // Kullanım: boş GO + BoxCollider (isTrigger) + bu script.
 using Bloodrush.Player;
 using Bloodrush.UI;
+using Bloodrush.Shared.Audio;
 
 namespace Bloodrush.Flow
 {
@@ -39,15 +40,13 @@ public class UploadTerminal : MonoBehaviour
     bool  uploading;
     bool  completed;
     float spawnTimer;
-    AudioSource audioSrc;
+    SfxPlayer sfx;
 
     void Start()
     {
         GetComponent<BoxCollider>().isTrigger = true;
 
-        audioSrc = gameObject.AddComponent<AudioSource>();
-        audioSrc.playOnAwake  = false;
-        audioSrc.spatialBlend = 0f;
+        sfx = SfxPlayer.Create(gameObject, spatialBlend: 0f);
 
         if (exitBarrier)  exitBarrier.SetActive(true);
         if (activeVisual) activeVisual.SetActive(false);
@@ -60,7 +59,7 @@ public class UploadTerminal : MonoBehaviour
 
         uploading  = true;
         spawnTimer = spawnInterval * 0.5f;   // ilk dalga çabuk gelsin
-        if (startClip) audioSrc.PlayOneShot(startClip, startVolume);
+        sfx.Play(startClip, startVolume);
     }
 
     void Update()
@@ -101,7 +100,7 @@ public class UploadTerminal : MonoBehaviour
         completed = true;
         if (activeVisual) activeVisual.SetActive(true);
         if (exitBarrier)  exitBarrier.SetActive(false);
-        if (completeClip) audioSrc.PlayOneShot(completeClip, completeVolume);
+        sfx.Play(completeClip, completeVolume);
         onComplete?.Invoke();
     }
 }

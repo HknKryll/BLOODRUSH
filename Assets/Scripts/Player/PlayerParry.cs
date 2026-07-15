@@ -1,5 +1,6 @@
 using UnityEngine;
 using Bloodrush.Shared;
+using Bloodrush.Shared.Audio;
 using Bloodrush.Enemy;
 using Bloodrush.FX;
 
@@ -23,13 +24,11 @@ public class PlayerParry : MonoBehaviour
     [SerializeField] AudioClip punchClip;
     [SerializeField] [Range(0f,1f)] float punchVolume = 0.8f;
 
-    AudioSource audioSrc;
+    SfxPlayer sfx;
 
     void Start()
     {
-        audioSrc = gameObject.AddComponent<AudioSource>();
-        audioSrc.playOnAwake  = false;
-        audioSrc.spatialBlend = 0f;
+        sfx = SfxPlayer.Create(gameObject, spatialBlend: 0f);
     }
 
     void Update()
@@ -46,7 +45,7 @@ public class PlayerParry : MonoBehaviour
                 parryable.Parry(parryStun);
                 CameraShake.Shake(0.2f, 0.15f);
                 weaponAnim?.TriggerParry();
-                if (parryClip) audioSrc.PlayOneShot(parryClip, parryVolume);
+                sfx.Play(parryClip, parryVolume);
                 return;
             }
         }
@@ -79,7 +78,7 @@ public class PlayerParry : MonoBehaviour
         target.Knockback(target.transform.position - transform.position, punchForce);
         weaponAnim?.TriggerParry();
         CameraShake.Shake(0.08f, 0.1f);
-        if (punchClip) audioSrc.PlayOneShot(punchClip, punchVolume);
+        sfx.Play(punchClip, punchVolume);
     }
 }
 }

@@ -6,6 +6,7 @@ using Bloodrush.Enemy;
 using Bloodrush.Weapons;
 using Bloodrush.UI;
 using Bloodrush.FX;
+using Bloodrush.Shared.Audio;
 
 namespace Bloodrush.Player
 {
@@ -62,7 +63,7 @@ public class PlayerShoot : MonoBehaviour
     bool            isReloading;
     float           nextFireTime;
     ThrowableAnchor activeAnchor;
-    AudioSource     audioSrc;
+    SfxPlayer       sfx;
 
     void Start()
     {
@@ -71,10 +72,7 @@ public class PlayerShoot : MonoBehaviour
         grenadeAmmo = maxGrenadeAmmo;
         flashAmmo   = maxFlashAmmo;
         if (playerCamera == null) playerCamera = Camera.main;
-        audioSrc = GetComponent<AudioSource>();
-        if (audioSrc == null) audioSrc = gameObject.AddComponent<AudioSource>();
-        audioSrc.playOnAwake  = false;
-        audioSrc.spatialBlend = 0f;
+        sfx = SfxPlayer.CreateOrGet(gameObject, spatialBlend: 0f);
     }
 
     void Update()
@@ -99,13 +97,13 @@ public class PlayerShoot : MonoBehaviour
         if (currentAmmo <= 0)
         {
             if (totalAmmo > 0) StartCoroutine(Reload());
-            else Play(emptyClickClip, emptyClickVolume);
+            else sfx.Play(emptyClickClip, emptyClickVolume);
             return;
         }
 
         currentAmmo--;
         nextFireTime = Time.time + revolverFireRate;
-        Play(revolverFireClip, revolverFireVolume);
+        sfx.Play(revolverFireClip, revolverFireVolume);
         weaponAnim?.TriggerFire();
         weaponMotion?.ApplyRecoil();
         CameraShake.Shake(0.04f, 0.08f);
@@ -145,7 +143,7 @@ public class PlayerShoot : MonoBehaviour
     {
         if (currentAmmo >= magazineSize || totalAmmo <= 0) yield break;
         isReloading = true;
-        Play(reloadClip, reloadVolume);
+        sfx.Play(reloadClip, reloadVolume);
         yield return new WaitForSeconds(reloadTime);
         int need    = magazineSize - currentAmmo;
         int take    = Mathf.Min(need, totalAmmo);
@@ -175,7 +173,7 @@ public class PlayerShoot : MonoBehaviour
     void FireLauncher()
     {
         weaponAnim?.TriggerFireLauncher();
-        Play(launcherFireClip, launcherFireVolume);
+        sfx.Play(launcherFireClip, launcherFireVolume);
         switch (mode)
         {
             case LauncherMode.Grenade when grenadeAmmo > 0:
@@ -216,10 +214,9 @@ public class PlayerShoot : MonoBehaviour
             LauncherMode.Flash   => LauncherMode.Anchor,
             _                    => LauncherMode.Grenade,
         };
-        Play(modeSwitchClip, modeSwitchVolume);
+        sfx.Play(modeSwitchClip, modeSwitchVolume);
     }
 
-    void Play(AudioClip clip, float vol = 1f) { if (clip) audioSrc.PlayOneShot(clip, vol); }
 
     // ───────────────── Public ─────────────────
 

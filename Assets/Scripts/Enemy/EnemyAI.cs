@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using Bloodrush.Shared;
+using Bloodrush.Shared.Audio;
 using Bloodrush.FX;
 using Bloodrush.Player;
 
@@ -95,7 +96,7 @@ public class EnemyAI : MonoBehaviour, IParryable
     NavMeshAgent agent;
     Transform player;
     PlayerMovement playerMovement;
-    AudioSource audioSrc;
+    SfxPlayer sfx;
 
     // ─────────────────────────────────────────────
 
@@ -106,9 +107,7 @@ public class EnemyAI : MonoBehaviour, IParryable
         player = pgo ? pgo.transform : null;
         playerMovement = pgo ? pgo.GetComponent<PlayerMovement>() : null;
 
-        audioSrc = gameObject.AddComponent<AudioSource>();
-        audioSrc.playOnAwake  = false;
-        audioSrc.spatialBlend = 1f;
+        sfx = SfxPlayer.Create(gameObject, spatialBlend: 1f);
 
         var health = GetComponent<Health>();
         health.onDeath.AddListener(OnDeath);
@@ -297,7 +296,7 @@ public class EnemyAI : MonoBehaviour, IParryable
 
         var proj = Instantiate(projectilePrefab, origin, Quaternion.LookRotation(dir));
         proj.Launch(dir, projectileSpeed, projectileDamage);
-        if (attackClip != null) audioSrc.PlayOneShot(attackClip, attackVolume);
+        sfx.Play(attackClip, attackVolume);
     }
 
     bool HasRangedLoS()
@@ -372,7 +371,7 @@ public class EnemyAI : MonoBehaviour, IParryable
                 playerMovement.Launch(away.normalized * playerKnockback + Vector3.up * 2f);
             }
 
-            if (attackClip != null) audioSrc.PlayOneShot(attackClip, attackVolume);
+            sfx.Play(attackClip, attackVolume);
             state = State.Attack;
         }
     }
@@ -532,7 +531,7 @@ public class EnemyAI : MonoBehaviour, IParryable
 
     void PlayHurt()
     {
-        if (hurtClip) audioSrc.PlayOneShot(hurtClip, hurtVolume);
+        sfx.Play(hurtClip, hurtVolume);
     }
 
     void OnDeath()
@@ -543,17 +542,7 @@ public class EnemyAI : MonoBehaviour, IParryable
         DamageVignette.OnKill();
         CameraShake.HitPause();
 
-        if (deathClip != null)
-        {
-            var sfxGO = new GameObject("EnemyDeathSFX");
-            sfxGO.transform.position = transform.position;
-            var src = sfxGO.AddComponent<AudioSource>();
-            src.spatialBlend = 0f; // 2D — mesafeden bağımsız
-            src.volume = deathVolume;
-            src.clip = deathClip;
-            src.Play();
-            Destroy(sfxGO, 5f);
-        }
+        SfxPlayer.PlayDetached(deathClip, transform.position, deathVolume);
 
         foreach (var r in GetComponentsInChildren<Renderer>())
             r.enabled = false;

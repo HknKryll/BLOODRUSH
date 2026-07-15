@@ -6,6 +6,7 @@ using UnityEngine;
 // Kullanım: boş GO + BoxCollider (isTrigger) + bu script.
 // Düşmanlar SAHNEYE elle dizilir (prefab değil, instance) ve enemies[]'e sürüklenir.
 using Bloodrush.Shared;
+using Bloodrush.Shared.Audio;
 using Bloodrush.Player;
 
 namespace Bloodrush.Flow
@@ -29,15 +30,13 @@ public class Arena : MonoBehaviour
     readonly List<GameObject> validEnemies = new();
     int  aliveCount;
     bool triggered;
-    AudioSource audioSrc;
+    SfxPlayer sfx;
 
     void Start()
     {
         GetComponent<BoxCollider>().isTrigger = true;
 
-        audioSrc = gameObject.AddComponent<AudioSource>();
-        audioSrc.playOnAwake  = false;
-        audioSrc.spatialBlend = 0f;
+        sfx = SfxPlayer.Create(gameObject, spatialBlend: 0f);
 
         if (entryBarrier) entryBarrier.SetActive(false);
         if (exitBarrier)  exitBarrier.SetActive(true);
@@ -78,7 +77,7 @@ public class Arena : MonoBehaviour
             e.SetActive(true);
 
         if (entryBarrier) entryBarrier.SetActive(true);
-        if (lockClip) audioSrc.PlayOneShot(lockClip, lockVolume);
+        sfx.Play(lockClip, lockVolume);
 
         Debug.Log($"[Arena] Oyuncu girdi — {aliveCount} düşman aktif.", this);
 
@@ -98,7 +97,7 @@ public class Arena : MonoBehaviour
 
         if (entryBarrier) entryBarrier.SetActive(false);
         if (exitBarrier)  exitBarrier.SetActive(false);
-        if (clearClip) audioSrc.PlayOneShot(clearClip, clearVolume);
+        sfx.Play(clearClip, clearVolume);
 
         var shoot = FindObjectOfType<PlayerShoot>();
         shoot?.RefillWave();

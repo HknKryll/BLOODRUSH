@@ -8,6 +8,7 @@ using UnityEngine.UI;
 // arkaya ışınlanma, uzakta kemp yapılırsa agresif dash, yakında parry'lenebilir
 // kabza vuruşu + oyuncuyu geri itme. Büyük düşman: kanca/yumruk işlemez.
 using Bloodrush.Shared;
+using Bloodrush.Shared.Audio;
 using Bloodrush.FX;
 using Bloodrush.Flow;
 using Bloodrush.Player;
@@ -77,7 +78,7 @@ public class BossAI : MonoBehaviour, IParryable
     Transform      player;
     Health         playerHealth;
     PlayerMovement playerMovement;
-    AudioSource    audioSrc;
+    SfxPlayer      sfx;
     Renderer[]     renderers;
     Image          blackoutImg;
     readonly List<Light> litLights = new();
@@ -96,9 +97,7 @@ public class BossAI : MonoBehaviour, IParryable
             playerMovement = pgo.GetComponent<PlayerMovement>();
         }
 
-        audioSrc = gameObject.AddComponent<AudioSource>();
-        audioSrc.playOnAwake  = false;
-        audioSrc.spatialBlend = 1f;
+        sfx = SfxPlayer.Create(gameObject, spatialBlend: 1f);
 
         renderers = GetComponentsInChildren<Renderer>(true);
         foreach (var smr in GetComponentsInChildren<SkinnedMeshRenderer>(true))
@@ -242,7 +241,7 @@ public class BossAI : MonoBehaviour, IParryable
     void FireShotgun()
     {
         if (muzzleFlash) { muzzleFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); muzzleFlash.Play(); }
-        if (fireClip) audioSrc.PlayOneShot(fireClip, fireVolume);
+        sfx.Play(fireClip, fireVolume);
         CameraShake.Shake(0.08f, 0.1f);
 
         float dist = Vector3.Distance(transform.position, player.position);
@@ -299,7 +298,7 @@ public class BossAI : MonoBehaviour, IParryable
                     Vector3 away = player.position - transform.position; away.y = 0f;
                     playerMovement.Launch(away.normalized * meleeKnockback + Vector3.up * 3f);
                 }
-                if (meleeClip) audioSrc.PlayOneShot(meleeClip, meleeVolume);
+                sfx.Play(meleeClip, meleeVolume);
                 CameraShake.Shake(0.3f, 0.2f);
             }
             meleeReadyTime = Time.time + meleeCooldown;

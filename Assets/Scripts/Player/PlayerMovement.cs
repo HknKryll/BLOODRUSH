@@ -1,5 +1,6 @@
 using UnityEngine;
 using Bloodrush.Flow;
+using Bloodrush.Shared.Audio;
 
 namespace Bloodrush.Player
 {
@@ -70,7 +71,7 @@ public class PlayerMovement : MonoBehaviour
     float   slideEndTime     = -1f;
     float   slideJumpDeadline;
 
-    AudioSource audioSrc;
+    SfxPlayer sfx;
     float footstepTimer;
     bool  wasGrounded;
 
@@ -97,9 +98,7 @@ public class PlayerMovement : MonoBehaviour
         float saved = PlayerPrefs.GetFloat("Sensitivity", sensitivity);
         if (saved >= 0.5f) sensitivity = saved;
 
-        audioSrc = gameObject.AddComponent<AudioSource>();
-        audioSrc.playOnAwake = false;
-        audioSrc.spatialBlend = 0f;
+        sfx = SfxPlayer.Create(gameObject, spatialBlend: 0f);
 
         var cam = cameraHolder.GetComponentInChildren<Camera>();
         if (cam) cam.nearClipPlane = 0.05f;
@@ -202,7 +201,7 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = wallRunJumpUp;
             Launch(wallRunNormal * wallRunJumpOut);
             wallRunning = false;
-            Play(jumpClip, jumpVolume);
+            sfx.Play(jumpClip, jumpVolume);
             return;
         }
 
@@ -223,7 +222,7 @@ public class PlayerMovement : MonoBehaviour
 
         // İniş sesi
         if (grounded && !wasGrounded && velocity.y < -2f)
-            Play(landClip, landVolume);
+            sfx.Play(landClip, landVolume);
         wasGrounded = grounded;
 
         if (grounded)
@@ -259,7 +258,7 @@ public class PlayerMovement : MonoBehaviour
             footstepTimer -= Time.deltaTime;
             if (footstepTimer <= 0f)
             {
-                Play(footstepClip, footstepVolume);
+                sfx.Play(footstepClip, footstepVolume);
                 footstepTimer = 0.32f;
             }
         }
@@ -283,7 +282,7 @@ public class PlayerMovement : MonoBehaviour
             velocity.y        = jumpForce;
             coyoteTimer       = 0f;
             slideJumpDeadline = 0f;
-            Play(jumpClip, jumpVolume);
+            sfx.Play(jumpClip, jumpVolume);
         }
 
         if (!DisableGravity)
@@ -312,7 +311,7 @@ public class PlayerMovement : MonoBehaviour
             slideDir   = wish.normalized;
             cc.height  = normalHeight * 0.5f;
             cc.center  = new Vector3(0f, normalCenter.y * 0.5f, 0f);
-            Play(slideClip, slideVolume);
+            sfx.Play(slideClip, slideVolume);
         }
     }
 
@@ -374,6 +373,5 @@ public class PlayerMovement : MonoBehaviour
         cc.enabled = true;
     }
 
-    void Play(AudioClip clip, float vol = 1f) { if (clip) audioSrc.PlayOneShot(clip, vol); }
 }
 }

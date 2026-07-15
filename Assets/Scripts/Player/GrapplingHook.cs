@@ -3,6 +3,7 @@ using Bloodrush.Flow;
 using Bloodrush.UI;
 using Bloodrush.Weapons;
 using Bloodrush.Enemy;
+using Bloodrush.Shared.Audio;
 
 namespace Bloodrush.Player
 {
@@ -40,7 +41,7 @@ public class GrapplingHook : MonoBehaviour
     [SerializeField] AudioClip hookReleaseClip;
     [SerializeField] [Range(0f,1f)] float hookReleaseVolume = 0.7f;
 
-    AudioSource audioSrc;
+    SfxPlayer sfx;
     PlayerMovement movement;
     Vector3 hookPoint;
     bool isHooked;
@@ -66,9 +67,7 @@ public class GrapplingHook : MonoBehaviour
         shoot    = GetComponent<PlayerShoot>();
         if (playerCamera == null) playerCamera = Camera.main;
         if (rope != null) rope.gameObject.SetActive(false);
-        audioSrc = gameObject.AddComponent<AudioSource>();
-        audioSrc.playOnAwake  = false;
-        audioSrc.spatialBlend = 0f;
+        sfx = SfxPlayer.Create(gameObject, spatialBlend: 0f);
     }
 
     void Update()
@@ -125,7 +124,7 @@ public class GrapplingHook : MonoBehaviour
         }
 
         // Hedefi belirle ama HENÜZ çekme — önce ip hedefe uçacak (firing)
-        if (hookFireClip) audioSrc.PlayOneShot(hookFireClip, hookFireVolume);
+        sfx.Play(hookFireClip, hookFireVolume);
         hookPoint        = hit.point;
         releasedManually = false;
         hookedEnemy  = hit.collider.GetComponent<EnemyAI>();
@@ -266,7 +265,7 @@ public class GrapplingHook : MonoBehaviour
         }
 
         if (!isHooked) return;
-        if (hookReleaseClip) audioSrc.PlayOneShot(hookReleaseClip, hookReleaseVolume);
+        sfx.Play(hookReleaseClip, hookReleaseVolume);
         isHooked = false;
         cooldownUntil = Time.time + cooldown;   // kullanımdan sonra bekleme
         movement.DisableGravity = false;

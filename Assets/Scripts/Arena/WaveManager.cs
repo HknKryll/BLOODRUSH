@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using Bloodrush.Shared;
+using Bloodrush.Shared.Audio;
 using Bloodrush.Player;
 
 namespace Bloodrush.Arena
@@ -36,18 +37,17 @@ public class WaveManager : MonoBehaviour
     [SerializeField] AudioClip defeatClip;
     [SerializeField] [Range(0f,1f)] float defeatVolume = 1f;
 
-    int         currentWave;
-    int         aliveEnemies;
-    bool        gameEnded;
-    AudioSource audioSrc;
+    int       currentWave;
+    int       aliveEnemies;
+    bool      gameEnded;
+    SfxPlayer sfx;
 
     public static bool IsGameOver { get; private set; }
 
     IEnumerator Start()
     {
         IsGameOver = false;
-        audioSrc = gameObject.AddComponent<AudioSource>();
-        audioSrc.playOnAwake = false;
+        sfx = SfxPlayer.Create(gameObject, spatialBlend: 0f);
 
         if (victoryPanel) victoryPanel.SetActive(false);
         if (defeatPanel)  defeatPanel.SetActive(false);
@@ -78,7 +78,7 @@ public class WaveManager : MonoBehaviour
             SpawnEnemy();
 
         if (messageText) messageText.text = $"WAVE {currentWave}";
-        Play(waveStartClip, waveStartVolume);
+        sfx.Play(waveStartClip, waveStartVolume);
         StartCoroutine(ClearMessage(2f));
         UpdateUI();
     }
@@ -139,15 +139,13 @@ public class WaveManager : MonoBehaviour
     {
         gameEnded  = true;
         IsGameOver = true;
-        Play(victory ? victoryClip : defeatClip, victory ? victoryVolume : defeatVolume);
+        sfx.Play(victory ? victoryClip : defeatClip, victory ? victoryVolume : defeatVolume);
         Time.timeScale = 0f;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible   = true;
         if (victoryPanel) victoryPanel.SetActive(victory);
         if (defeatPanel)  defeatPanel.SetActive(!victory);
     }
-
-    void Play(AudioClip clip, float vol = 1f) { if (clip) audioSrc.PlayOneShot(clip, vol); }
 
     public void ReturnToMenu()
     {
