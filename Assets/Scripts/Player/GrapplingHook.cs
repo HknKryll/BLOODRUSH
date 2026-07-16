@@ -13,7 +13,7 @@ public class GrapplingHook : MonoBehaviour
     [SerializeField] KeyCode hookKey = KeyCode.E;
     [SerializeField] float maxRange = 30f;
     [SerializeField] float pullSpeed = 28f;
-    [SerializeField] float arrivalDistance = 1.5f;
+    [SerializeField] float arrivalDistance = 0.6f;
     [SerializeField] float pickupArrivalDistance = 0.6f;
     [SerializeField] float launchMultiplier = 0.5f;
     [SerializeField] LayerMask hookMask = ~0;
@@ -213,9 +213,13 @@ public class GrapplingHook : MonoBehaviour
         }
         else
         {
-            // Yerden ayrıldıktan sonra yere değince bırak
+            // Yerden ayrılıp tekrar zemine değince bırak — ama sadece hedefe iyice
+            // yaklaşmışken (uzaktayken ufak bir çıkıntı/rampa üzerinden geçerken
+            // yanlışlıkla iptal olmasın)
             if (!ActuallyGrounded()) hasLeftGround = true;
-            if (hasLeftGround && ActuallyGrounded()) { ReleaseGrapple(); return; }
+            float distToTarget = Vector3.Distance(transform.position, hookPoint);
+            if (hasLeftGround && ActuallyGrounded() && distToTarget <= arrivalDistance * 2f)
+            { ReleaseGrapple(); return; }
 
             if (hookedEnemy != null)  hookPoint = hookedEnemy.transform.position;
             if (hookedAnchor != null)
@@ -234,11 +238,13 @@ public class GrapplingHook : MonoBehaviour
 
             // İlerleme durduysa (duvara/kenara takıldık) → asılı kal.
             // Kavisli duvara sürtünmeyi iptal SANMAZ; sadece gerçekten tıkanınca durur.
+            // Eşik gevşetildi: normal eğim/köşelerde tetiklenmesin, sadece gerçek
+            // sıkışmalarda (hareket neredeyse tamamen durduğunda, daha uzun süre) devreye girsin.
             float moved = Vector3.Distance(before, transform.position);
-            if (moved < pullSpeed * Time.deltaTime * 0.25f)
+            if (moved < pullSpeed * Time.deltaTime * 0.15f)
             {
                 stuckTimer += Time.deltaTime;
-                if (stuckTimer >= 0.2f) { EnterHang(); return; }
+                if (stuckTimer >= 0.4f) { EnterHang(); return; }
             }
             else stuckTimer = 0f;
         }

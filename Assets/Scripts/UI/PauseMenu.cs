@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using Bloodrush.Arena;
 using Bloodrush.Player;
+using Bloodrush.Flow;
 
 namespace Bloodrush.UI
 {
@@ -56,10 +57,12 @@ public class PauseMenu : MonoBehaviour
     {
         isPaused             = true;
         Time.timeScale       = 0f;
+        AudioListener.pause  = true;
         Cursor.lockState     = CursorLockMode.None;
         Cursor.visible       = true;
         pauseRoot.SetActive(true);
         pausePanel.SetActive(true);
+        TutorialHintUI.SetPaused(true);
     }
 
     void Resume()
@@ -67,10 +70,12 @@ public class PauseMenu : MonoBehaviour
         isPaused             = false;
         CloseSettings();
         Time.timeScale       = 1f;
+        AudioListener.pause  = false;
         Cursor.lockState     = CursorLockMode.Locked;
         Cursor.visible       = false;
         pausePanel.SetActive(false);
         pauseRoot.SetActive(false);
+        TutorialHintUI.SetPaused(false);
     }
 
     void GoToMainMenu()

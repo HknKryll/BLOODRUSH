@@ -29,6 +29,15 @@ public class TutorialHintUI : MonoBehaviour
         instance.targetAlpha = 0f;
     }
 
+    // Duraklatma menüsü açılıp kapanınca çağrılır — açıkken ipucu tamamen
+    // gizlenir (donuk halde pause menüsünün üstünde kalmasın), kapanınca
+    // kaldığı yerden (varsa) devam eder.
+    public static void SetPaused(bool paused)
+    {
+        if (instance == null) return;
+        instance.gameObject.SetActive(!paused);
+    }
+
     static void Ensure()
     {
         if (instance != null) return;

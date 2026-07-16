@@ -94,6 +94,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 2713358396226797343}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5879566a7abf4934a85d8c380f2c8d6a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2713358396226797344}
   m_SourcePrefab: {fileID: 100100000, guid: 5879566a7abf4934a85d8c380f2c8d6a, type: 3}
 --- !u!1 &1984937619357302023 stripped
 GameObject:
@@ -185,3 +189,30 @@ MonoBehaviour:
   stunEffect: {fileID: 0}
   attackIndicator: {fileID: 0}
   telegraphDuration: 0.7
+--- !u!54 &2713358396226797344
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1984937619357302023}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 0

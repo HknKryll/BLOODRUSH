@@ -1,4 +1,5 @@
 using UnityEngine;
+using Bloodrush.FX;
 
 namespace Bloodrush.Player
 {
@@ -6,30 +7,33 @@ public class BloodEffect : MonoBehaviour
 {
     void Start()
     {
-        int count = Random.Range(10, 18);
-        for (int i = 0; i < count; i++)
-            SpawnDrop();
-        Destroy(gameObject, 3f);
-    }
+        var ps = gameObject.AddComponent<ParticleSystem>();
 
-    void SpawnDrop()
-    {
-        var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        go.transform.position = transform.position;
+        var main = ps.main;
+        main.loop             = false;
+        main.duration          = 0.5f;
+        main.startLifetime     = new ParticleSystem.MinMaxCurve(0.25f, 0.5f);
+        main.startSpeed        = new ParticleSystem.MinMaxCurve(1.5f, 5f);
+        main.startSize         = new ParticleSystem.MinMaxCurve(0.08f, 0.2f);
+        main.startColor        = new ParticleSystem.MinMaxGradient(
+            new Color(0.5f, 0f, 0f), new Color(0.75f, 0.05f, 0.05f));
+        main.gravityModifier   = 1.2f;
+        main.simulationSpace   = ParticleSystemSimulationSpace.World;
 
-        float s = Random.Range(0.07f, 0.18f);
-        go.transform.localScale = Vector3.one * s;
+        var emission = ps.emission;
+        emission.rateOverTime = 0f;
+        emission.SetBursts(new[] { new ParticleSystem.Burst(0f, (short)Random.Range(10, 18)) });
 
-        var mpb = new MaterialPropertyBlock();
-        mpb.SetColor("_BaseColor", new Color(Random.Range(0.4f, 0.7f), 0f, 0f));
-        go.GetComponent<Renderer>().SetPropertyBlock(mpb);
+        var shape = ps.shape;
+        shape.shapeType = ParticleSystemShapeType.Cone;
+        shape.angle     = 35f;
+        shape.radius    = 0.05f;
 
-        var rb = go.AddComponent<Rigidbody>();
-        Vector3 vel = Random.onUnitSphere * Random.Range(1.5f, 6f);
-        vel.y = Mathf.Abs(vel.y) + Random.Range(0f, 2f);
-        rb.velocity = vel;
+        var renderer = ps.GetComponent<ParticleSystemRenderer>();
+        renderer.renderMode = ParticleSystemRenderMode.Billboard;
+        renderer.material   = SoftDotVFX.CreateMaterial(new Color(0.6f, 0f, 0f));
 
-        Destroy(go, 2.5f);
+        Destroy(gameObject, 2.5f);
     }
 }
 }

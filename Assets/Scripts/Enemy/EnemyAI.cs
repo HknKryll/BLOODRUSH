@@ -10,6 +10,7 @@ namespace Bloodrush.Enemy
 {
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Health))]
+[RequireComponent(typeof(Rigidbody))]
 public class EnemyAI : MonoBehaviour, IParryable
 {
     // ───── Durum makinesi ─────
@@ -70,7 +71,7 @@ public class EnemyAI : MonoBehaviour, IParryable
 
     bool beingPulled;
     bool knockedBack;
-    Vector3 launchVelocity;
+    bool physicsFalling;   // gerçek Rigidbody fiziğiyle düşüyor (fırlatma/kanca bırakışı)
 
     // ───── Efektler ─────
     [Header("Efektler")]
@@ -84,6 +85,7 @@ public class EnemyAI : MonoBehaviour, IParryable
 
     // ───── Referanslar ─────
     NavMeshAgent agent;
+    Rigidbody rb;
     Transform player;
     PlayerMovement playerMovement;
     SfxPlayer sfx;
@@ -98,6 +100,9 @@ public class EnemyAI : MonoBehaviour, IParryable
     void Awake()
     {
         agent  = GetComponent<NavMeshAgent>();
+        rb     = GetComponent<Rigidbody>();
+        rb.isKinematic = true;   // normalde NavMeshAgent sürer; sadece fırlatma/düşüş sırasında fizik açılır
+        rb.useGravity  = false;
         var pgo = GameObject.FindGameObjectWithTag("Player");
         player = pgo ? pgo.transform : null;
         playerMovement = pgo ? pgo.GetComponent<PlayerMovement>() : null;
@@ -133,22 +138,7 @@ public class EnemyAI : MonoBehaviour, IParryable
 
         if (beingPulled) return;
         if (knockedBack) return;
-
-        if (launchVelocity != Vector3.zero)
-        {
-            launchVelocity.y += Physics.gravity.y * Time.deltaTime;
-            transform.position += launchVelocity * Time.deltaTime;
-
-            if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 0.4f, NavMesh.AllAreas)
-                && launchVelocity.y <= 0f)
-            {
-                transform.position = hit.position;
-                launchVelocity     = Vector3.zero;
-                agent.enabled      = true;
-                state              = State.Chase;
-            }
-            return;
-        }
+        if (physicsFalling) return;
 
         if (state == State.Stunned)
         {
@@ -327,7 +317,7 @@ public class EnemyAI : MonoBehaviour, IParryable
         meleeAttack.HideIndicator();
         StopStunEffect();          // yumruk stun'ı keser, efekt takılı kalmasın
         knockedBack = true;
-        StartCoroutine(knockbackHandler.Run(transform, agent, dir.normalized, force, () =>
+        StartCoroutine(knockbackHandler.Run(transform, agent, rb, dir.normalized, force, () =>
         {
             state = State.Chase;
             knockedBack = false;
@@ -358,14 +348,45 @@ public class EnemyAI : MonoBehaviour, IParryable
             // Düşmanı en yakın NavMesh noktasına otur (duvar içi/dışı boşlukta kalmasın)
             if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 3f, NavMesh.AllAreas))
                 transform.position = hit.position;
-            launchVelocity = Vector3.zero;
-            agent.enabled  = true;
-            state          = State.Chase;
+            agent.enabled = true;
+            state         = State.Chase;
         }
         else
         {
-            launchVelocity = momentum;   // agent kapalı kalır, launch fazı bitince Update açar
+            StartCoroutine(PhysicsFall(momentum));   // gerçek fizikle düşüp doğal şekilde yerleşir
         }
+    }
+
+    // Fırlatma/kanca bırakışı sonrası gerçek Rigidbody fiziğiyle düşüş —
+    // ani "ışınlanma" yerine PhysX doğal şekilde yere/duvara oturtur.
+    IEnumerator PhysicsFall(Vector3 initialVelocity)
+    {
+        physicsFalling = true;
+        agent.enabled  = false;
+        rb.isKinematic = false;
+        rb.useGravity  = true;
+        rb.velocity    = initialVelocity;
+
+        float t = 0f;
+        while (t < 3f)
+        {
+            t += Time.deltaTime;
+            bool grounded = Physics.Raycast(transform.position + Vector3.up * 0.1f, Vector3.down, 0.3f,
+                                             ~0, QueryTriggerInteraction.Ignore);
+            if (grounded && rb.velocity.magnitude < 0.3f) break;
+            yield return null;
+        }
+
+        rb.velocity    = Vector3.zero;
+        rb.isKinematic = true;
+        rb.useGravity  = false;
+
+        if (!agent.isOnNavMesh && NavMesh.SamplePosition(transform.position, out NavMeshHit end, 2f, NavMesh.AllAreas))
+            transform.position = end.position;
+
+        agent.enabled  = true;
+        physicsFalling = false;
+        state          = State.Chase;
     }
 
     // Flash/stun etkisi (launcher flash modu)

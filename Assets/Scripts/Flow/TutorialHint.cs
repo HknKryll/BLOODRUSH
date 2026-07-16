@@ -19,10 +19,12 @@ public class TutorialHint : MonoBehaviour
     bool  used;
     bool  showing;
     float hideAt = -1f;
+    BoxCollider box;
 
     void Start()
     {
-        GetComponent<BoxCollider>().isTrigger = true;
+        box = GetComponent<BoxCollider>();
+        box.isTrigger = true;
     }
 
     void OnTriggerEnter(Collider other)
@@ -39,7 +41,20 @@ public class TutorialHint : MonoBehaviour
     {
         if (!showing) return;
         if (other.GetComponentInParent<PlayerMovement>() == null) return;
+
+        // Zıplama gibi sadece dikey (Y) hareketle kutunun üstünden çıkışları yok say —
+        // oyuncu hâlâ bölgenin yatay (X/Z) sınırları içindeyse ipucu kapanmasın.
+        if (StillInsideHorizontally(other)) return;
+
         Dismiss();
+    }
+
+    bool StillInsideHorizontally(Collider other)
+    {
+        Vector3 localPos = transform.InverseTransformPoint(other.bounds.center);
+        Vector3 half      = box.size * 0.5f;
+        return Mathf.Abs(localPos.x - box.center.x) <= half.x &&
+               Mathf.Abs(localPos.z - box.center.z) <= half.z;
     }
 
     void Update()

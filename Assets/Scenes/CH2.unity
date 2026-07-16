@@ -272,7 +272,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hintText: "[Sol T\u0131k] Ate\u015F et \u2022 [F] Parry: d\xFC\u015Fman\u0131n
     sald\u0131r\u0131s\u0131n\u0131 savu\u015Ftur ve yumruk at"
-  oneShot: 0
+  oneShot: 1
   autoHideSeconds: 10
 --- !u!65 &11076445
 BoxCollider:
@@ -7418,7 +7418,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hintText: "Sar\u0131 I\u015F\u0131klar kancay\u0131 nereye atacabilece\u011Fini
     g\xF6sterir. Duvarlardan ikinci kez z\u0131playabilirsin."
-  oneShot: 0
+  oneShot: 1
   autoHideSeconds: 0
 --- !u!65 &803651718
 BoxCollider:
@@ -14283,7 +14283,7 @@ Transform:
   m_GameObject: {fileID: 1840482719}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
