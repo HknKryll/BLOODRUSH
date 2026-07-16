@@ -8,9 +8,13 @@ public class BloodEffect : MonoBehaviour
     void Start()
     {
         var ps = gameObject.AddComponent<ParticleSystem>();
+        // AddComponent playOnAwake ile hemen oynamaya başlar — süre/emisyon gibi
+        // ayarları değiştirmeden önce durdurup, konfigürasyon bitince elle başlatıyoruz.
+        ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
         var main = ps.main;
         main.loop             = false;
+        main.playOnAwake      = false;
         main.duration          = 0.5f;
         main.startLifetime     = new ParticleSystem.MinMaxCurve(0.25f, 0.5f);
         main.startSpeed        = new ParticleSystem.MinMaxCurve(1.5f, 5f);
@@ -33,6 +37,7 @@ public class BloodEffect : MonoBehaviour
         renderer.renderMode = ParticleSystemRenderMode.Billboard;
         renderer.material   = SoftDotVFX.CreateMaterial(new Color(0.6f, 0f, 0f));
 
+        ps.Play();
         Destroy(gameObject, 2.5f);
     }
 }
