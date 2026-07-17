@@ -1,18 +1,15 @@
 using System.Collections;
 using UnityEngine;
-using Bloodrush.Shared;
 using Bloodrush.Flow;
-using Bloodrush.Enemy;
 using Bloodrush.Weapons;
-using Bloodrush.UI;
-using Bloodrush.FX;
 using Bloodrush.Shared.Audio;
 
 namespace Bloodrush.Player
 {
 public class PlayerShoot : MonoBehaviour
 {
-    public enum LauncherMode { Grenade, Flash, Anchor }
+    public enum LauncherMode { Grenade, Flash }
+    public enum Firearm { Revolver, Shotgun, Lmg }
 
     [Header("Revolver")]
     [SerializeField] float revolverDamage  = 40f;
@@ -26,6 +23,57 @@ public class PlayerShoot : MonoBehaviour
     [SerializeField] int   startingAmmo = 60;
     [SerializeField] float reloadTime   = 3f;
 
+    [Header("Revolver Ses")]
+    [SerializeField] AudioClip revolverFireClip;
+    [SerializeField] [Range(0f,1f)] float revolverFireVolume = 1f;
+    [SerializeField] AudioClip emptyClickClip;
+    [SerializeField] [Range(0f,1f)] float emptyClickVolume = 0.6f;
+    [SerializeField] AudioClip reloadClip;
+    [SerializeField] [Range(0f,1f)] float reloadVolume = 0.8f;
+
+    [Header("Shotgun")]
+    [SerializeField] float shotgunDamageNear      = 18f;
+    [SerializeField] float shotgunDamageFar       = 4f;
+    [SerializeField] float shotgunRange           = 14f;
+    [SerializeField] float shotgunFireRate        = 0.85f;
+    [SerializeField] int   shotgunPellets         = 8;
+    [SerializeField] float shotgunSpread          = 4.5f;
+    [SerializeField] int   shotgunMagazineSize    = 6;
+    [SerializeField] int   shotgunStartingReserve = 24;
+    [SerializeField] float shotgunReloadTime      = 2.4f;
+    [SerializeField] ParticleSystem shotgunMuzzleFlash;
+
+    [Header("Shotgun Ses")]
+    [SerializeField] AudioClip shotgunFireClip;
+    [SerializeField] [Range(0f,1f)] float shotgunFireVolume = 1f;
+    [SerializeField] AudioClip shotgunEmptyClickClip;
+    [SerializeField] [Range(0f,1f)] float shotgunEmptyClickVolume = 0.6f;
+    [SerializeField] AudioClip shotgunReloadClip;
+    [SerializeField] [Range(0f,1f)] float shotgunReloadVolume = 0.8f;
+
+    [Header("LMG (Hafif Makineli Tüfek)")]
+    [SerializeField] float lmgDamage          = 9f;
+    [SerializeField] float lmgRange           = 60f;
+    [SerializeField] float lmgFireRate        = 0.09f;
+    [SerializeField] float lmgSpread          = 1.5f;
+    [SerializeField] int   lmgMagazineSize    = 45;
+    [SerializeField] int   lmgStartingReserve = 135;
+    [SerializeField] float lmgReloadTime      = 3.2f;
+    [SerializeField] ParticleSystem lmgMuzzleFlash;
+
+    [Header("LMG Ses")]
+    [SerializeField] AudioClip lmgFireClip;
+    [SerializeField] [Range(0f,1f)] float lmgFireVolume = 0.9f;
+    [SerializeField] AudioClip lmgEmptyClickClip;
+    [SerializeField] [Range(0f,1f)] float lmgEmptyClickVolume = 0.6f;
+    [SerializeField] AudioClip lmgReloadClip;
+    [SerializeField] [Range(0f,1f)] float lmgReloadVolume = 0.8f;
+
+    [Header("Silah Değiştirme")]
+    [SerializeField] KeyCode switchToRevolverKey = KeyCode.Alpha1;
+    [SerializeField] KeyCode switchToShotgunKey  = KeyCode.Alpha2;
+    [SerializeField] KeyCode switchToLmgKey      = KeyCode.Alpha3;
+
     [Header("Launcher")]
     [SerializeField] LauncherProjectile grenadePrefab;
     [SerializeField] LauncherProjectile flashPrefab;
@@ -34,17 +82,7 @@ public class PlayerShoot : MonoBehaviour
     [SerializeField] int                maxGrenadeAmmo = 6;
     [SerializeField] int                maxFlashAmmo   = 3;
 
-    [Header("Anchor")]
-    [SerializeField] GameObject anchorPrefab;
-    [SerializeField] float      anchorThrowSpeed = 30f;
-
-    [Header("Ses")]
-    [SerializeField] AudioClip revolverFireClip;
-    [SerializeField] [Range(0f,1f)] float revolverFireVolume = 1f;
-    [SerializeField] AudioClip emptyClickClip;
-    [SerializeField] [Range(0f,1f)] float emptyClickVolume = 0.6f;
-    [SerializeField] AudioClip reloadClip;
-    [SerializeField] [Range(0f,1f)] float reloadVolume = 0.8f;
+    [Header("Launcher Ses")]
     [SerializeField] AudioClip launcherFireClip;
     [SerializeField] [Range(0f,1f)] float launcherFireVolume = 1f;
     [SerializeField] AudioClip modeSwitchClip;
@@ -58,27 +96,47 @@ public class PlayerShoot : MonoBehaviour
     LauncherMode    mode = LauncherMode.Grenade;
     int             grenadeAmmo;
     int             flashAmmo;
-    int             currentAmmo;
-    int             totalAmmo;
-    bool            isReloading;
-    float           nextFireTime;
-    ThrowableAnchor activeAnchor;
     SfxPlayer       sfx;
+
+    PlayerFirearm[] firearms;
+    int             activeIndex;
 
     void Start()
     {
-        currentAmmo = magazineSize;
-        totalAmmo   = startingAmmo - magazineSize; // ilk şarjör zaten silahta
         grenadeAmmo = maxGrenadeAmmo;
         flashAmmo   = maxFlashAmmo;
         if (playerCamera == null) playerCamera = Camera.main;
         sfx = SfxPlayer.CreateOrGet(gameObject, spatialBlend: 0f);
+
+        firearms = new PlayerFirearm[3];
+        firearms[(int)Firearm.Revolver] = new PlayerFirearm("REVOLVER",
+            revolverDamage, revolverDamage, revolverRange, revolverFireRate,
+            1, 0f, magazineSize, startingAmmo, reloadTime, hitMask, playerCamera, muzzleFlash,
+            sfx, revolverFireClip, revolverFireVolume, emptyClickClip, emptyClickVolume, reloadClip, reloadVolume);
+
+        firearms[(int)Firearm.Shotgun] = new PlayerFirearm("SHOTGUN",
+            shotgunDamageNear, shotgunDamageFar, shotgunRange, shotgunFireRate,
+            shotgunPellets, shotgunSpread, shotgunMagazineSize, shotgunStartingReserve, shotgunReloadTime,
+            hitMask, playerCamera, shotgunMuzzleFlash,
+            sfx, shotgunFireClip, shotgunFireVolume, shotgunEmptyClickClip, shotgunEmptyClickVolume,
+            shotgunReloadClip, shotgunReloadVolume);
+
+        firearms[(int)Firearm.Lmg] = new PlayerFirearm("LMG",
+            lmgDamage, lmgDamage, lmgRange, lmgFireRate,
+            1, lmgSpread, lmgMagazineSize, lmgStartingReserve, lmgReloadTime,
+            hitMask, playerCamera, lmgMuzzleFlash,
+            sfx, lmgFireClip, lmgFireVolume, lmgEmptyClickClip, lmgEmptyClickVolume,
+            lmgReloadClip, lmgReloadVolume);
     }
 
     void Update()
     {
-        if (Input.GetMouseButton(0) && Time.time >= nextFireTime && !isReloading)
-            FireRevolver();
+        if (Input.GetKeyDown(switchToRevolverKey)) SwitchFirearm(Firearm.Revolver);
+        if (Input.GetKeyDown(switchToShotgunKey))  SwitchFirearm(Firearm.Shotgun);
+        if (Input.GetKeyDown(switchToLmgKey))      SwitchFirearm(Firearm.Lmg);
+
+        if (Input.GetMouseButton(0))
+            FireActive();
 
         if (LauncherEnabled && Input.GetButtonDown("Fire2"))
             FireLauncher();
@@ -86,86 +144,35 @@ public class PlayerShoot : MonoBehaviour
         if (LauncherEnabled && Input.GetKeyDown(KeyCode.Q))
             SwitchMode();
 
-        if (Input.GetKeyDown(KeyCode.R) && !isReloading)
-            StartCoroutine(Reload());
+        if (Input.GetKeyDown(KeyCode.R) && !ActiveFirearm.IsReloading)
+            StartCoroutine(ActiveFirearm.Reload());
     }
 
-    // ───────────────── Revolver ─────────────────
+    // ───────────────── Ateşli silah ─────────────────
 
-    void FireRevolver()
+    void FireActive()
     {
-        if (currentAmmo <= 0)
+        var fw     = ActiveFirearm;
+        var result = fw.TryFire(DamageMultiplier);
+
+        if (result == PlayerFirearm.FireResult.Fired)
         {
-            if (totalAmmo > 0) StartCoroutine(Reload());
-            else sfx.Play(emptyClickClip, emptyClickVolume);
-            return;
+            weaponAnim?.TriggerFire();
+            weaponMotion?.ApplyRecoil();
+            if (fw.CurrentAmmo == 0 && fw.TotalAmmo > 0)
+                StartCoroutine(fw.Reload());
         }
-
-        currentAmmo--;
-        nextFireTime = Time.time + revolverFireRate;
-        sfx.Play(revolverFireClip, revolverFireVolume);
-        weaponAnim?.TriggerFire();
-        weaponMotion?.ApplyRecoil();
-        CameraShake.Shake(0.04f, 0.08f);
-
-        if (muzzleFlash != null)
+        else if (result == PlayerFirearm.FireResult.Empty && fw.TotalAmmo > 0)
         {
-            muzzleFlash.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-            muzzleFlash.Play();
+            StartCoroutine(fw.Reload());
         }
-
-        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
-        // Görünmez trigger hacimleri (Arena, TutorialHint, LevelExit) mermiyi emmesin
-        if (!Physics.Raycast(ray, out RaycastHit hit, revolverRange, hitMask, QueryTriggerInteraction.Ignore)) return;
-
-        LauncherProjectile proj = hit.collider.GetComponent<LauncherProjectile>();
-        if (proj != null) { proj.Detonate(); return; }
-
-        var health = hit.collider.GetComponentInParent<Health>();
-        if (health != null)
-        {
-            float dmg = revolverDamage * DamageMultiplier;
-            var armor = hit.collider.GetComponentInParent<DirectionalArmor>();
-            if (armor != null) dmg *= armor.Multiplier(ray.direction);  // önden zırh emer
-
-            health.TakeDamage(dmg);
-            CrosshairHUD.Instance?.ShowHitMarker();
-            CameraShake.Shake(0.08f, 0.12f);
-            SpawnHitEffect(hit.point, hit.normal);
-            SpawnBloodEffect(hit.point, hit.normal);
-        }
-
-        if (currentAmmo == 0 && totalAmmo > 0)
-            StartCoroutine(Reload());
     }
 
-    IEnumerator Reload()
+    void SwitchFirearm(Firearm next)
     {
-        if (currentAmmo >= magazineSize || totalAmmo <= 0) yield break;
-        isReloading = true;
-        sfx.Play(reloadClip, reloadVolume);
-        yield return new WaitForSeconds(reloadTime);
-        int need    = magazineSize - currentAmmo;
-        int take    = Mathf.Min(need, totalAmmo);
-        currentAmmo += take;
-        totalAmmo   -= take;
-        isReloading  = false;
-    }
-
-    void SpawnHitEffect(Vector3 point, Vector3 normal)
-    {
-        var go = new GameObject("HitFX");
-        go.transform.position = point;
-        go.transform.rotation = Quaternion.LookRotation(normal);
-        go.AddComponent<HitEffect>();
-    }
-
-    void SpawnBloodEffect(Vector3 point, Vector3 normal)
-    {
-        var go = new GameObject("BloodFX");
-        go.transform.position = point;
-        go.transform.rotation = Quaternion.LookRotation(normal);
-        go.AddComponent<BloodEffect>();
+        int index = (int)next;
+        if (index == activeIndex) return;
+        activeIndex = index;
     }
 
     // ───────────────── Launcher ─────────────────
@@ -184,20 +191,7 @@ public class PlayerShoot : MonoBehaviour
                 flashAmmo--;
                 SpawnProjectile(flashPrefab);
                 break;
-            case LauncherMode.Anchor:
-                ThrowAnchor();
-                break;
         }
-    }
-
-    void ThrowAnchor()
-    {
-        if (anchorPrefab == null) return;
-        if (activeAnchor != null) Destroy(activeAnchor.gameObject);
-        var go = Instantiate(anchorPrefab, launcherBarrel.position, playerCamera.transform.rotation);
-        var rb = go.GetComponent<Rigidbody>();
-        if (rb) rb.velocity = playerCamera.transform.forward * anchorThrowSpeed;
-        activeAnchor = go.GetComponent<ThrowableAnchor>();
     }
 
     void SpawnProjectile(LauncherProjectile prefab)
@@ -208,22 +202,14 @@ public class PlayerShoot : MonoBehaviour
 
     void SwitchMode()
     {
-        mode = mode switch
-        {
-            LauncherMode.Grenade => LauncherMode.Flash,
-            LauncherMode.Flash   => LauncherMode.Anchor,
-            _                    => LauncherMode.Grenade,
-        };
+        mode = mode == LauncherMode.Grenade ? LauncherMode.Flash : LauncherMode.Grenade;
         sfx.Play(modeSwitchClip, modeSwitchVolume);
     }
 
 
     // ───────────────── Public ─────────────────
 
-    public void AddAmmo(int amount)
-    {
-        totalAmmo = Mathf.Min(totalAmmo + amount, startingAmmo);
-    }
+    public void AddAmmo(int amount) => ActiveFirearm.AddAmmo(amount);
 
     public void RefillWave()
     {
@@ -236,16 +222,20 @@ public class PlayerShoot : MonoBehaviour
         if (grenFull && flashFull) AddAmmo(5);
     }
 
+    PlayerFirearm ActiveFirearm => firearms[activeIndex];
+
     public float        DamageMultiplier { get; set; } = 1f;
     public bool         LauncherEnabled  { get; set; } = true;
-    public LauncherMode CurrentMode  => mode;
+    public LauncherMode CurrentMode      => mode;
+    public Firearm      CurrentFirearm   => (Firearm)activeIndex;
+    public string       CurrentFirearmName => ActiveFirearm.displayName;
     public int  GrenadeAmmo          => grenadeAmmo;
     public int  FlashAmmo            => flashAmmo;
     public int  MaxGrenadeAmmo       => maxGrenadeAmmo;
     public int  MaxFlashAmmo         => maxFlashAmmo;
-    public int  CurrentAmmo          => currentAmmo;
-    public int  TotalAmmo            => totalAmmo;
-    public int  MagazineSize         => magazineSize;
-    public bool IsReloading          => isReloading;
+    public int  CurrentAmmo          => ActiveFirearm.CurrentAmmo;
+    public int  TotalAmmo            => ActiveFirearm.TotalAmmo;
+    public int  MagazineSize         => ActiveFirearm.MagazineSize;
+    public bool IsReloading          => ActiveFirearm.IsReloading;
 }
 }

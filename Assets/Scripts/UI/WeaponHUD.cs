@@ -9,10 +9,10 @@ public class WeaponHUD : MonoBehaviour
 {
     [SerializeField] PlayerShoot shoot;
 
-    TextMeshProUGUI ammoText;    // revolver: "10 | 50"
+    TextMeshProUGUI weaponText;  // "REVOLVER" / "SHOTGUN" / "LMG"
+    TextMeshProUGUI ammoText;    // "10 | 50"
     TextMeshProUGUI grenText;    // "GRN  x6"
     TextMeshProUGUI flashText;   // "FLS  x3"
-    TextMeshProUGUI modeText;    // "[ ANCHOR ]"
     TextMeshProUGUI reloadText;  // "RELOADING..."
 
     static readonly Color ColActive  = Color.yellow;
@@ -30,13 +30,14 @@ public class WeaponHUD : MonoBehaviour
         gameObject.AddComponent<CanvasScaler>();
         gameObject.AddComponent<GraphicRaycaster>();
 
-        // Sağ alt köşe — yukarıdan aşağı: mod, reload, grenade, flash, revolver
-        modeText   = MakeText(new Vector2(-18, 130), 15, TextAlignmentOptions.Right);
+        // Sağ alt köşe — yukarıdan aşağı: silah adı, reload, grenade, flash, revolver
+        weaponText = MakeText(new Vector2(-18, 124), 15, TextAlignmentOptions.Right);
         reloadText = MakeText(new Vector2(-18,  98), 20, TextAlignmentOptions.Right);
         grenText   = MakeText(new Vector2(-18,  72), 18, TextAlignmentOptions.Right);
         flashText  = MakeText(new Vector2(-18,  46), 18, TextAlignmentOptions.Right);
         ammoText   = MakeText(new Vector2(-18,  14), 28, TextAlignmentOptions.Right);
 
+        weaponText.color = ColCyan;
         reloadText.text  = "";
         reloadText.color = ColWarn;
     }
@@ -47,7 +48,9 @@ public class WeaponHUD : MonoBehaviour
 
         var m = shoot.CurrentMode;
 
-        // Revolver
+        weaponText.text = shoot.CurrentFirearmName;
+
+        // Aktif ateşli silah
         if (shoot.IsReloading)
         {
             reloadText.text  = "RELOADING...";
@@ -67,7 +70,6 @@ public class WeaponHUD : MonoBehaviour
         bool launcher = shoot.LauncherEnabled;
         if (grenText.gameObject.activeSelf != launcher) grenText.gameObject.SetActive(launcher);
         if (flashText.gameObject.activeSelf != launcher) flashText.gameObject.SetActive(launcher);
-        if (modeText.gameObject.activeSelf != launcher) modeText.gameObject.SetActive(launcher);
 
         if (launcher)
         {
@@ -76,10 +78,6 @@ public class WeaponHUD : MonoBehaviour
 
             grenText.color  = m == PlayerShoot.LauncherMode.Grenade ? ColActive : ColDim;
             flashText.color = m == PlayerShoot.LauncherMode.Flash   ? ColCyan   : ColDim;
-
-            // Mod göstergesi (anchor aktifken)
-            modeText.text  = m == PlayerShoot.LauncherMode.Anchor ? "[ ANCHOR ]" : "";
-            modeText.color = new Color(0.5f, 1f, 0.5f);
         }
     }
 

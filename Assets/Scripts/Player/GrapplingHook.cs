@@ -1,7 +1,6 @@
 using UnityEngine;
 using Bloodrush.Flow;
 using Bloodrush.UI;
-using Bloodrush.Weapons;
 using Bloodrush.Enemy;
 using Bloodrush.Shared.Audio;
 
@@ -56,7 +55,6 @@ public class GrapplingHook : MonoBehaviour
     bool releasedManually;  // true sadece oyuncu tuşu kasıtlı bıraktıysa
     EnemyAI hookedEnemy;
     bool pullingEnemy;
-    ThrowableAnchor hookedAnchor;
     AmmoPickup hookedPickup;
     bool pullingPickup;
     PlayerShoot shoot;
@@ -128,7 +126,6 @@ public class GrapplingHook : MonoBehaviour
         hookPoint        = hit.point;
         releasedManually = false;
         hookedEnemy  = hit.collider.GetComponent<EnemyAI>();
-        hookedAnchor = hit.collider.GetComponent<ThrowableAnchor>();
         hookedPickup = hit.collider.GetComponent<AmmoPickup>();
 
         float dist   = Vector3.Distance(playerCamera.transform.position, hookPoint);
@@ -222,12 +219,6 @@ public class GrapplingHook : MonoBehaviour
             { ReleaseGrapple(); return; }
 
             if (hookedEnemy != null)  hookPoint = hookedEnemy.transform.position;
-            if (hookedAnchor != null)
-                hookPoint = hookedAnchor.transform.position;
-            else if (hookedAnchor is object)  // Unity fake-null: yok edildi
-            {
-                ReleaseGrapple(); return;
-            }
 
             float dist = Vector3.Distance(transform.position, hookPoint);
             if (dist <= arrivalDistance) { EnterHang(); return; }   // hedefe vardı → asılı kal
@@ -263,7 +254,7 @@ public class GrapplingHook : MonoBehaviour
         if (firing)
         {
             firing = false;
-            hookedEnemy = null; hookedAnchor = null; hookedPickup = null;
+            hookedEnemy = null; hookedPickup = null;
             releasedManually = false;
             cooldownUntil = Time.time + cooldown;
             if (rope != null) rope.gameObject.SetActive(false);
@@ -298,7 +289,6 @@ public class GrapplingHook : MonoBehaviour
 
         releasedManually = false;
         hookedEnemy   = null;
-        hookedAnchor  = null;
         hookedPickup  = null;
         pullingEnemy  = false;
         pullingPickup = false;
@@ -362,7 +352,6 @@ public class GrapplingHook : MonoBehaviour
         cooldownUntil = Time.time + cooldown;
 
         hookedEnemy   = null;
-        hookedAnchor  = null;
         hookedPickup  = null;
         pullingEnemy  = false;
         pullingPickup = false;

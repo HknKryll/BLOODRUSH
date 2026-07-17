@@ -23,8 +23,9 @@ public class EndingSequence : MonoBehaviour
         "Yükleme tamamlandı.",
         "",
         "Sırları artık herkes biliyor.",
+        "\"Seçilmiş\" diye biri hiç olmadı — ben sadece sıradaydım.",
         "",
-        "Beden bitti — ama iş bitti."
+        "Ve bir sonraki isim şimdiden çağrılıyor."
     };
 
     bool started;

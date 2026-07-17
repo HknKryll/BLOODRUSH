@@ -19,11 +19,11 @@ public class PresentationScreen : MonoBehaviour
     [TextArea]
     [SerializeField] string[] slides =
     {
-        "PROJE ATLAS\nSAHA RAPORU",
-        "OPERASYON BAŞARILI",
+        "KONSEY\nPROJE ATLAS — SAHA RAPORU",
         "HEDEF NÖTRALİZE:  %100",
-        "ETKİNLİK: BEKLENENİN ÜZERİNDE",
-        "TEBRİKLER",
+        "ADAY: GÖREVİNİ TAMAMLADI",
+        "KONSEY SİZİ GURURLA ANIYOR",
+        "BİR SONRAKİ SEÇİLMİŞE HAZIR OLUN",
     };
     [SerializeField] float slideDuration = 4f;
     [SerializeField] float fadeDuration  = 0.6f;

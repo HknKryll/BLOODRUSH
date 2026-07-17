@@ -13,15 +13,15 @@ public class IntroTextSequence : MonoBehaviour
 
     static readonly string[] Lines =
     {
-        "Takıntım beni yıllarca kör etti.",
+        "Konsey bana \"Seçilmiş\" dedi.",
         "",
-        "Ne yaptığımı biliyordum ama aklım ne yaptığımda değil,",
-        "yaptığım şeyin başarısındaydı.",
+        "İnandım. İnanmak istedim.",
+        "Çünkü inanmazsam geriye sadece bir isim kalıyordu —",
+        "benden önce gönderilip bir daha dönmeyen onlarca isimden biri.",
         "",
-        "Fakat yaptığım şeyin ne denli tehlikeli,",
-        "ne denli ölümcül olduğunu görünce kafama dank etti.",
+        "Onlara da aynı şeyi söylemişlerdi.",
         "",
-        "İşte o an ben kararımı verdim..."
+        "Bugün sıra bende."
     };
 
     public static event System.Action OnFinished;

@@ -55,6 +55,15 @@ public class EnemyAI : MonoBehaviour, IParryable
     [Header("Tip")]
     [SerializeField] bool isLarge = false;
 
+    // ───── Sıçrama (Tip 2 — Sıçrayıcı, opsiyonel) ─────
+    [Header("Sıçrama (Sıçrayıcı)")]
+    [SerializeField] bool  isJumper      = false;
+    [SerializeField] float leapRangeMin  = 4f;
+    [SerializeField] float leapRangeMax  = 10f;
+    [SerializeField] float leapCooldown  = 3f;
+    [SerializeField] float leapSpeed     = 14f;
+    [SerializeField] float leapArcHeight = 6f;
+
     [Header("Drop")]
     [SerializeField] GameObject ammoPickupPrefab;
 
@@ -94,6 +103,8 @@ public class EnemyAI : MonoBehaviour, IParryable
     EnemyMeleeAttack      meleeAttack;
     EnemyRangedAttack     rangedAttack;
     EnemyKnockbackHandler knockbackHandler;
+    EnemyLeapBehavior     leap;
+    bool leaping;
 
     // ─────────────────────────────────────────────
 
@@ -115,6 +126,7 @@ public class EnemyAI : MonoBehaviour, IParryable
         rangedAttack = new EnemyRangedAttack(rangedRange, magSize, fireRate, reloadTime,
             projectileSpeed, projectileDamage, spreadAngle, projectilePrefab, muzzle, sfx, attackClip, attackVolume);
         knockbackHandler = new EnemyKnockbackHandler();
+        leap = new EnemyLeapBehavior(leapRangeMin, leapRangeMax, leapCooldown, leapSpeed, leapArcHeight);
 
         var health = GetComponent<Health>();
         health.onDeath.AddListener(OnDeath);
@@ -139,6 +151,7 @@ public class EnemyAI : MonoBehaviour, IParryable
         if (beingPulled) return;
         if (knockedBack) return;
         if (physicsFalling) return;
+        if (leaping) return;
 
         if (state == State.Stunned)
         {
@@ -179,6 +192,12 @@ public class EnemyAI : MonoBehaviour, IParryable
         if (behavior == Behavior.Ranged)
         {
             DoRangedChase(dist);
+            return;
+        }
+
+        if (isJumper && leap.ReadyToLeap(dist))
+        {
+            StartLeap();
             return;
         }
 
@@ -321,6 +340,18 @@ public class EnemyAI : MonoBehaviour, IParryable
         {
             state = State.Chase;
             knockedBack = false;
+        }));
+    }
+
+    // Sıçrayıcı: chase sırasında orta menzilde oyuncuya doğru fiziksel sıçrayış
+    void StartLeap()
+    {
+        leaping = true;
+        meleeAttack.HideIndicator();
+        StartCoroutine(leap.Run(transform, agent, rb, player.position, () =>
+        {
+            leaping = false;
+            state = State.Chase;
         }));
     }
 
