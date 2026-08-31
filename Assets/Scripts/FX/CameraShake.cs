@@ -3,20 +3,55 @@ using UnityEngine;
 
 namespace Bloodrush.FX
 {
+// Kamera sarsıntısı — SÜRÜKLENMEZ. Eski sürüm her DoShake başında
+// "origin = localPosition" yakalıyordu; üst üste binen shake'lerde (ateş, parry,
+// terminal) ikinci coroutine zaten kaymış konumu origin sanıp oraya döndürüyor,
+// kamera gerçek merkezine dönemeyip kalıcı kayıyordu. Yeni model: merkez BİR KEZ
+// yakalanır (basePos), her kare localPosition = basePos + gürültü*trauma yazılır,
+// üst üste binen shake'ler sadece trauma'yı artırır (tavanla sınırlı). Böylece
+// kamera her zaman basePos'a döner — kalıcı kayma imkânsız.
 public class CameraShake : MonoBehaviour
 {
     public static CameraShake Instance { get; private set; }
 
+    [Tooltip("Trauma'nın saniyede azalma hızı (büyük = daha kısa sarsıntı).")]
+    [SerializeField] float traumaDecay = 2.5f;
+    [Tooltip("Ofset tavanı (m) — üst üste binen shake'ler bunu aşamaz.")]
+    [SerializeField] float maxTrauma   = 0.5f;
+    [Tooltip("Gürültü hızı (titreşim sıklığı).")]
+    [SerializeField] float frequency   = 40f;
+
+    Vector3 basePos;
+    float   trauma;      // 0..maxTrauma — aynı zamanda ofsetin metre büyüklüğü
+    float   seedX, seedY;
+    bool    haveBase;
+
     void Awake()
     {
         if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        else { Destroy(gameObject); return; }
+        seedX = Random.value * 100f;
+        seedY = Random.value * 100f;
     }
 
+    void Start()
+    {
+        // Merkez bir kez, tüm Start'lardan sonra yakalanır (kamera yerel konumu sabit)
+        basePos  = transform.localPosition;
+        haveBase = true;
+    }
+
+    // intensity = eklenecek tepe ofset (m). Üst üste binenler toplanır, tavanla sınırlı.
+    // duration parametresi artık yok sayılır — sönümleme traumaDecay ile yapılır (API uyumu için kalıyor).
     public static void Shake(float intensity = 0.15f, float duration = 0.15f)
     {
-        if (Instance) Instance.StartCoroutine(Instance.DoShake(intensity, duration));
+        if (Instance) Instance.trauma = Mathf.Min(Instance.maxTrauma, Instance.trauma + intensity);
     }
+
+    // Kamera taban konumunun SAHİBİ dışarısıdır (PlayerMovement) — flip'te göz tavanın
+    // altına iner. CameraShake yalnızca bu tabanın üstüne sarsıntı ofseti ekler; kendi
+    // yakaladığı sabit basePos'u dayatıp flip kamerasını ezmez. Her kare çağrılabilir.
+    public void SetBaseLocalPos(Vector3 p) { basePos = p; haveBase = true; }
 
     public static void HitPause(float duration = 0.06f, float scale = 0.12f)
     {
@@ -31,23 +66,23 @@ public class CameraShake : MonoBehaviour
         Time.timeScale = 1f;
     }
 
-    IEnumerator DoShake(float intensity, float duration)
+    void LateUpdate()
     {
-        Vector3 origin  = transform.localPosition;
-        float   elapsed = 0f;
+        if (!haveBase) return;
 
-        while (elapsed < duration)
+        if (trauma <= 0f)
         {
-            float t = elapsed / duration;
-            float fade = 1f - t;
-            float x = (Mathf.PerlinNoise(elapsed * 80f, 0f) - 0.5f) * 2f * intensity * fade;
-            float y = (Mathf.PerlinNoise(0f, elapsed * 80f) - 0.5f) * 2f * intensity * fade;
-            transform.localPosition = origin + new Vector3(x, y, 0f);
-            elapsed += Time.unscaledDeltaTime;
-            yield return null;
+            transform.localPosition = basePos;   // her zaman gerçek merkez
+            return;
         }
 
-        transform.localPosition = origin;
+        // unscaledTime → hit-pause/slow-mo sırasında da sarsıntı akıcı kalır
+        float t = Time.unscaledTime * frequency;
+        float x = (Mathf.PerlinNoise(seedX, t) - 0.5f) * 2f * trauma;
+        float y = (Mathf.PerlinNoise(seedY, t) - 0.5f) * 2f * trauma;
+        transform.localPosition = basePos + new Vector3(x, y, 0f);
+
+        trauma = Mathf.MoveTowards(trauma, 0f, traumaDecay * Time.unscaledDeltaTime);
     }
 }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using TMPro;
 using Bloodrush.Arena;
@@ -30,6 +31,11 @@ public class PauseMenu : MonoBehaviour
     bool isPaused;
     bool settingsOpen;
 
+    GameObject         controlsPanel;
+    bool               controlsOpen;
+    int                listeningIndex = -1;   // rebind için tuş bekliyor
+    TextMeshProUGUI[]  keyButtons;
+
     PlayerMovement movement;
 
     // ─── Başlangıç ───────────────────────────────────────────────────
@@ -38,13 +44,31 @@ public class PauseMenu : MonoBehaviour
     {
         movement = FindFirstObjectByType<PlayerMovement>();
         AudioListener.volume = PlayerPrefs.GetFloat("MasterVolume", 1f);
+        EnsureEventSystem();
         BuildUI();
+    }
+
+    // Kampanya sahnelerinde (CH1-CH3) sahneye EventSystem konmamış — onsuz hiçbir
+    // UI butonu/slider'ı tıklamaya cevap vermez (menü görünür ama ölüdür). Yoksa
+    // burada oluştur; PauseMenu her kampanya sahnesindeki Player'da olduğu için
+    // bu, tüm sahneleri tek seferde garantiye alır. Proje eski Input Manager'ı
+    // kullanıyor (Input.GetKeyDown/GetAxisRaw) → StandaloneInputModule doğru modül.
+    void EnsureEventSystem()
+    {
+        if (FindFirstObjectByType<EventSystem>() != null) return;
+        var es = new GameObject("EventSystem");
+        es.AddComponent<EventSystem>();
+        es.AddComponent<StandaloneInputModule>();
     }
 
     void Update()
     {
+        // Rebind dinleme modu — bir sonraki tuşu yakala (ESC iptal)
+        if (listeningIndex >= 0) { CaptureRebindKey(); return; }
+
         if (!Input.GetKeyDown(KeyCode.Escape)) return;
         if (WaveManager.IsGameOver) return;
+        if (controlsOpen) { CloseControls(); return; }
         if (settingsOpen) { CloseSettings(); return; }
         TogglePause();
     }
@@ -87,7 +111,69 @@ public class PauseMenu : MonoBehaviour
     // ─── Ayarlar ─────────────────────────────────────────────────────
 
     void OpenSettings()  { settingsOpen = true;  settingsPanel.SetActive(true);  }
-    void CloseSettings() { settingsOpen = false; settingsPanel.SetActive(false); }
+    void CloseSettings()
+    {
+        settingsOpen = false;
+        controlsOpen = false;
+        listeningIndex = -1;
+        if (controlsPanel) controlsPanel.SetActive(false);
+        settingsPanel.SetActive(false);
+    }
+
+    // ─── Kontroller (tuş atama) ──────────────────────────────────────
+
+    void OpenControls()
+    {
+        controlsOpen = true;
+        settingsPanel.SetActive(false);
+        controlsPanel.SetActive(true);
+        RefreshAllKeyButtons();
+    }
+
+    void CloseControls()
+    {
+        controlsOpen = false;
+        listeningIndex = -1;
+        controlsPanel.SetActive(false);
+        settingsPanel.SetActive(true);
+    }
+
+    void BeginRebind(int action)
+    {
+        listeningIndex = action;
+        if (keyButtons != null && action < keyButtons.Length && keyButtons[action])
+            keyButtons[action].text = "...";
+    }
+
+    void CaptureRebindKey()
+    {
+        foreach (KeyCode kc in System.Enum.GetValues(typeof(KeyCode)))
+        {
+            if (kc == KeyCode.None || !Input.GetKeyDown(kc)) continue;
+            if (kc != KeyCode.Escape)   // ESC = iptal
+                KeyBindings.Set((KeyBindings.Action)listeningIndex, kc);
+            RefreshKeyButton(listeningIndex);
+            listeningIndex = -1;
+            return;
+        }
+    }
+
+    void RefreshKeyButton(int i)
+    {
+        if (keyButtons != null && i >= 0 && i < keyButtons.Length && keyButtons[i])
+            keyButtons[i].text = KeyBindings.Get((KeyBindings.Action)i).ToString();
+    }
+
+    void RefreshAllKeyButtons()
+    {
+        for (int i = 0; i < KeyBindings.Count; i++) RefreshKeyButton(i);
+    }
+
+    void ResetBindings()
+    {
+        KeyBindings.ResetDefaults();
+        RefreshAllKeyButtons();
+    }
 
     void OnVolumeChanged(float v)
     {
@@ -145,9 +231,80 @@ public class PauseMenu : MonoBehaviour
         sensLabel = AddSettingsLabel(settingsPanel.transform, $"HASSASİYET   {savedSens:0.0}", new Vector2(0, 10));
         sensSlider = AddSlider(settingsPanel.transform, new Vector2(0, -18), 0.5f, 10f, savedSens, OnSensChanged);
 
-        AddButton(settingsPanel.transform, "GERİ", new Vector2(0, -110), CloseSettings);
+        AddButton(settingsPanel.transform, "KONTROLLER", new Vector2(0, -72), OpenControls);
+        AddButton(settingsPanel.transform, "GERİ",       new Vector2(0, -135), CloseSettings);
         settingsPanel.SetActive(false);
+
+        BuildControlsPanel();
         pauseRoot.SetActive(false);
+    }
+
+    // Kontroller paneli: her aksiyon için bir satır (etiket + mevcut tuş butonu),
+    // altta "Varsayılana Dön". Tuş butonuna basınca rebind dinleme moduna girer.
+    void BuildControlsPanel()
+    {
+        controlsPanel = MakeCenterBox(pauseRoot.transform, "ControlsPanel", new Vector2(520, 600));
+        AddTopLine(controlsPanel.transform);
+        AddSettingsTitle(controlsPanel.transform, "KONTROLLER", new Vector2(0, 270));
+
+        int n = KeyBindings.Count;
+        keyButtons = new TextMeshProUGUI[n];
+        float startY = 220f, rowH = 32f;
+        for (int i = 0; i < n; i++)
+        {
+            float y = startY - i * rowH;
+            AddControlLabel(controlsPanel.transform, KeyBindings.DisplayNames[i], new Vector2(-140, y));
+            int action = i;
+            keyButtons[i] = AddKeyButton(controlsPanel.transform,
+                KeyBindings.Get((KeyBindings.Action)i).ToString(),
+                new Vector2(150, y), () => BeginRebind(action));
+        }
+        float by = startY - n * rowH - 14f;
+        AddButton(controlsPanel.transform, "VARSAYILANA DÖN", new Vector2(0, by),        ResetBindings);
+        AddButton(controlsPanel.transform, "GERİ",            new Vector2(0, by - 58f),  CloseControls);
+        controlsPanel.SetActive(false);
+    }
+
+    void AddControlLabel(Transform parent, string text, Vector2 pos)
+    {
+        var go = new GameObject("CtrlLbl");
+        go.transform.SetParent(parent, false);
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchoredPosition = pos;
+        rt.sizeDelta        = new Vector2(230, 30);
+        var tmp = go.AddComponent<TextMeshProUGUI>();
+        tmp.text = text; tmp.fontSize = 16f; tmp.fontStyle = FontStyles.Bold;
+        tmp.alignment = TextAlignmentOptions.MidlineLeft; tmp.color = Color.white;
+    }
+
+    TextMeshProUGUI AddKeyButton(Transform parent, string label, Vector2 pos,
+                                 UnityEngine.Events.UnityAction action)
+    {
+        float w = 150f, h = 30f;
+        var border = new GameObject("KeyBtn");
+        border.transform.SetParent(parent, false);
+        var brt = border.AddComponent<RectTransform>();
+        brt.anchoredPosition = pos; brt.sizeDelta = new Vector2(w, h);
+        border.AddComponent<Image>().color = NeonRed;
+
+        var bgGO  = Stretch(border.transform, "BG", new Vector2(2, 2), new Vector2(-2, -2));
+        var bgImg = bgGO.AddComponent<Image>();
+        bgImg.color = BtnBg;
+
+        var textGO = Stretch(border.transform, "Text");
+        var tmp    = textGO.AddComponent<TextMeshProUGUI>();
+        tmp.text = label; tmp.fontSize = 16f; tmp.fontStyle = FontStyles.Bold;
+        tmp.alignment = TextAlignmentOptions.Center; tmp.color = Color.white;
+
+        var btn = border.AddComponent<Button>();
+        btn.transition    = Selectable.Transition.ColorTint;
+        btn.targetGraphic = bgImg;
+        var colors = btn.colors;
+        colors.highlightedColor = new Color(0.5f, 0.12f, 0.12f, 1f);
+        colors.pressedColor     = new Color(0.7f, 0.15f, 0.15f, 1f);
+        btn.colors = colors;
+        btn.onClick.AddListener(action);
+        return tmp;
     }
 
     // ─── Yardımcılar ─────────────────────────────────────────────────

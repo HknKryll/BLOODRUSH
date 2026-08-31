@@ -25,6 +25,10 @@ public class SceneVolumeSetup : MonoBehaviour
     [SerializeField] Color ambientColor     = new Color(0.85f, 0.9f, 1f);   // hafif soğuk (floresan)
     [SerializeField] [Range(0f, 3f)] float ambientIntensity = 0.8f;
 
+    [Header("Sis")]
+    [Tooltip("KÜÇÜK = daha yoğun sis. 120 ince (temiz bölüm), 40-60 yoğun (derin tesis). SurfacePalette buraya yazar.")]
+    [SerializeField] float fogMeanFreePath = 120f;
+
     Fog              fogComp;
     CustomPassVolume cpv;
     PixelatePass     pixelPass;
@@ -79,7 +83,7 @@ public class SceneVolumeSetup : MonoBehaviour
         fogComp.active = true;
         fogComp.enabled.Override(true);
         fogComp.albedo.Override(new Color(0.5f, 0.45f, 0.4f));   // sıcak krem, mavi değil
-        fogComp.meanFreePath.Override(120f);                    // daha ince sis
+        fogComp.meanFreePath.Override(fogMeanFreePath);         // palet/Inspector'dan ayarlanır
         fogComp.baseHeight.Override(0f);
         fogComp.maximumHeight.Override(60f);
 

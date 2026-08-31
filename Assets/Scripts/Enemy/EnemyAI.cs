@@ -66,6 +66,8 @@ public class EnemyAI : MonoBehaviour, IParryable
 
     [Header("Drop")]
     [SerializeField] GameObject ammoPickupPrefab;
+    [SerializeField] GameObject healthPickupPrefab;
+    [SerializeField] [Range(0f,1f)] float healthDropChance = 0.12f;
 
     [Header("Ses")]
     [SerializeField] AudioClip deathClip;
@@ -98,6 +100,8 @@ public class EnemyAI : MonoBehaviour, IParryable
     Transform player;
     PlayerMovement playerMovement;
     SfxPlayer sfx;
+    Animator anim;   // opsiyonel — animasyonlu gövdesi olan düşmanlarda (yoksa null, atlanır)
+    bool hasStunnedAnimParam;   // Animator'da "Stunned" bool'u var mı (varsa stun klibi oynar, yoksa dondurulur)
 
     EnemyPatrolBehavior   patrol;
     EnemyMeleeAttack      meleeAttack;
@@ -111,6 +115,14 @@ public class EnemyAI : MonoBehaviour, IParryable
     void Awake()
     {
         agent  = GetComponent<NavMeshAgent>();
+        anim   = GetComponentInChildren<Animator>();   // animasyonlu gövde varsa
+
+        // Animator'da "Stunned" bool'u tanımlı mı? Varsa stun'da o klibe geçilir;
+        // yoksa fallback: animator DONDURULUR (yumruk ortada kalır — stun okunur).
+        if (anim)
+            foreach (var p in anim.parameters)
+                if (p.type == AnimatorControllerParameterType.Bool && p.name == "Stunned")
+                { hasStunnedAnimParam = true; break; }
         rb     = GetComponent<Rigidbody>();
         rb.isKinematic = true;   // normalde NavMeshAgent sürer; sadece fırlatma/düşüş sırasında fizik açılır
         rb.useGravity  = false;
@@ -148,6 +160,9 @@ public class EnemyAI : MonoBehaviour, IParryable
     {
         if (player == null) return;
 
+        // Koşma/idle animasyonu için hız (Animator "Speed" parametresi)
+        if (anim) anim.SetFloat("Speed", agent.enabled ? agent.velocity.magnitude : 0f);
+
         if (beingPulled) return;
         if (knockedBack) return;
         if (physicsFalling) return;
@@ -159,6 +174,7 @@ public class EnemyAI : MonoBehaviour, IParryable
             {
                 state = State.Chase;
                 StopStunEffect();
+                SetStunAnim(false);   // animasyonu serbest bırak (koşuya dönsün)
             }
             return;
         }
@@ -277,6 +293,7 @@ public class EnemyAI : MonoBehaviour, IParryable
         {
             state = State.Telegraphing;
             meleeAttack.StartTelegraph();
+            if (anim) anim.SetTrigger("Attack");   // yumruk animasyonu (wind-up + vuruş)
         }
     }
 
@@ -312,6 +329,13 @@ public class EnemyAI : MonoBehaviour, IParryable
     public bool IsLarge      => isLarge;
     public bool IsParryable  => state == State.Telegraphing;
 
+    // WaveDirector gibi "takviye" spawn'ları için: devriye/görüş beklemeden
+    // doğrudan oyuncuyu avlamaya başlar — zaten nerede olduğunu biliyorlar.
+    public void AlertNow()
+    {
+        if (state == State.Patrol) state = State.Chase;
+    }
+
     public void SetPatrolPoints(Transform[] points)
     {
         patrol.SetPoints(points);
@@ -335,6 +359,7 @@ public class EnemyAI : MonoBehaviour, IParryable
         if (dir.sqrMagnitude < 0.01f) return;
         meleeAttack.HideIndicator();
         StopStunEffect();          // yumruk stun'ı keser, efekt takılı kalmasın
+        SetStunAnim(false);        // donmuş animator'ı serbest bırak
         knockedBack = true;
         StartCoroutine(knockbackHandler.Run(transform, agent, rb, dir.normalized, force, () =>
         {
@@ -364,9 +389,38 @@ public class EnemyAI : MonoBehaviour, IParryable
         }
     }
 
+    // Stun'da saldırı animasyonunu KES: bekleyen Attack trigger'ı iptal + ya "Stunned"
+    // klibine geç (parametre varsa) ya da animator'ı dondur (yumruk ortada asılı kalır —
+    // sersemletme okunur). Stun bitince/kesilince geri sarılır: donmuş saldırı devam
+    // etmesin diye mevcut state sonuna atlanır → çıkış geçişiyle koşu/idle'a döner.
+    void SetStunAnim(bool on)
+    {
+        if (anim == null) return;
+
+        anim.ResetTrigger("Attack");                    // bekleyen yumruğu iptal et
+
+        if (hasStunnedAnimParam)
+        {
+            anim.SetBool("Stunned", on);
+            return;
+        }
+
+        if (on)
+        {
+            anim.speed = 0f;                            // fallback: kare dondur
+        }
+        else
+        {
+            anim.speed = 1f;
+            var st = anim.GetCurrentAnimatorStateInfo(0);
+            anim.Play(st.shortNameHash, 0, 0.999f);     // saldırıyı bitmiş say → çıkış geçişi
+        }
+    }
+
     public void StartBeingPulled()
     {
         beingPulled = true;
+        SetStunAnim(false);        // stun'da donmuşsa çekilirken serbest kalsın
         agent.enabled = false;
     }
 
@@ -425,6 +479,8 @@ public class EnemyAI : MonoBehaviour, IParryable
     {
         state     = State.Stunned;
         stunUntil = Time.time + duration;
+        meleeAttack.HideIndicator();       // kafadaki telegraph ışığı sönsün
+        SetStunAnim(true);                 // saldırı animasyonunu kes/dondur
         if (agent.enabled && agent.isOnNavMesh) agent.ResetPath();
         if (stunEffect)
         {
@@ -443,6 +499,9 @@ public class EnemyAI : MonoBehaviour, IParryable
     {
         if (ammoPickupPrefab != null)
             Instantiate(ammoPickupPrefab, transform.position + Vector3.up * 0.3f, Quaternion.identity);
+
+        if (healthPickupPrefab != null && Random.value < healthDropChance)
+            Instantiate(healthPickupPrefab, transform.position + Vector3.up * 0.3f, Quaternion.identity);
 
         DamageVignette.OnKill();
         CameraShake.HitPause();

@@ -63,6 +63,21 @@ public class Arena : MonoBehaviour
         }
 
         Debug.Log($"[Arena] {validEnemies.Count} geçerli düşman hazır.", this);
+
+        // Oyuncu dövüş bitmeden ölürse giriş kilitli kalıp oyuncuyu dışarıda
+        // hapsetmesin diye — ölünce (checkpoint'ten dönüş sonrası) tekrar
+        // girebilsin diye giriş açılır. Düşmanlar/aliveCount dokunulmadan kalır,
+        // yani geri dönünce kaldığın yerden (boss'un o ana kadarki hasarıyla) devam eder.
+        var pgo = GameObject.FindGameObjectWithTag("Player");
+        if (pgo != null && pgo.TryGetComponent(out Health playerHealth))
+            playerHealth.onDeath.AddListener(OnPlayerDied);
+    }
+
+    void OnPlayerDied()
+    {
+        if (!triggered || aliveCount <= 0) return;   // dövüş başlamamış/zaten bitmişse dokunma
+        if (entryBarrier) entryBarrier.SetActive(false);
+        Debug.Log("[Arena] Oyuncu öldü, dövüş bitmemiş — giriş tekrar açıldı.", this);
     }
 
     void OnTriggerEnter(Collider other)

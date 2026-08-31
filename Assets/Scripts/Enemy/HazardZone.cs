@@ -13,13 +13,15 @@ public class HazardZone : MonoBehaviour
     float tickDamage;
     float tickInterval;
     LayerMask damageMask;
+    Health ignore;   // alanı bırakan canlı (boss) kendi alanından hasar yemesin
 
-    public void Init(float radius, float duration, float tickDamage, float tickInterval, LayerMask damageMask)
+    public void Init(float radius, float duration, float tickDamage, float tickInterval, LayerMask damageMask, Health ignore = null)
     {
         this.radius       = radius;
         this.tickDamage   = tickDamage;
         this.tickInterval = tickInterval;
         this.damageMask   = damageMask;
+        this.ignore       = ignore;
         StartCoroutine(Run(duration));
     }
 
@@ -29,7 +31,10 @@ public class HazardZone : MonoBehaviour
         while (elapsed < duration)
         {
             foreach (var col in Physics.OverlapSphere(transform.position, radius, damageMask))
-                col.GetComponentInParent<Health>()?.TakeDamage(tickDamage);
+            {
+                var h = col.GetComponentInParent<Health>();
+                if (h != null && h != ignore) h.TakeDamage(tickDamage);
+            }
 
             yield return new WaitForSeconds(tickInterval);
             elapsed += tickInterval;

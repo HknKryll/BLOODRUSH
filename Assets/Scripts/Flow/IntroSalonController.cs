@@ -28,14 +28,12 @@ public class IntroSalonController : MonoBehaviour
     [SerializeField] float sitCameraMoveTime   = 1f;
 
     [Header("Metinler")]
-    [SerializeField] string objectiveText = "bir yer bul... ve otur";
-    [SerializeField] string promptText    = "[E] Otur";
+    [SerializeField] string promptText = "[E] Otur";
 
     GameObject     player;
     Camera         playerCam;
     PlayerMovement movement;
 
-    Text objectiveLabel;
     Text promptLabel;
 
     bool controlsReady;   // itiraf metni bitti, oyuncu yürüyebilir
@@ -81,7 +79,6 @@ public class IntroSalonController : MonoBehaviour
     {
         IntroTextSequence.OnFinished -= OnIntroFinished;
         controlsReady = true;
-        if (objectiveLabel) objectiveLabel.enabled = true;
     }
 
     void Update()
@@ -103,8 +100,7 @@ public class IntroSalonController : MonoBehaviour
     IEnumerator SitAndExit()
     {
         sitting = true;
-        if (objectiveLabel) objectiveLabel.enabled = false;
-        if (promptLabel)    promptLabel.enabled    = false;
+        if (promptLabel) promptLabel.enabled = false;
 
         if (movement) movement.enabled = false;   // yürüyüş + bakış dursun
 
@@ -157,11 +153,7 @@ public class IntroSalonController : MonoBehaviour
         canvas.sortingOrder = 20;
         cgo.AddComponent<CanvasScaler>();
 
-        // Hedef yazısı — sol üstte (WASD tutorialı alt-ortada çıktığı için çakışmasın)
-        objectiveLabel = MakeLabel(cgo.transform, objectiveText, 18,
-            new Color(0.75f, 0.75f, 0.75f, 0.85f),
-            new Vector2(0.02f, 0.86f), new Vector2(0.5f, 0.97f), TextAnchor.UpperLeft);
-        objectiveLabel.enabled = false;
+        // (Sol üstteki hedef yazısı kaldırıldı — sadece [E] Otur prompt'u kalır.)
 
         // Prompt — ekran ortasının biraz altında, ortalı
         promptLabel = MakeLabel(cgo.transform, promptText, 22,

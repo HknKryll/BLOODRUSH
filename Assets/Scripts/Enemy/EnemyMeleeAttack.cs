@@ -40,8 +40,12 @@ public class EnemyMeleeAttack
     public bool InRange(float dist)    => dist <= attackRange;
     public bool OutOfRange(float dist) => dist > attackRange * 1.3f;
 
-    // Chase -> Attack geçişinde çağrılır.
-    public void EnterAttack() => lastAttackTime = Time.time;
+    // Chase -> Attack geçişinde çağrılır. NOT: eskiden burada lastAttackTime = Time.time
+    // yapılıyordu — bu, menzile girince tam attackCooldown kadar BEKLEME + her yeniden
+    // girişte sıfırlama demekti (koş→dur→koş salınımı, geç vuruş). Kaldırıldı: ilk vuruş
+    // menzile girer girmez tetiklenir; cooldown yalnız ResolveTelegraph'tan (gerçek
+    // vuruştan) sayılır, böylece saldırı akıcı ve hızlı olur.
+    public void EnterAttack() { }
 
     public bool ReadyToTelegraph() => Time.time >= lastAttackTime + attackCooldown;
 

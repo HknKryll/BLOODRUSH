@@ -130,6 +130,34 @@ geçiş yapılıyor (bkz. `PlayerShoot.cs`). Bomba/Flash ayrı bir sistem
      Uzaktan Saldıran (Tip 5) tipleri eklenir; kombinasyonlar başlar.
   3. **Son üçte bir:** Tüm tipler karışık + 1 mini-boss + final boss.
 
+### 7.1 CH3 Yerleşimi — KARARLAŞTIRILDI (2026-07-19, dairesel yapı terk edildi)
+
+Eski "Server Core" dairesel arenası (merkeze daralan katlar, `ArenaBuilder.cs`)
+oyuncuya sıkışık hissettirdiği için CH3 baştan tasarlandı. Not: bu CH1-CH3
+kampanyası oyunun YAYINLANACAK İLK SÜRÜMÜ — oyun bununla sınırlı kalmayacak,
+ileride genişleyecek.
+
+- **Mekan:** Çok katlı, ASİMETRİK sanayi/server salonu — zemin + 2 üst seviye
+  (~4m orta platformlar, ~8m üst köprüler). Kurulum: `IndustrialHallBuilder.cs`
+  (parametrik greybox builder; çıktı elle düzenlenebilir — builder kararı
+  ileride değişebilir, ekip notu).
+- **Katların rolü:** Aktif savaş alanı. Menzilli/zırhlı tipler üst kat
+  spawn'larından doğup köprülerden ateş eder (`WaveDirector.elevatedSpawnPoints`);
+  melee/hızlı tipler zeminden gelir, merdivenlerle katlara çıkabilir.
+- **Terminaller:** Farklı seviyelere dağıtılır (bazıları üst platformlarda) —
+  oyuncu dikeyde hareket etmek zorunda; terminal doldururken üstten/alttan
+  baskıya açık kalır.
+- **Dalga sistemi:** `WaveDirector` heat+terminal sistemi korunur (CH3'ün
+  kimliği), sadece mekan değişti.
+- **Final boss:** AYRI odada (`RoomBuilder.cs` ile kurulan dikdörtgen arena,
+  salonun doğu kapısından geçilir). Boss = kaçmış deneyin nihai evrimi:
+  `ExperimentBossAI.cs` — sıçrayıp yere çakılma (alan hasarı + asit alanı),
+  mermi salvosu, parry'lenebilir pençe, faz geçişlerinde patlama + asit
+  halkası. Ch2'nin insan denetçi boss'undan (pompalı+karanlık) bilinçli
+  olarak farklı bir dövüş dili. Görsel placeholder — model sonra takılır.
+- **Final tetiği:** Boss ölümü → `ExperimentBossAI.onDefeated` event'i →
+  (ekibin ekleyeceği ara sahne) → `EndingSequence.Begin()`.
+
 ## 8. Düşman Roster'ı
 
 Kısa oyun için az sayıda ama birbirini tamamlayan, net siluetli tipler

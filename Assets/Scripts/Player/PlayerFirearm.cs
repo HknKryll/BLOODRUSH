@@ -134,8 +134,9 @@ public class PlayerFirearm
 
         float dmg = Mathf.Lerp(damageNear, damageFar, Mathf.Clamp01(hit.distance / range)) * damageMultiplier;
 
-        var armor = hit.collider.GetComponentInParent<DirectionalArmor>();
-        if (armor != null) dmg *= armor.Multiplier(ray.direction);   // önden zırh emer
+        // Yönlü zırh (önden az hasar / arkadan tam) kaldırıldı — zırhlı düşman
+        // artık her yönden tam hasar alır. DirectionalArmor component'i ArmoredHazard
+        // prefab'ında atıl duruyor; istenirse elle silinebilir.
 
         health.TakeDamage(dmg);
         CrosshairHUD.Instance?.ShowHitMarker();

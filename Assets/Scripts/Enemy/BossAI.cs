@@ -12,6 +12,7 @@ using Bloodrush.Shared.Audio;
 using Bloodrush.FX;
 using Bloodrush.Flow;
 using Bloodrush.Player;
+using Bloodrush.UI;
 
 namespace Bloodrush.Enemy
 {
@@ -62,6 +63,16 @@ public class BossAI : MonoBehaviour, IParryable
     [SerializeField] AudioClip meleeClip;
     [SerializeField] [Range(0f,1f)] float meleeVolume = 1f;
 
+    [Header("Can Barı")]
+    [SerializeField] string bossName     = "KONSEY DENETÇİSİ";
+    [SerializeField] float  barShowRange = 35f;
+
+    [Header("Ölünce Düşen Silahlar")]
+    [Tooltip("Boss ölünce yere düşen silah pickup prefabları (WeaponPickup içeren). CH2: Shotgun + LMG.")]
+    [SerializeField] GameObject[] weaponDropPrefabs;
+    [Tooltip("Düşüş saçılma yarıçapı (m).")]
+    [SerializeField] float weaponDropSpread = 1.6f;
+
     State state = State.Chase;
     int   phase = 1;              // 1: >66%, 2: 66-33%, 3: <33%
     float fireTimer;
@@ -69,6 +80,7 @@ public class BossAI : MonoBehaviour, IParryable
     float stunUntil;
     float logTimer;
     bool  dead;
+    bool  barShown;
 
     NavMeshAgent   agent;
     Health         health;
@@ -131,6 +143,13 @@ public class BossAI : MonoBehaviour, IParryable
         float dist = Vector3.Distance(transform.position, player.position);
         FacePlayer();
         UpdateDashTimer(dist);
+
+        // Oyuncu boss alanına girince can barını göster (bir kez)
+        if (!barShown && dist <= barShowRange)
+        {
+            BossHealthUI.ShowBoss(health, bossName);
+            barShown = true;
+        }
 
         logTimer += Time.deltaTime;
         if (logTimer >= 1f)
@@ -315,7 +334,22 @@ public class BossAI : MonoBehaviour, IParryable
         if (agent.enabled) agent.enabled = false;
         SetRenderers(false);
         enabled = false;
+        BossHealthUI.HideBoss();
+        DropWeapons();                 // silahlar yere düşer → oyuncu alır → kalıcı açılır
         Destroy(gameObject, 0.1f);
+    }
+
+    // Boss ölünce silahları yanına saçarak düşür (WeaponPickup üstüne gidince açılır)
+    void DropWeapons()
+    {
+        if (weaponDropPrefabs == null) return;
+        foreach (var prefab in weaponDropPrefabs)
+        {
+            if (prefab == null) continue;
+            Vector2 off = Random.insideUnitCircle * weaponDropSpread;
+            Vector3 pos = transform.position + new Vector3(off.x, 0.6f, off.y);
+            Instantiate(prefab, pos, Quaternion.Euler(0f, Random.Range(0f, 360f), 0f));
+        }
     }
 
     // Boss büyük — kanca/yumruk işlemez (kancanın kontrol edeceği bilgi)

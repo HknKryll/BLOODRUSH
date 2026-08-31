@@ -15,6 +15,8 @@ public class PlayerShoot : MonoBehaviour
     [SerializeField] float revolverDamage  = 40f;
     [SerializeField] float revolverRange   = 120f;
     [SerializeField] float revolverFireRate = 0.28f;
+    [Tooltip("Tepme çarpanı — ProceduralWeaponMotion'daki temel recoil değerleriyle çarpılır.")]
+    [SerializeField] float revolverRecoilScale = 1f;
     [SerializeField] LayerMask hitMask     = ~0;
     [SerializeField] ParticleSystem muzzleFlash;
 
@@ -41,6 +43,8 @@ public class PlayerShoot : MonoBehaviour
     [SerializeField] int   shotgunMagazineSize    = 6;
     [SerializeField] int   shotgunStartingReserve = 24;
     [SerializeField] float shotgunReloadTime      = 2.4f;
+    [Tooltip("Tepme çarpanı — shotgun sert teper.")]
+    [SerializeField] float shotgunRecoilScale     = 1.8f;
     [SerializeField] ParticleSystem shotgunMuzzleFlash;
 
     [Header("Shotgun Ses")]
@@ -59,6 +63,8 @@ public class PlayerShoot : MonoBehaviour
     [SerializeField] int   lmgMagazineSize    = 45;
     [SerializeField] int   lmgStartingReserve = 135;
     [SerializeField] float lmgReloadTime      = 3.2f;
+    [Tooltip("Tepme çarpanı — LMG hafif ama seri teper.")]
+    [SerializeField] float lmgRecoilScale     = 0.45f;
     [SerializeField] ParticleSystem lmgMuzzleFlash;
 
     [Header("LMG Ses")]
@@ -68,11 +74,6 @@ public class PlayerShoot : MonoBehaviour
     [SerializeField] [Range(0f,1f)] float lmgEmptyClickVolume = 0.6f;
     [SerializeField] AudioClip lmgReloadClip;
     [SerializeField] [Range(0f,1f)] float lmgReloadVolume = 0.8f;
-
-    [Header("Silah Değiştirme")]
-    [SerializeField] KeyCode switchToRevolverKey = KeyCode.Alpha1;
-    [SerializeField] KeyCode switchToShotgunKey  = KeyCode.Alpha2;
-    [SerializeField] KeyCode switchToLmgKey      = KeyCode.Alpha3;
 
     [Header("Launcher")]
     [SerializeField] LauncherProjectile grenadePrefab;
@@ -88,6 +89,12 @@ public class PlayerShoot : MonoBehaviour
     [SerializeField] AudioClip modeSwitchClip;
     [SerializeField] [Range(0f,1f)] float modeSwitchVolume = 0.6f;
 
+    [Header("Silah Modelleri")]
+    [Tooltip("Sıra: 0=Revolver, 1=Shotgun, 2=Lmg. Aktif olan görünür, diğerleri gizlenir.")]
+    [SerializeField] GameObject[] weaponModels;
+    [Tooltip("Silahı indirme süresi — model bu sürenin sonunda (en altta, görünmezken) değişir.")]
+    [SerializeField] float switchHolsterTime = 0.16f;
+
     [Header("References")]
     [SerializeField] Camera                 playerCamera;
     [SerializeField] WeaponAnimator         weaponAnim;
@@ -100,6 +107,11 @@ public class PlayerShoot : MonoBehaviour
 
     PlayerFirearm[] firearms;
     int             activeIndex;
+    bool            switching;
+
+    // Silah kilidi — bölüm ilerlemesine göre GameFlow kısar. Varsayılan hepsi AÇIK
+    // (GameFlow'suz sahneler eskisi gibi tüm silahlar). Revolver (0) hep açık kalır.
+    readonly bool[] unlocked = { true, true, true };
 
     void Start()
     {
@@ -127,28 +139,50 @@ public class PlayerShoot : MonoBehaviour
             hitMask, playerCamera, lmgMuzzleFlash,
             sfx, lmgFireClip, lmgFireVolume, lmgEmptyClickClip, lmgEmptyClickVolume,
             lmgReloadClip, lmgReloadVolume);
+
+        // weaponMotion atanmamışsa otomatik bul (PlayerShoot Player kökünde,
+        // ProceduralWeaponMotion bir child'da) — referans kopması recoil'i öldürmesin.
+        if (weaponMotion == null)
+            weaponMotion = GetComponentInChildren<ProceduralWeaponMotion>(true);
+
+        UpdateWeaponModel();                        // açılışta sadece aktif silah görünür
+        Motion?.PlayDraw(ViaBottom(activeIndex));   // silah kendi yönünden çekilerek belirir
     }
+
+    // Silahın giriş/çıkış yönü: revolver ekranın ALTINDAN iner/çekilir (kılıf hissi),
+    // omuz silahları (shotgun/LMG) ÜSTTEN iner/çekilir (sırttan alma hissi).
+    static bool ViaBottom(int index) => index == (int)Firearm.Revolver;
 
     void Update()
     {
-        if (Input.GetKeyDown(switchToRevolverKey)) SwitchFirearm(Firearm.Revolver);
-        if (Input.GetKeyDown(switchToShotgunKey))  SwitchFirearm(Firearm.Shotgun);
-        if (Input.GetKeyDown(switchToLmgKey))      SwitchFirearm(Firearm.Lmg);
+        if (Input.GetKeyDown(KeyBindings.Weapon1)) SwitchFirearm(Firearm.Revolver);
+        if (Input.GetKeyDown(KeyBindings.Weapon2)) SwitchFirearm(Firearm.Shotgun);
+        if (Input.GetKeyDown(KeyBindings.Weapon3)) SwitchFirearm(Firearm.Lmg);
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && !switching)
             FireActive();
 
         if (LauncherEnabled && Input.GetButtonDown("Fire2"))
             FireLauncher();
 
-        if (LauncherEnabled && Input.GetKeyDown(KeyCode.Q))
+        if (LauncherEnabled && Input.GetKeyDown(KeyBindings.LauncherMode))
             SwitchMode();
 
-        if (Input.GetKeyDown(KeyCode.R) && !ActiveFirearm.IsReloading)
+        if (Input.GetKeyDown(KeyBindings.Reload) && !ActiveFirearm.IsReloading)
             StartCoroutine(ActiveFirearm.Reload());
     }
 
     // ───────────────── Ateşli silah ─────────────────
+
+    // Inspector referansı kopmuşsa sahnedeki tek motora (singleton) düş —
+    // recoil, PlayerShoot'un nerede olduğundan bağımsız her zaman çalışsın.
+    ProceduralWeaponMotion Motion =>
+        weaponMotion != null ? weaponMotion : ProceduralWeaponMotion.Instance;
+
+    // Aktif silahın tepme çarpanı
+    float ActiveRecoilScale => activeIndex == (int)Firearm.Shotgun ? shotgunRecoilScale
+                             : activeIndex == (int)Firearm.Lmg     ? lmgRecoilScale
+                             :                                       revolverRecoilScale;
 
     void FireActive()
     {
@@ -158,7 +192,7 @@ public class PlayerShoot : MonoBehaviour
         if (result == PlayerFirearm.FireResult.Fired)
         {
             weaponAnim?.TriggerFire();
-            weaponMotion?.ApplyRecoil();
+            Motion?.ApplyRecoil(ActiveRecoilScale);
             if (fw.CurrentAmmo == 0 && fw.TotalAmmo > 0)
                 StartCoroutine(fw.Reload());
         }
@@ -171,8 +205,44 @@ public class PlayerShoot : MonoBehaviour
     void SwitchFirearm(Firearm next)
     {
         int index = (int)next;
-        if (index == activeIndex) return;
-        activeIndex = index;
+        if (index == activeIndex || switching) return;
+        if (index >= 0 && index < unlocked.Length && !unlocked[index]) return;   // kilitli silah — yok say
+        StartCoroutine(SwitchRoutine(index));
+    }
+
+    // Silah kilidi (GameFlow / WeaponPickup çağırır). Revolver her zaman açık.
+    public void SetUnlocked(Firearm w, bool value)
+    {
+        int i = (int)w;
+        if (i == (int)Firearm.Revolver) value = true;
+        if (i >= 0 && i < unlocked.Length) unlocked[i] = value;
+    }
+
+    public bool IsUnlocked(Firearm w)
+    {
+        int i = (int)w;
+        return i < 0 || i >= unlocked.Length || unlocked[i];
+    }
+
+    // Holster (eldeki kendi yönünden çıkar) → uçta model değiştir → yenisi kendi yönünden gelir
+    IEnumerator SwitchRoutine(int index)
+    {
+        switching = true;
+        Motion?.Holster(ViaBottom(activeIndex));       // eldeki silah kendi yönünden iner
+        yield return new WaitForSeconds(switchHolsterTime);
+        activeIndex = index;                           // istatistik/mermi yeni silaha geçer
+        UpdateWeaponModel();                           // model ekran dışındayken değişir
+        Motion?.PlayDraw(ViaBottom(index));            // yeni silah kendi yönünden çekilir
+        sfx?.Play(modeSwitchClip, modeSwitchVolume);   // çekiş sesi (opsiyonel klip)
+        switching = false;
+    }
+
+    // Aktif silah modelini göster, diğerlerini gizle
+    void UpdateWeaponModel()
+    {
+        if (weaponModels == null) return;
+        for (int i = 0; i < weaponModels.Length; i++)
+            if (weaponModels[i]) weaponModels[i].SetActive(i == activeIndex);
     }
 
     // ───────────────── Launcher ─────────────────
@@ -196,6 +266,8 @@ public class PlayerShoot : MonoBehaviour
 
     void SpawnProjectile(LauncherProjectile prefab)
     {
+        // Prefab/namlu atanmamışsa sessizce çık — eksik referans oyunu patlatmasın.
+        if (prefab == null || launcherBarrel == null) return;
         var proj = Instantiate(prefab, launcherBarrel.position, playerCamera.transform.rotation);
         proj.Launch(playerCamera.transform.forward * launchSpeed);
     }

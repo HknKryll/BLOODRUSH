@@ -8,7 +8,6 @@ namespace Bloodrush.Player
 {
 public class PlayerParry : MonoBehaviour
 {
-    [SerializeField] KeyCode        parryKey   = KeyCode.F;
     [SerializeField] float          parryRange = 5f;
     [SerializeField] float          parryStun  = 2f;
     [SerializeField] WeaponAnimator weaponAnim;
@@ -33,7 +32,7 @@ public class PlayerParry : MonoBehaviour
 
     void Update()
     {
-        if (!Input.GetKeyDown(parryKey)) return;
+        if (!Input.GetKeyDown(KeyBindings.ParryPunch)) return;
 
         // 1) Önce parry dene — telegraph yapan düşman/boss varsa
         Collider[] cols = Physics.OverlapSphere(transform.position, parryRange);

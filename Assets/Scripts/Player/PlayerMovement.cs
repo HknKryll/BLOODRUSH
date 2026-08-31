@@ -36,9 +36,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float wallRunTilt      = 14f;   // kamera yatması
 
     [Header("Slide")]
-    [SerializeField] KeyCode slideKey      = KeyCode.LeftControl;
     [SerializeField] float   slideSpeed    = 22f;
-    [SerializeField] float   slideDuration = 0.65f;
+    [Tooltip("Kayma sürtünmesi (hız/sn azalma). Küçük = daha uzun kayma.")]
+    [SerializeField] float   slideFriction = 9f;
+    [Tooltip("Bu hızın altına düşünce kayma biter (≈ yürüme hızı).")]
+    [SerializeField] float   minSlideSpeed = 11f;
+    [Tooltip("Güvenlik: en fazla bu kadar saniye kayılır (sonsuz kaymayı önler).")]
+    [SerializeField] float   maxSlideTime  = 3f;
     [SerializeField] float   slideTilt     = 8f;
 
     [Header("Camera")]
@@ -46,6 +50,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float sensitivityField = 2f;
     public float sensitivity { get => sensitivityField; set => sensitivityField = value; }
     [SerializeField] float maxPitch    = 85f;
+    [Tooltip("Flip'te (tavanda) gözün tavanın altında ne kadar aşağıda olacağı. Ayaklar tavanda hissi için ayarla.")]
+    [SerializeField] float flipEyeHeight = 1.6f;
 
     [Header("Ses")]
     [SerializeField] AudioClip footstepClip;
@@ -62,6 +68,14 @@ public class PlayerMovement : MonoBehaviour
     Vector3 launchVelocity;
     float   pitch;
     float   coyoteTimer;
+
+    // Yerçekimi flip (yerçekimi odası): zıplayınca yerçekimi ters döner, tavan zemin olur
+    bool           flipped;
+    float          flipRoll;         // kamera hedef roll'ü (0 / 180)
+    float          camRoll;          // kameranın anlık roll'ü (euler geri-okuma bug'ı olmasın)
+    CollisionFlags lastFlags;        // flip zemin algısı için cc.Move sonucu
+    Vector3        defaultCamLocal;  // normal göz yerel konumu; flip'te Y aynalanır
+    Bloodrush.FX.CameraShake camShake; // varsa kamera taban konumunu buna veririz
 
     PlayerWallRun wallRun;
     PlayerSlide   slide;
@@ -83,10 +97,28 @@ public class PlayerMovement : MonoBehaviour
         wallRun = new PlayerWallRun(cc, transform,
             wallJumpMask, wallJumpCheckDist, wallJumpRefillTime, maxWallJumpsPerWall, wallJumpLockDuration,
             wallRunMask, wallRunCheckDist, wallRunSpeed, wallRunMaxTime, wallRunGravity, wallRunJumpOut);
-        slide = new PlayerSlide(cc, slideSpeed, slideDuration, moveSpeed);
+        slide = new PlayerSlide(cc, slideSpeed, slideFriction, minSlideSpeed, maxSlideTime, moveSpeed);
 
         var cam = cameraHolder.GetComponentInChildren<Camera>();
         if (cam) cam.nearClipPlane = 0.05f;
+
+        defaultCamLocal = cameraHolder.localPosition;
+        camShake        = cameraHolder.GetComponentInChildren<Bloodrush.FX.CameraShake>();
+    }
+
+    // Kamera TABAN yerel konumu: normalde defaultCamLocal, flip'te göz tavanın (capsule
+    // üst teması) flipEyeHeight kadar ALTINA iner — böylece tavanın içinde kalmaz.
+    // TEK SAHİP burasıdır: CameraShake varsa tabanı ona veririz (o base+sarsıntı yazar,
+    // yoksa CameraShake her kare 0.48'e geri ezip flip kamerasını bozuyordu). Yoksa
+    // doğrudan yazarız.
+    void ApplyCameraBase()
+    {
+        Vector3 baseLocal = defaultCamLocal;
+        if (flipped)
+            baseLocal.y = cc.center.y + cc.height * 0.5f - flipEyeHeight;
+
+        if (camShake != null) camShake.SetBaseLocalPos(baseLocal);
+        else                  cameraHolder.localPosition = baseLocal;
     }
 
     void Update()
@@ -94,12 +126,20 @@ public class PlayerMovement : MonoBehaviour
         Look();
         Move();
 
-        slide.Tick(Input.GetButtonDown("Jump"), out bool slideEnded, out bool slideJumpedOut, out Vector3 slideLaunch);
+        slide.Tick(Input.GetKeyDown(KeyBindings.Jump), Input.GetKey(KeyBindings.Slide),
+                   out bool slideEnded, out bool slideJumpedOut, out Vector3 slideLaunch);
         if (slideEnded)
         {
             launchVelocity = slideLaunch;
             if (slideJumpedOut) velocity.y = jumpForce;
         }
+    }
+
+    // Kamera tabanını her kare CameraShake'e ver (normal + flip) — CameraShake bunun
+    // üstüne sarsıntı ekler, artık kavga yok (execution-order'a bağlı değil).
+    void LateUpdate()
+    {
+        ApplyCameraBase();
     }
 
     void Look()
@@ -108,19 +148,28 @@ public class PlayerMovement : MonoBehaviour
         float mx = Input.GetAxisRaw("Mouse X") * sensitivity;
         float my = Input.GetAxisRaw("Mouse Y") * sensitivity;
 
+        // Flip'te bakış tersine döner (ekran 180° dönük olduğu için kontroller ters gelmesin)
+        if (flipped) { mx = -mx; my = -my; }
+
         pitch -= my;
         pitch = Mathf.Clamp(pitch, -maxPitch, maxPitch);
 
-        float tilt = slide.IsSliding  ? -slideTilt
-                   : wallRun.Running  ? wallRun.Side * wallRunTilt
+        float roll = FlipEnabled     ? flipRoll
+                   : slide.IsSliding ? -slideTilt
+                   : wallRun.Running ? wallRun.Side * wallRunTilt
                    : 0f;
-        cameraHolder.localRotation = Quaternion.Euler(pitch, 0f,
-            Mathf.LerpAngle(cameraHolder.localEulerAngles.z, tilt, Time.deltaTime * 10f));
+        float rollLerp = FlipEnabled ? 3.5f : 10f;   // flip'te daha yavaş/yumuşak 180° dönüş
+        // Roll'ü kendi float'ımızda izle — euler'dan geri okumak (pitch≠0'da) bozuk
+        // değer verip 180°'e oturmasını engelliyordu.
+        camRoll = Mathf.LerpAngle(camRoll, roll, Time.deltaTime * rollLerp);
+        cameraHolder.localRotation = Quaternion.Euler(pitch, 0f, camRoll);
         transform.Rotate(Vector3.up * mx);
     }
 
     void Move()
     {
+        if (FlipEnabled) { MoveFlip(); return; }   // yerçekimi odası — izole flip yolu
+
         bool grounded = cc.isGrounded;
         wallRun.CheckWall();
 
@@ -172,7 +221,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         bool jumpAllowed = coyoteTimer > 0f || Time.time < slide.SlideJumpDeadline || wallRun.CanWallJump;
-        if (Input.GetButtonDown("Jump") && jumpAllowed && JumpEnabled)
+        if (Input.GetKeyDown(KeyBindings.Jump) && jumpAllowed && JumpEnabled)
         {
             if (wallRun.CanWallJump)
                 Launch(wallRun.ConsumeWallJump() * wallJumpPushForce); // duvardan yatay itiş
@@ -184,7 +233,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         if (!DisableGravity)
-            velocity.y += gravity * Time.deltaTime;
+            velocity.y += gravity * GravityScale * Time.deltaTime;
 
         cc.Move(velocity * Time.deltaTime);
 
@@ -200,18 +249,53 @@ public class PlayerMovement : MonoBehaviour
             if (grounded) coyoteTimer = coyoteTime; // zıplama hakkını geri ver
         }
 
-        bool slideKeyDown = Input.GetKeyDown(slideKey);
-        bool slideKeyHeld = Input.GetKey(slideKey);
-        if (SlideEnabled && slide.CanStart(slideKeyDown, slideKeyHeld, grounded, wish))
+        if (SlideEnabled && slide.CanStart(Input.GetKeyDown(KeyBindings.Slide), grounded, wish))
         {
-            slide.Start(wish);
+            slide.Start(wish, new Vector2(cc.velocity.x, cc.velocity.z).magnitude);
             sfx.Play(slideClip, slideVolume);
         }
     }
 
+    // Yerçekimi odası hareketi: zıplama = FLIP (yerçekimi yönü ters döner, tavan zemin
+    // olur). Basit tutuldu — wallrun/slide devre dışı. Zemin algısı cc.Move'un
+    // CollisionFlags'inden (aşağı/yukarı çarpma). Kamera Look()'ta 180° döner.
+    void MoveFlip()
+    {
+        int  gs       = flipped ? -1 : 1;   // yerçekimi yönü işareti (aşağı=+, yukarı=−)
+        bool grounded = flipped ? (lastFlags & CollisionFlags.Above) != 0
+                                : ((lastFlags & CollisionFlags.Below) != 0 || cc.isGrounded);
+
+        bool jumped = false;
+        if (Input.GetKeyDown(KeyBindings.Jump) && JumpEnabled)
+        {
+            flipped    = !flipped;              // yerçekimini ters çevir
+            velocity.y = 0f;                    // yeni yüzeye taze düşüş
+            flipRoll   = flipped ? 180f : 0f;
+            ApplyCameraBase();                  // gözü yeni tarafa aynala (hemen)
+            sfx.Play(jumpClip, jumpVolume);
+            jumped = true;
+        }
+
+        if (!jumped)
+        {
+            velocity.y += gravity * gs * Time.deltaTime;   // yönlü yerçekimi
+            velocity.y  = Mathf.Clamp(velocity.y, -14f, 14f);   // tünelleme önle (ince tavandan geçmesin)
+            if (grounded) velocity.y = -gs * 2f;           // yüzeye hafif baskı (aşağı −2 / yukarı +2)
+        }
+
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
+        if (flipped) h = -h;   // 180° roll'da sağ-sol görsel olarak ters — A/D'yi eşle
+        Vector3 wish = transform.right * h + transform.forward * v;
+        if (wish.magnitude > 1f) wish.Normalize();
+
+        Vector3 move = wish * (moveSpeed * SpeedMultiplier) + Vector3.up * velocity.y;
+        lastFlags = cc.Move(move * Time.deltaTime);
+    }
+
     void TickWallRun()
     {
-        wallRun.Update(Input.GetButtonDown("Jump") && JumpEnabled, out bool jumpedOff, out Vector3 jumpOutHorizontal);
+        wallRun.Update(Input.GetKeyDown(KeyBindings.Jump) && JumpEnabled, out bool jumpedOff, out Vector3 jumpOutHorizontal);
         if (jumpedOff)
         {
             velocity.y = wallRunJumpUp;
@@ -224,10 +308,26 @@ public class PlayerMovement : MonoBehaviour
     public bool    IsGrounded      => cc.isGrounded;
     public bool    IsSliding       => slide.IsSliding;
     public bool    DisableGravity  { get; set; }
+    public float   GravityScale    { get; set; } = 1f;   // yerçekimi bölgeleri (düşük-g) çarpanı
     public float   SpeedMultiplier { get; set; } = 1f;
     public bool    JumpEnabled     { get; set; } = true;
     public bool    SlideEnabled    { get; set; } = true;
+    public bool    FlipEnabled     { get; private set; }   // yerçekimi flip modu aktif mi
     public CharacterController Controller => cc;
+
+    // GravityFlipZone çağırır — odaya girince flip modu açılır, çıkınca normale döner
+    public void SetFlipMode(bool on)
+    {
+        FlipEnabled = on;
+        if (!on) { flipped = false; flipRoll = 0f; ApplyCameraBase(); }
+    }
+
+    // Yerçekimi bölgesi (anti-grav kolonu) yukarı itiş uygular — GravityZone çağırır
+    public void AddUpdraft(float upSpeed)
+    {
+        if (velocity.y < upSpeed)
+            velocity.y = Mathf.MoveTowards(velocity.y, upSpeed, 60f * Time.deltaTime);
+    }
 
     public void Launch(Vector3 v)
     {
@@ -247,6 +347,12 @@ public class PlayerMovement : MonoBehaviour
         transform.SetPositionAndRotation(pos, rot);
         velocity       = Vector3.zero;
         launchVelocity = Vector3.zero;
+        // Işınlama sonrası ters-dönük/eğik kalma — flip görselini sıfırla (FlipEnabled'e
+        // dokunma; bölge içine ışınlandıysak flip modu açık kalmalı).
+        flipped  = false;
+        flipRoll = 0f;
+        camRoll  = 0f;
+        ApplyCameraBase();
         cc.enabled = true;
     }
 

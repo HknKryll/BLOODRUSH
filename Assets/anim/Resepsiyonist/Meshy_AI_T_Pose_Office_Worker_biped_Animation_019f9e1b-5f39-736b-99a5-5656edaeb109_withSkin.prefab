@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &7808498839208394361
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 5ce3fa4962825e3428ac85bc9d0b5a71,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -41.760254
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5ce3fa4962825e3428ac85bc9d0b5a71,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 24.94
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5ce3fa4962825e3428ac85bc9d0b5a71,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 7.3895273
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5ce3fa4962825e3428ac85bc9d0b5a71,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5ce3fa4962825e3428ac85bc9d0b5a71,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5ce3fa4962825e3428ac85bc9d0b5a71,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5ce3fa4962825e3428ac85bc9d0b5a71,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5ce3fa4962825e3428ac85bc9d0b5a71,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5ce3fa4962825e3428ac85bc9d0b5a71,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5ce3fa4962825e3428ac85bc9d0b5a71,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 5ce3fa4962825e3428ac85bc9d0b5a71,
+        type: 3}
+      propertyPath: m_Name
+      value: Meshy_AI_T_Pose_Office_Worker_biped_Animation_019f9e1b-5f39-736b-99a5-5656edaeb109_withSkin
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5ce3fa4962825e3428ac85bc9d0b5a71,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -8916351701524474394}
+  m_SourcePrefab: {fileID: 100100000, guid: 5ce3fa4962825e3428ac85bc9d0b5a71, type: 3}
+--- !u!1 &6961497962109059880 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 5ce3fa4962825e3428ac85bc9d0b5a71,
+    type: 3}
+  m_PrefabInstance: {fileID: 7808498839208394361}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-8916351701524474394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6961497962109059880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f053ea1bd252ef549826a96841bd835e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speakerName: "RESEPS\u0130YON\u0130ST"
+  lines:
+  - "Ho\u015Fgeldiniz"
+  - "Hemen sa\u011F\u0131n\u0131zdaki asans\xF6re binip a\u015F\u015Fa\u011F\u0131ya
+    inebilirsiniz"
+  repeatThreshold: 5
+  annoyedLine: "G\u0130T ARTIK!!!!!!!"
+  talkKey: 101
+  promptText: "[E] Konu\u015F"
+  range: 3
+  lookDot: 0.5
+  headOffset: 1.5

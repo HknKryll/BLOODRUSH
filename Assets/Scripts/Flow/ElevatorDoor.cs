@@ -18,6 +18,10 @@ namespace Bloodrush.Flow
 [RequireComponent(typeof(BoxCollider))]
 public class ElevatorDoor : MonoBehaviour
 {
+    [Header("Davranış")]
+    [Tooltip("Oyuncu trigger'a girince otomatik açılsın mı? ÇIKIŞ kapısında KAPAT — o sadece asansör varınca (Elevator.exitDoor) açılır.")]
+    [SerializeField] bool autoOpenOnApproach = true;
+
     [Header("Kapı Kanatları")]
     [SerializeField] Transform leftDoor;
     [SerializeField] Transform rightDoor;
@@ -49,7 +53,7 @@ public class ElevatorDoor : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"ElevatorDoor: trigger'a giren obje '{other.name}'", this);
+        if (!autoOpenOnApproach) return;   // çıkış kapısı: sadece Elevator varışta açar
         if (other.GetComponentInParent<PlayerMovement>() != null) Open();
     }
 

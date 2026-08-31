@@ -22,6 +22,12 @@ public class GameFlow : MonoBehaviour
     [Tooltip("BEDEN / YÜKLEME barları görünsün mü? Ch1-Ch2'de kapat, Ch3+'te aç.")]
     [SerializeField] bool showHUDBars = true;
 
+    [Header("Silah İlerlemesi")]
+    [Tooltip("Yeni oyun başı — silah kilidini sıfırla (sadece revolver). SADECE CH1'de TRUE.")]
+    [SerializeField] bool resetProgressOnStart = false;
+    [Tooltip("Bu sahnede tüm silahlar açık olsun (izole test kolaylığı; ilerlemeyi yok sayar).")]
+    [SerializeField] bool allWeaponsThisScene = false;
+
     static float uploadAtSceneStart;
 
     static GameFlow  instance;
@@ -37,6 +43,7 @@ public class GameFlow : MonoBehaviour
         Time.timeScale = 1f;   // hit-pause/slow-mo ortasında ölüm ihtimaline karşı
         uploadAtSceneStart = GameHUD.UploadProgress;
         hasCheckpoint = false; // yeni sahne temiz başlar (checkpoint önceki sahneden taşınmasın)
+        if (resetProgressOnStart) GameProgress.ResetRun();   // yeni oyun: sadece revolver
     }
 
     // Checkpoint trigger'ı çağırır
@@ -67,9 +74,14 @@ public class GameFlow : MonoBehaviour
         if (player.TryGetComponent(out Health health))
             health.onDeath.AddListener(OnPlayerDied);
 
-        // Bölüm loadout'u — launcher açık/kapalı
+        // Bölüm loadout'u — launcher açık/kapalı + silah kilidi (ilerlemeye göre)
         var ps = player.GetComponentInChildren<PlayerShoot>(true);
-        if (ps) ps.LauncherEnabled = launcherEnabled;
+        if (ps)
+        {
+            ps.LauncherEnabled = launcherEnabled;
+            ps.SetUnlocked(PlayerShoot.Firearm.Shotgun, GameProgress.ShotgunUnlocked || allWeaponsThisScene);
+            ps.SetUnlocked(PlayerShoot.Firearm.Lmg,     GameProgress.LmgUnlocked     || allWeaponsThisScene);
+        }
 
         // BEDEN / YÜKLEME barları görünürlüğü
         if (GameHUD.Instance) GameHUD.Instance.SetVisible(showHUDBars);

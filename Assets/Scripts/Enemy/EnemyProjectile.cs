@@ -13,6 +13,33 @@ public class EnemyProjectile : MonoBehaviour
     float damage;
     float life = 5f;
 
+    static Material trailMat;
+
+    void Awake()
+    {
+        // Asset'siz parlak iz (tracer) — gelen ateş net görünür. Prefab'a zaten
+        // TrailRenderer eklenmemişse ekle.
+        if (GetComponent<TrailRenderer>() == null)
+        {
+            var trail = gameObject.AddComponent<TrailRenderer>();
+            trail.time            = 0.12f;
+            trail.startWidth      = 0.10f;
+            trail.endWidth        = 0f;
+            trail.numCapVertices  = 2;
+            trail.sharedMaterial  = GetTrailMat();
+        }
+    }
+
+    static Material GetTrailMat()
+    {
+        if (trailMat == null)
+        {
+            trailMat = new Material(Shader.Find("HDRP/Unlit"));
+            trailMat.SetColor("_UnlitColor", new Color(1f, 0.5f, 0.2f) * 1.8f);   // hafif HDR turuncu (Bloom patlatmasın)
+        }
+        return trailMat;
+    }
+
     public void Launch(Vector3 direction, float projectileSpeed, float projectileDamage)
     {
         transform.forward = direction;

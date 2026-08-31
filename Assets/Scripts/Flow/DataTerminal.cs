@@ -16,7 +16,8 @@ namespace Bloodrush.Flow
 [RequireComponent(typeof(BoxCollider))]
 public class DataTerminal : MonoBehaviour
 {
-    [SerializeField] float activateTime = 4f;
+    [Tooltip("Oyuncunun içinde durup terminali doldurma süresi (sn). Büyük = daha uzun savunma = daha uzun bölüm.")]
+    [SerializeField] float activateTime = 6f;
     [SerializeField] [Range(0f,1f)] float uploadShare = 0.25f;
 
     [Header("EMP Dalgası (tamamlanınca)")]
@@ -35,6 +36,10 @@ public class DataTerminal : MonoBehaviour
     static readonly Color ActiveColor = new Color(1f,   0.8f, 0.1f);
     static readonly Color DoneColor   = new Color(0.2f, 1f,   0.3f);
 
+    // HUD'ın "VERİ x/y — %.." satırı için: oyuncunun şu an içinde durduğu terminal
+    public static DataTerminal Active { get; private set; }
+    public float Progress => Mathf.Clamp01(progress);
+
     float   progress;
     bool    playerInside;
     bool    done;
@@ -45,12 +50,38 @@ public class DataTerminal : MonoBehaviour
     {
         GetComponent<BoxCollider>().isTrigger = true;
         sfx = SfxPlayer.Create(gameObject, spatialBlend: 0f);
+
+        // Inspector'da atanmadıysa isimle child ara — IndustrialHallBuilder'ın
+        // otomatik ürettiği terminaller bu isimlerle gelir ("Glow", "FillBar")
+        if (glow == null)
+        {
+            var g = transform.Find("Glow");
+            if (g) glow = g.GetComponent<Renderer>();
+        }
+        if (fillBar == null) fillBar = transform.Find("FillBar");
+
         if (fillBar) { fillBaseScale = fillBar.localScale; var s = fillBaseScale; s.x = 0f; fillBar.localScale = s; }
         SetGlow(IdleColor);
     }
 
-    void OnTriggerEnter(Collider o) { if (o.GetComponentInParent<PlayerMovement>() != null) playerInside = true; }
-    void OnTriggerExit(Collider o)  { if (o.GetComponentInParent<PlayerMovement>() != null) playerInside = false; }
+    void OnTriggerEnter(Collider o)
+    {
+        if (o.GetComponentInParent<PlayerMovement>() == null) return;
+        playerInside = true;
+        if (!done) Active = this;
+    }
+
+    void OnTriggerExit(Collider o)
+    {
+        if (o.GetComponentInParent<PlayerMovement>() == null) return;
+        playerInside = false;
+        if (Active == this) Active = null;
+    }
+
+    void OnDestroy()
+    {
+        if (Active == this) Active = null;   // sahne geçişinde bayat referans kalmasın
+    }
 
     void Update()
     {
@@ -72,6 +103,7 @@ public class DataTerminal : MonoBehaviour
     void Complete()
     {
         done = true;
+        if (Active == this) Active = null;
         GameHUD.AddUploadProgress(uploadShare);
         if (WaveDirector.Instance != null) WaveDirector.Instance.OnTerminalDone();
         SetGlow(DoneColor);

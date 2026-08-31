@@ -24,6 +24,9 @@ public class WeaponHUD : MonoBehaviour
 
     void Start()
     {
+        // Referans kopmuşsa (PlayerShoot başka objeye taşınmış olabilir) otomatik bul
+        if (shoot == null) shoot = FindFirstObjectByType<PlayerShoot>();
+
         var canvas = gameObject.AddComponent<Canvas>();
         canvas.renderMode   = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 10;

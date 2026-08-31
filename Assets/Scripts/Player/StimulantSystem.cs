@@ -10,7 +10,6 @@ public class StimulantSystem : MonoBehaviour
     public static StimulantSystem Instance { get; private set; }
 
     [Header("Uyarıcı")]
-    [SerializeField] KeyCode useKey       = KeyCode.C;
     [SerializeField] float healthRestore  = 30f;
     [SerializeField] float speedBoost     = 1.5f;
     [SerializeField] float speedDuration  = 6f;
@@ -39,7 +38,7 @@ public class StimulantSystem : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(useKey))
+        if (Input.GetKeyDown(KeyBindings.Stimulant))
             UseStimulant();
     }
 

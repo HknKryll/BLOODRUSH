@@ -9,7 +9,6 @@ namespace Bloodrush.Player
 public class GrapplingHook : MonoBehaviour
 {
     [Header("Kanca")]
-    [SerializeField] KeyCode hookKey = KeyCode.E;
     [SerializeField] float maxRange = 30f;
     [SerializeField] float pullSpeed = 28f;
     [SerializeField] float arrivalDistance = 0.6f;
@@ -59,6 +58,10 @@ public class GrapplingHook : MonoBehaviour
     bool pullingPickup;
     PlayerShoot shoot;
 
+    // Dışarıdan kapatılabilir (ör. Flip Kulesi / GravityFlipZone) — hook varsa flip
+    // tırmanışı anlamsızlaşır. Kapatılınca aktif kanca hemen iptal edilir.
+    public bool HookEnabled { get; set; } = true;
+
     void Start()
     {
         movement = GetComponent<PlayerMovement>();
@@ -70,8 +73,14 @@ public class GrapplingHook : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(hookKey)) TryGrapple();
-        if (Input.GetKeyUp(hookKey))
+        if (!HookEnabled)                       // kule/flip bölgesi — kanca devre dışı
+        {
+            if (firing || isHooked || hanging) CancelActive();
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyBindings.Grapple)) TryGrapple();
+        if (Input.GetKeyUp(KeyBindings.Grapple))
         {
             // Uçuş sırasında bırakmak iptal ETMEZ — kanca varınca kısa çekişle fırlatır (tap desteği)
             if (firing) releasedDuringFlight = true;
@@ -173,7 +182,7 @@ public class GrapplingHook : MonoBehaviour
         }
 
         // Uçuş sırasında tuş bırakıldıysa (tap): varır varmaz fırlatmalı bırakış
-        if (releasedDuringFlight || !Input.GetKey(hookKey))
+        if (releasedDuringFlight || !Input.GetKey(KeyBindings.Grapple))
         {
             releasedDuringFlight = false;
             releasedManually     = true;
@@ -322,8 +331,8 @@ public class GrapplingHook : MonoBehaviour
     {
         hangTimer -= Time.deltaTime;
 
-        // Space → duvardan zıpla
-        if (Input.GetButtonDown("Jump"))
+        // Zıpla tuşu → duvardan zıpla
+        if (Input.GetKeyDown(KeyBindings.Jump))
         {
             movement.Launch(hangWallNormal * wallHangJumpOut + Vector3.up * wallHangJumpUp);
             EndHang();
@@ -361,5 +370,18 @@ public class GrapplingHook : MonoBehaviour
     }
 
     public bool IsHooked => isHooked;
+
+    // Kanca dışarıdan kapatıldığında aktif durumu güvenle sök (yerçekimi/ip/düşman geri al)
+    void CancelActive()
+    {
+        firing = false; isHooked = false; hanging = false;
+        if (movement != null) movement.DisableGravity = false;
+        if (hookedEnemy != null) hookedEnemy.StopBeingPulled();
+        hookedEnemy = null; hookedPickup = null;
+        pullingEnemy = false; pullingPickup = false;
+        releasedManually = false;
+        cooldownUntil = Time.time + cooldown;
+        if (rope != null) rope.gameObject.SetActive(false);
+    }
 }
 }

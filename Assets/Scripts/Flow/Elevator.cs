@@ -4,30 +4,33 @@ using UnityEngine.Events;
 using Bloodrush.Player;
 using Bloodrush.Shared.Audio;
 
-// Fiziksel asansör: oyuncu platforma binince kısa bir "kapı kapanıyor" bekleme
-// süresinin ardından otomatik olarak hedef noktaya iner. Sürüş boyunca oyuncu
-// bu objeye parent'lanır (kabin hareketiyle birlikte taşınır) ve PlayerMovement
-// kapatılır — yürüme/bakış donar, IntroSalonController'daki oturma sekansıyla
-// aynı desen (bkz. Assets/Scripts/Flow/IntroSalonController.cs).
+// Asansör (fade + ışınlama): oyuncu kabine binince kısa bir bekleme sonrası giriş
+// kapısı kapanır, EKRAN KARARIR, karanlıkta asansör sesi çalar, oyuncu destination'a
+// IŞINLANIR, (varsa) çıkış kapısı açılır ve ekran geri açılır. Kabin FİZİKSEL OLARAK
+// HAREKET ETMEZ — parent/kapı-birlikte-inme dertleri yok.
 //
-// Kullanım: bu script'i asansör kabininin/platformunun üzerine koy (görsel
-// kabin modeli varsa bu objenin child'ı yap — birlikte hareket eder).
-// BoxCollider (isTrigger) platform zeminini kaplasın. "destination" alanına
-// asansörün varacağı noktayı işaretleyen boş bir GameObject ata. İniş
-// bitince "onArrived" event'ini odanın/sunumun açılışına bağlayabilirsin.
+// Kurulum: bu script kabin objesinde; BoxCollider (isTrigger) kabin zeminini kaplasın.
+// destination = alt kattaki varış noktası (boş obje; MAVİ OK = oyuncunun bakacağı yön).
+// Alt katta görsel istersen oraya ayrı bir kabin kopyası kur — exitDoor onun kapısı olur.
 namespace Bloodrush.Flow
 {
 [RequireComponent(typeof(BoxCollider))]
 public class Elevator : MonoBehaviour
 {
-    [Header("Güzergah")]
+    [Header("Varış")]
+    [Tooltip("Işınlanma hedefi (boş obje). Mavi ok = oyuncunun bakış yönü.")]
     [SerializeField] Transform destination;
-    [SerializeField] float     rideDuration   = 4f;
     [SerializeField] float     doorCloseDelay = 1.2f;   // oyuncu binince bekleme süresi
+    [SerializeField] float     fadeDuration   = 0.8f;   // kararma/açılma süresi
+    [Tooltip("Tam karanlıkta bekleme süresi (asansör sesi bu sırada çalar) — 'iniş' hissi.")]
+    [SerializeField] float     blackHold      = 1.5f;
 
-    [Header("Kapı (opsiyonel)")]
-    [Tooltip("Atanırsa iniş başlamadan önce bu kapı kapatılır ve kapanması beklenir.")]
-    [SerializeField] ElevatorDoor door;
+    [Header("Kapılar (opsiyonel)")]
+    [Tooltip("Oyuncu binince AÇILIR, kararmadan önce KAPANIR (üst kattaki kapı).")]
+    [UnityEngine.Serialization.FormerlySerializedAs("door")]
+    [SerializeField] ElevatorDoor entryDoor;
+    [Tooltip("Varışta AÇILIR (alt kattaki kabin kopyasının kapısı). Auto Open On Approach = KAPALI olsun.")]
+    [SerializeField] ElevatorDoor exitDoor;
 
     [Header("Ses")]
     [SerializeField] AudioClip rideLoopClip;
@@ -42,8 +45,6 @@ public class Elevator : MonoBehaviour
     bool           activated;
     float          insideTimer;
     PlayerMovement playerMovement;
-    Transform      playerTransform;
-    Transform      originalParent;
     SfxPlayer      sfx;
     AudioSource    rideLoopSource;
 
@@ -59,10 +60,11 @@ public class Elevator : MonoBehaviour
         var pm = other.GetComponentInParent<PlayerMovement>();
         if (pm == null) return;
 
-        playerInside    = true;
-        playerMovement  = pm;
-        playerTransform = pm.transform;
-        insideTimer     = 0f;
+        playerInside   = true;
+        playerMovement = pm;
+        insideTimer    = 0f;
+
+        if (entryDoor != null) entryDoor.Open();   // oyuncu binince giriş kapısı açılır
     }
 
     void OnTriggerExit(Collider other)
@@ -92,16 +94,22 @@ public class Elevator : MonoBehaviour
 
     IEnumerator Run()
     {
-        // CharacterController açıkken parent'ın hareketi onu "ezip" fiziksel olarak
-        // geri itebiliyor (bkz. PlayerMovement.Teleport() — aynı sebeple CC'yi kapatıyor).
-        // Önce CC'yi kapat, sonra parent'la — yoksa oyuncu platformla birlikte gelmez.
-        playerMovement.Controller.enabled = false;
-        playerMovement.enabled = false;
-        originalParent = playerTransform.parent;
-        playerTransform.SetParent(transform, true);
+        playerMovement.enabled = false;            // karanlıkta yürüme/bakış donsun
 
-        if (door != null) yield return door.CloseAndWait();   // kapı kapanana kadar bekle, sonra in
+        if (entryDoor != null) yield return entryDoor.CloseAndWait();   // kapı kapansın
 
+        // Ekran kararır
+        var img = GameFlow.CreateOverlay(Color.black);
+        float t = 0f;
+        while (t < fadeDuration)
+        {
+            t += Time.deltaTime;
+            img.color = new Color(0f, 0f, 0f, t / fadeDuration);
+            yield return null;
+        }
+        img.color = Color.black;
+
+        // Karanlıkta "iniş": asansör sesi + bekleme
         if (rideLoopClip != null)
         {
             rideLoopSource = gameObject.AddComponent<AudioSource>();
@@ -111,26 +119,27 @@ public class Elevator : MonoBehaviour
             rideLoopSource.spatialBlend = 0f;
             rideLoopSource.Play();
         }
-
-        Vector3 start = transform.position;
-        Vector3 end   = destination.position;
-        float   t     = 0f;
-        while (t < rideDuration)
-        {
-            t += Time.deltaTime;
-            float p = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / rideDuration));
-            transform.position = Vector3.Lerp(start, end, p);
-            yield return null;
-        }
-        transform.position = end;
-
+        yield return new WaitForSeconds(blackHold);
         if (rideLoopSource != null) Destroy(rideLoopSource);
 
-        playerTransform.SetParent(originalParent, true);
-        playerMovement.Controller.enabled = true;
-        playerMovement.enabled = true;
+        // Karanlıkta ışınla (yaw = destination'ın yönü; Teleport CC/hız/flip'i halleder)
+        playerMovement.Teleport(destination.position,
+                                Quaternion.Euler(0f, destination.eulerAngles.y, 0f));
 
         sfx.Play(arriveClip, arriveVolume);
+        if (exitDoor != null) exitDoor.Open();     // varışta çıkış kapısı açılır
+
+        // Ekran geri açılır
+        t = 0f;
+        while (t < fadeDuration)
+        {
+            t += Time.deltaTime;
+            img.color = new Color(0f, 0f, 0f, 1f - t / fadeDuration);
+            yield return null;
+        }
+        Destroy(img.canvas.gameObject);
+
+        playerMovement.enabled = true;
         onArrived?.Invoke();
     }
 }
