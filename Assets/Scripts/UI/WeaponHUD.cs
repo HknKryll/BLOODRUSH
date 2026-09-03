@@ -9,10 +9,12 @@ public class WeaponHUD : MonoBehaviour
 {
     [SerializeField] PlayerShoot shoot;
 
-    TextMeshProUGUI weaponText;  // "REVOLVER" / "SHOTGUN" / "LMG"
+    Image           weaponIcon;  // hangi silah — artık yazı yok, sadece ikon
     TextMeshProUGUI ammoText;    // "10 | 50"
-    TextMeshProUGUI grenText;    // "GRN  x6"
-    TextMeshProUGUI flashText;   // "FLS  x3"
+    Image           grenIcon;
+    TextMeshProUGUI grenText;    // "x6"
+    Image           flashIcon;
+    TextMeshProUGUI flashText;   // "x3"
     TextMeshProUGUI reloadText;  // "RELOADING..."
 
     static readonly Color ColActive  = Color.yellow;
@@ -33,14 +35,19 @@ public class WeaponHUD : MonoBehaviour
         gameObject.AddComponent<CanvasScaler>();
         gameObject.AddComponent<GraphicRaycaster>();
 
-        // Sağ alt köşe — yukarıdan aşağı: silah adı, reload, grenade, flash, revolver
-        weaponText = MakeText(new Vector2(-18, 124), 15, TextAlignmentOptions.Right);
-        reloadText = MakeText(new Vector2(-18,  98), 20, TextAlignmentOptions.Right);
-        grenText   = MakeText(new Vector2(-18,  72), 18, TextAlignmentOptions.Right);
-        flashText  = MakeText(new Vector2(-18,  46), 18, TextAlignmentOptions.Right);
-        ammoText   = MakeText(new Vector2(-18,  14), 28, TextAlignmentOptions.Right);
+        // Sağ alt köşe — yukarıdan aşağı: silah ikonu, reload, grenade, flash, mermi.
+        // Mermi sayısı ekranın gerçek dibinde (y çok küçük); ikonlar onun ÜSTÜNDE.
+        weaponIcon = MakeIcon(new Vector2(-18, 152), 56);
+        reloadText = MakeText(new Vector2(-18,  98), 20, TextAlignmentOptions.Right, 220f);
 
-        weaponText.color = ColCyan;
+        grenIcon = MakeIcon(new Vector2(-58, 68), 26);
+        grenText = MakeText(new Vector2(-18, 72), 20, TextAlignmentOptions.Right, 36f);
+
+        flashIcon = MakeIcon(new Vector2(-58, 42), 26);
+        flashText = MakeText(new Vector2(-18, 46), 20, TextAlignmentOptions.Right, 36f);
+
+        ammoText = MakeText(new Vector2(-18, 8), 28, TextAlignmentOptions.Right, 220f);
+
         reloadText.text  = "";
         reloadText.color = ColWarn;
     }
@@ -51,7 +58,15 @@ public class WeaponHUD : MonoBehaviour
 
         var m = shoot.CurrentMode;
 
-        weaponText.text = shoot.CurrentFirearmName;
+        var icon = shoot.CurrentFirearm switch
+        {
+            PlayerShoot.Firearm.Revolver => UIIcons.Revolver,
+            PlayerShoot.Firearm.Shotgun  => UIIcons.Shotgun,
+            PlayerShoot.Firearm.Lmg      => UIIcons.Lmg,
+            _ => null,
+        };
+        weaponIcon.sprite  = icon;
+        weaponIcon.enabled = icon != null;
 
         // Aktif ateşli silah
         if (shoot.IsReloading)
@@ -71,20 +86,59 @@ public class WeaponHUD : MonoBehaviour
 
         // Launcher göstergeleri — launcher kapalıysa (Ch2) tamamen gizle
         bool launcher = shoot.LauncherEnabled;
-        if (grenText.gameObject.activeSelf != launcher) grenText.gameObject.SetActive(launcher);
-        if (flashText.gameObject.activeSelf != launcher) flashText.gameObject.SetActive(launcher);
+        if (grenText.gameObject.activeSelf != launcher)
+        {
+            grenText.gameObject.SetActive(launcher);
+            grenIcon.gameObject.SetActive(launcher);
+        }
+        if (flashText.gameObject.activeSelf != launcher)
+        {
+            flashText.gameObject.SetActive(launcher);
+            flashIcon.gameObject.SetActive(launcher);
+        }
 
         if (launcher)
         {
-            grenText.text  = $"GRN   x{shoot.GrenadeAmmo}";
-            flashText.text = $"FLS   x{shoot.FlashAmmo}";
+            grenText.text  = $"x{shoot.GrenadeAmmo}";
+            flashText.text = $"x{shoot.FlashAmmo}";
 
-            grenText.color  = m == PlayerShoot.LauncherMode.Grenade ? ColActive : ColDim;
-            flashText.color = m == PlayerShoot.LauncherMode.Flash   ? ColCyan   : ColDim;
+            var grenActive  = m == PlayerShoot.LauncherMode.Grenade;
+            var flashActive = m == PlayerShoot.LauncherMode.Flash;
+
+            grenText.color  = grenActive  ? ColActive : ColDim;
+            flashText.color = flashActive ? ColCyan   : ColDim;
+
+            grenIcon.sprite   = UIIcons.Grenade;
+            grenIcon.enabled  = UIIcons.Grenade != null;
+            grenIcon.color    = grenActive ? ColActive : ColDim;
+
+            flashIcon.sprite  = UIIcons.Flash;
+            flashIcon.enabled = UIIcons.Flash != null;
+            flashIcon.color   = flashActive ? ColCyan : ColDim;
         }
     }
 
-    TextMeshProUGUI MakeText(Vector2 pos, float size, TextAlignmentOptions align)
+    // MakeText ile aynı anchor/pivot deseni (sağ-alt köşeden büyüyen HUD) — kare ikon kutusu.
+    Image MakeIcon(Vector2 pos, float size)
+    {
+        var go = new GameObject("_hudIcon");
+        go.transform.SetParent(transform, false);
+
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin        = new Vector2(1f, 0f);
+        rt.anchorMax        = new Vector2(1f, 0f);
+        rt.pivot            = new Vector2(1f, 0f);
+        rt.anchoredPosition = pos;
+        rt.sizeDelta        = new Vector2(size, size);
+
+        var img = go.AddComponent<Image>();
+        img.raycastTarget  = false;
+        img.preserveAspect = true;
+        img.enabled        = false;
+        return img;
+    }
+
+    TextMeshProUGUI MakeText(Vector2 pos, float size, TextAlignmentOptions align, float width)
     {
         var go = new GameObject("_hud");
         go.transform.SetParent(transform, false);
@@ -94,7 +148,7 @@ public class WeaponHUD : MonoBehaviour
         rt.anchorMax        = new Vector2(1f, 0f);
         rt.pivot            = new Vector2(1f, 0f);
         rt.anchoredPosition = pos;
-        rt.sizeDelta        = new Vector2(220f, 40f);
+        rt.sizeDelta        = new Vector2(width, 40f);
 
         var tmp = go.AddComponent<TextMeshProUGUI>();
         tmp.fontSize        = size;

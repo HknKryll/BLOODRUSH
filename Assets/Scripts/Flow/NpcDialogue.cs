@@ -92,12 +92,14 @@ public class NpcDialogue : MonoBehaviour
 
         if (inRange)
         {
-            DialogueUI.ShowPrompt(promptText);
+            DialogueUI.ShowPrompt(promptText, this, UIIcons.Chat);
             if (Input.GetKeyDown(talkKey)) Begin();
         }
         else
         {
-            DialogueUI.HidePrompt();
+            // owner verilir: menzil dışındayken BAŞKA bir etkileşimin (koltuk/kitap)
+            // prompt'unu söndürmesin — sadece kendi gösterdiğini gizler.
+            DialogueUI.HidePrompt(this);
         }
     }
 

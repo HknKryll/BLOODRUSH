@@ -339,7 +339,7 @@ MonoBehaviour:
   ammoPickupPrefab: {fileID: 3493876658738239896, guid: cce660c19bd567247922cae9c64d505c,
     type: 3}
   healthPickupPrefab: {fileID: 0}
-  healthDropChance: 0.12
+  healthDropChance: 0.25
   deathClip: {fileID: 8300000, guid: cfc858b94162f554bbf1899156fbd912, type: 3}
   deathVolume: 1
   hurtClip: {fileID: 8300000, guid: 2a87a17d5dd38e84b938a68053e6b9a4, type: 3}

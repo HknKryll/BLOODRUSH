@@ -10,6 +10,7 @@ public class DialogueUI : MonoBehaviour
     static DialogueUI instance;
 
     GameObject boxRoot;
+    Image      promptIcon;
     Text       promptLabel, speakerLabel, lineLabel;
 
     static DialogueUI Ensure()
@@ -19,16 +20,31 @@ public class DialogueUI : MonoBehaviour
         return instance;
     }
 
-    public static void ShowPrompt(string text)
+    // Prompt'u en son KİM gösterdi. Sahnede birden fazla etkileşim (NPC, koltuk, kitap)
+    // aynı anda Update çalıştırdığı için, menzil dışındaki biri her frame HidePrompt
+    // çağırırsa menzildeki başkasının prompt'unu söndürüyordu — bu yüzden sahip takibi var.
+    static Object promptOwner;
+
+    public static void ShowPrompt(string text, Object owner = null, Sprite icon = null)
     {
         var i = Ensure();
         i.promptLabel.text    = text;
         i.promptLabel.enabled = true;
+        i.promptIcon.sprite   = icon;
+        i.promptIcon.enabled  = icon != null;
+        promptOwner = owner;
     }
 
-    public static void HidePrompt()
+    // owner verilirse: SADECE prompt'u gösteren o ise gizler (başkasınınkini söndürmez).
+    public static void HidePrompt(Object owner = null)
     {
-        if (instance != null) instance.promptLabel.enabled = false;
+        if (owner != null && promptOwner != null && promptOwner != owner) return;
+        if (instance != null)
+        {
+            instance.promptLabel.enabled = false;
+            instance.promptIcon.enabled  = false;
+        }
+        promptOwner = null;
     }
 
     public static void ShowLine(string speaker, string line)
@@ -61,9 +77,29 @@ public class DialogueUI : MonoBehaviour
         scaler.referenceResolution = new Vector2(1920, 1080);
         scaler.matchWidthOrHeight  = 0.5f;
 
-        // Etkileşim yazısı ("[E] Konuş") — ekran ortasının biraz altında
-        promptLabel = MakeText("Prompt", transform, 26, new Color(1f, 1f, 1f, 0.92f), TextAnchor.MiddleCenter,
-            new Vector2(0.3f, 0.30f), new Vector2(0.7f, 0.36f));
+        // Etkileşim yazısı ("[E] Konuş") — ekran ortasının biraz altında. Kutu ekranda
+        // ortalı sabit bir alan; içine önce ikon (varsa), sonra soldan başlayan metin
+        // konur — ikon yoksa metin sadece biraz sola kaymış görünür, sorun değil.
+        var promptGroup = new GameObject("PromptGroup");
+        promptGroup.transform.SetParent(transform, false);
+        var pgRT = promptGroup.AddComponent<RectTransform>();
+        pgRT.anchorMin = new Vector2(0.3f, 0.30f);
+        pgRT.anchorMax = new Vector2(0.7f, 0.36f);
+        pgRT.offsetMin = pgRT.offsetMax = Vector2.zero;
+
+        var iconGo = new GameObject("Icon");
+        iconGo.transform.SetParent(promptGroup.transform, false);
+        promptIcon = iconGo.AddComponent<Image>();
+        promptIcon.raycastTarget = false;
+        promptIcon.preserveAspect = true;
+        var iconRT = promptIcon.rectTransform;
+        iconRT.anchorMin = new Vector2(0f, 0.1f);
+        iconRT.anchorMax = new Vector2(0.13f, 0.9f);
+        iconRT.offsetMin = iconRT.offsetMax = Vector2.zero;
+        promptIcon.enabled = false;
+
+        promptLabel = MakeText("Prompt", promptGroup.transform, 26, new Color(1f, 1f, 1f, 0.92f), TextAnchor.MiddleLeft,
+            new Vector2(0.17f, 0f), new Vector2(1f, 1f));
         promptLabel.fontStyle = FontStyle.Bold;
         promptLabel.enabled   = false;
 

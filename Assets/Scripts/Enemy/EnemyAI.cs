@@ -67,7 +67,7 @@ public class EnemyAI : MonoBehaviour, IParryable
     [Header("Drop")]
     [SerializeField] GameObject ammoPickupPrefab;
     [SerializeField] GameObject healthPickupPrefab;
-    [SerializeField] [Range(0f,1f)] float healthDropChance = 0.12f;
+    [SerializeField] [Range(0f,1f)] float healthDropChance = 0.25f;
 
     [Header("Ses")]
     [SerializeField] AudioClip deathClip;

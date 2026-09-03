@@ -332,7 +332,7 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 0
-  attackRange: 5
+  attackRange: 3.01
   attackDamage: 15
   attackCooldown: 0.6
   projectilePrefab: {fileID: 0}
@@ -357,7 +357,7 @@ MonoBehaviour:
     type: 3}
   healthPickupPrefab: {fileID: 5703438585318101565, guid: 168cbb315a2845d4ca993f5e50f75338,
     type: 3}
-  healthDropChance: 0.12
+  healthDropChance: 0.25
   deathClip: {fileID: 8300000, guid: cfc858b94162f554bbf1899156fbd912, type: 3}
   deathVolume: 1
   hurtClip: {fileID: 8300000, guid: 2a87a17d5dd38e84b938a68053e6b9a4, type: 3}

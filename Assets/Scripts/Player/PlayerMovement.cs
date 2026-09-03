@@ -235,7 +235,14 @@ public class PlayerMovement : MonoBehaviour
         if (!DisableGravity)
             velocity.y += gravity * GravityScale * Time.deltaTime;
 
-        cc.Move(velocity * Time.deltaTime);
+        var moveFlags = cc.Move(velocity * Time.deltaTime);
+        // Tavana/bir platformun altına kafa çarpınca yukarı hız hemen sıfırlansın —
+        // yoksa velocity.y pozitif kalmaya devam edip yerçekimi onu ancak birkaç kare
+        // içinde yavaşça düşürüyordu (oyuncu tavana "yapışıp" zıplama süresi bitene
+        // kadar yukarı bakar halde kalıyordu). Sıfırlanınca bir sonraki karede
+        // yerçekimi hemen devreye girip anında düşmeye başlar.
+        if ((moveFlags & CollisionFlags.Above) != 0 && velocity.y > 0f)
+            velocity.y = 0f;
 
         if (launchVelocity.sqrMagnitude > 0.1f)
         {

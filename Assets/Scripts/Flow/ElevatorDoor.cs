@@ -51,6 +51,18 @@ public class ElevatorDoor : MonoBehaviour
             Debug.LogWarning("ElevatorDoor: leftDoor/rightDoor atanmadı — kapı hiç hareket etmeyecek.", this);
     }
 
+    // Builder'ların (ör. EntranceFacadeBuilder) programatik kurulumu için — Inspector'dan
+    // elle sürüklemek yerine kod ile kanat/offset atar. Mevcut Inspector kullanımını
+    // etkilemez, sadece private alanlara ek bir giriş yolu açar.
+    public void Configure(Transform left, Transform right, Vector3 leftOpen, Vector3 rightOpen, bool autoOpen)
+    {
+        leftDoor = left;
+        rightDoor = right;
+        leftOpenOffset = leftOpen;
+        rightOpenOffset = rightOpen;
+        autoOpenOnApproach = autoOpen;
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (!autoOpenOnApproach) return;   // çıkış kapısı: sadece Elevator varışta açar
