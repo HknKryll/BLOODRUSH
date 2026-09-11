@@ -9,6 +9,7 @@ public class WeaponHUD : MonoBehaviour
 {
     [SerializeField] PlayerShoot shoot;
 
+    Canvas          canvas;
     Image           weaponIcon;  // hangi silah — artık yazı yok, sadece ikon
     TextMeshProUGUI ammoText;    // "10 | 50"
     Image           grenIcon;
@@ -29,7 +30,7 @@ public class WeaponHUD : MonoBehaviour
         // Referans kopmuşsa (PlayerShoot başka objeye taşınmış olabilir) otomatik bul
         if (shoot == null) shoot = FindFirstObjectByType<PlayerShoot>();
 
-        var canvas = gameObject.AddComponent<Canvas>();
+        canvas = gameObject.AddComponent<Canvas>();
         canvas.renderMode   = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 10;
         gameObject.AddComponent<CanvasScaler>();
@@ -55,6 +56,14 @@ public class WeaponHUD : MonoBehaviour
     void Update()
     {
         if (shoot == null) return;
+
+        // Silahsızken (asansör kazası) tüm silah HUD'ı kapanır — aksi halde PlayerShoot
+        // devre dışıyken bile bayat mermi sayısı ekranda kalırdı. PUSH değil PULL: canvas
+        // burada, Start()'ta AddComponent ile yaratılıyor ve Start sırası garanti değil,
+        // dışarıdan yazmak yarış yaratırdı.
+        bool armed = PlayerLoadout.ShowWeaponHUD;
+        if (canvas != null && canvas.enabled != armed) canvas.enabled = armed;
+        if (!armed) return;
 
         var m = shoot.CurrentMode;
 

@@ -27,6 +27,14 @@ public class GameFlow : MonoBehaviour
     [SerializeField] bool resetProgressOnStart = false;
     [Tooltip("Bu sahnede tüm silahlar açık olsun (izole test kolaylığı; ilerlemeyi yok sayar).")]
     [SerializeField] bool allWeaponsThisScene = false;
+    [Tooltip("Bu sahne ASANSÖR KAZASINDAN SONRA geçiyor: oyuncu silahsız VE yaralı başlar. " +
+             "Sahneyi doğrudan Play'lediğinde de çalışır (kazayı tekrar oynamana gerek yok). " +
+             "Tur boyunca bir kez tetiklenir — burada bulduğun silahı ölünce KAYBETMEZSİN.")]
+    [SerializeField] bool startDisarmed = false;
+    [Tooltip("Yaralı zıplama gücü. 1 = normal, 0.55 ≈ zar zor, 0 = hiç zıplayamaz. " +
+             "İyileşince PlayerLoadout.SetInjured(false) ile normale döner.")]
+    [Range(0f, 1f)]
+    [SerializeField] float startJumpScale = 0.55f;
 
     static float uploadAtSceneStart;
 
@@ -85,6 +93,14 @@ public class GameFlow : MonoBehaviour
 
         // BEDEN / YÜKLEME barları görünürlüğü
         if (GameHUD.Instance) GameHUD.Instance.SetVisible(showHUDBars);
+
+        // Aktif bir ekipman kısıtı varsa (asansör kazası) yukarıdaki loadout'un ÜSTÜNE yazar.
+        // Sıra önemli: SetUnlocked/LauncherEnabled'dan SONRA gelmeli, çünkü Apply() onların
+        // çıktısını kısıyor. Kısıt yoksa hiçbir şey yapmaz.
+        PlayerLoadout.Apply(player);
+
+        // "Kazadan sonrası" sahnesi — nereden gelinirse gelinsin silahsız + yaralı başlanır.
+        if (startDisarmed) PlayerLoadout.EnterPostCrashState(startJumpScale);
     }
 
     void OnPlayerDied()

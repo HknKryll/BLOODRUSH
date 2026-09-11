@@ -16026,6 +16026,57 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 175447016}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &175647000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 175647002}
+  - component: {fileID: 175647001}
+  m_Layer: 0
+  m_Name: "resepsiyonM\xFCzi\u011Fi"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &175647001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175647000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bcbc61dec3a6c149be5e1e203e7b9bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clip: {fileID: 8300000, guid: 5f7e739d259630a4cb03c097ae42d583, type: 3}
+  mixerGroup: {fileID: 0}
+  volume: 0.5
+  spatialBlend: 0
+  fadeInDuration: 2
+  fadeOutDuration: 3
+  playOnStart: 1
+--- !u!4 &175647002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175647000}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -39.455055, y: 25.774416, z: 0.91829807}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &175810335
 GameObject:
   m_ObjectHideFlags: 0
@@ -25770,6 +25821,74 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 246004913}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &248547165
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 248547168}
+  - component: {fileID: 248547167}
+  - component: {fileID: 248547166}
+  m_Layer: 0
+  m_Name: "Asans\xF6rM\xFCzi\u011Fi"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &248547166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248547165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065db4a54498d8a40add30d6acd404f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  music: {fileID: 175647001}
+  fadeOutOnEnter: 1
+--- !u!65 &248547167
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248547165}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.3958187, y: 5.2379417, z: 5.0587416}
+  m_Center: {x: -0.19790936, y: 0.38102913, z: 0.5293708}
+--- !u!4 &248547168
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248547165}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -22.04, y: 25.964941, z: 1.824}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &249279219
 GameObject:
   m_ObjectHideFlags: 0
@@ -56114,75 +56233,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 539913032}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &540068823
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 540068826}
-  - component: {fileID: 540068825}
-  - component: {fileID: 540068824}
-  m_Layer: 0
-  m_Name: Tutorial
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &540068824
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540068823}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99786ac3936076d4c8dc05e3bf018f75, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hintText: WASD ile hareket et
-  oneShot: 1
-  autoHideSeconds: 0
---- !u!65 &540068825
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540068823}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!4 &540068826
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540068823}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -12.62, y: -2.31, z: 2.536}
-  m_LocalScale: {x: 2.6944, y: 1, z: 3.9392}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &540187971
 GameObject:
   m_ObjectHideFlags: 0
@@ -82183,7 +82233,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponModel: {fileID: 0}
-  chair: {fileID: 926952130}
+  chair: {fileID: 0}
   sitCameraPose: {fileID: 1354071392}
   nextSceneName: 
   walkSpeedMultiplier: 0.32
@@ -97211,6 +97261,7 @@ GameObject:
   - component: {fileID: 926952133}
   - component: {fileID: 926952132}
   - component: {fileID: 926952131}
+  - component: {fileID: 926952134}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -97304,6 +97355,40 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 926952129}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &926952134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 926952129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: beff36d2620f1c847a4023516a8546d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  videoClip: {fileID: 32900000, guid: 7ce3ad09fd9b716478213aa779387d49, type: 3}
+  musicClip: {fileID: 8300000, guid: 2382f79c056ff4d4a818f18244179256, type: 3}
+  musicMixerGroup: {fileID: 0}
+  musicVolume: 0.85
+  seatPoint: {fileID: 1354071392}
+  transitionTime: 0.6
+  interactKey: 101
+  range: 2.5
+  lookDot: 0.35
+  sitPrompt: '[E] Otur'
+  fadeToBlack: 0.8
+  blackHold: 0.6
+  roomMusicToSilence: {fileID: 0}
+  allowSkip: 0
+  skipKey: 32
+  skipFade: 0.6
+  nextScene: 
+  sceneHoldBlack: 0.8
+  sceneFadeIn: 1.2
+  onPresentationFinished:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &927919962
 GameObject:
   m_ObjectHideFlags: 0
@@ -98877,6 +98962,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   destination: {fileID: 1755143475}
+  destinationScene: 
   doorCloseDelay: 1.2
   fadeDuration: 0.8
   blackHold: 1.5
@@ -98886,6 +98972,9 @@ MonoBehaviour:
   rideLoopVolume: 0.5
   arriveClip: {fileID: 0}
   arriveVolume: 0.9
+  useFade: 1
+  preFadeChaosHold: 0
+  postTeleportHold: 0
   onArrived:
     m_PersistentCalls:
       m_Calls: []
@@ -122433,6 +122522,8 @@ MonoBehaviour:
   showHUDBars: 0
   resetProgressOnStart: 1
   allWeaponsThisScene: 0
+  startDisarmed: 0
+  startJumpScale: 0.55
 --- !u!4 &1173543740
 Transform:
   m_ObjectHideFlags: 0
@@ -230134,7 +230225,6 @@ SceneRoots:
   - {fileID: 204894372}
   - {fileID: 209564394}
   - {fileID: 1354071392}
-  - {fileID: 540068826}
   - {fileID: 230229902}
   - {fileID: 1098455841}
   - {fileID: 1198782745}
@@ -230144,3 +230234,5 @@ SceneRoots:
   - {fileID: 1676140849}
   - {fileID: 1399247855}
   - {fileID: 581756302}
+  - {fileID: 175647002}
+  - {fileID: 248547168}

@@ -60,6 +60,17 @@ public class StimulantSystem : MonoBehaviour
             health?.TakeDamage(9999f);
     }
 
+    // PlayerLoadout çağırır: buff coroutine'i ortasında component kapatılırsa çarpanları
+    // 1'e döndürecek olan `yield` sonrası satırlar HİÇ çalışmaz ve oyuncu sonsuza dek
+    // %50 hızlı / %60 hasarlı kalırdı. Kapatmadan önce burası temizler.
+    public void CancelBuffs()
+    {
+        if (speedRoutine  != null) { StopCoroutine(speedRoutine);  speedRoutine  = null; }
+        if (damageRoutine != null) { StopCoroutine(damageRoutine); damageRoutine = null; }
+        if (movement) movement.SpeedMultiplier  = 1f;
+        if (shoot)    shoot.DamageMultiplier    = 1f;
+    }
+
     IEnumerator SpeedBuff()
     {
         if (movement) movement.SpeedMultiplier = speedBoost;

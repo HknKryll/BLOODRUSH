@@ -15,6 +15,7 @@ public static class GameProgress
     {
         ShotgunUnlocked = false;
         LmgUnlocked     = false;
+        PlayerLoadout.ResetRun();   // yeni oyun asla "asansör kazası" kısıtıyla başlamasın
     }
 
     public static void Unlock(PlayerShoot.Firearm w)

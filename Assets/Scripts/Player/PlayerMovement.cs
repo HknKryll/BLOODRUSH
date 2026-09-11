@@ -226,7 +226,7 @@ public class PlayerMovement : MonoBehaviour
             if (wallRun.CanWallJump)
                 Launch(wallRun.ConsumeWallJump() * wallJumpPushForce); // duvardan yatay itiş
 
-            velocity.y  = jumpForce;
+            velocity.y  = jumpForce * JumpMultiplier;
             coyoteTimer = 0f;
             slide.ConsumeJumpDeadline();
             sfx.Play(jumpClip, jumpVolume);
@@ -305,7 +305,7 @@ public class PlayerMovement : MonoBehaviour
         wallRun.Update(Input.GetKeyDown(KeyBindings.Jump) && JumpEnabled, out bool jumpedOff, out Vector3 jumpOutHorizontal);
         if (jumpedOff)
         {
-            velocity.y = wallRunJumpUp;
+            velocity.y = wallRunJumpUp * JumpMultiplier;
             Launch(jumpOutHorizontal);
             sfx.Play(jumpClip, jumpVolume);
         }
@@ -318,6 +318,9 @@ public class PlayerMovement : MonoBehaviour
     public float   GravityScale    { get; set; } = 1f;   // yerçekimi bölgeleri (düşük-g) çarpanı
     public float   SpeedMultiplier { get; set; } = 1f;
     public bool    JumpEnabled     { get; set; } = true;
+    // Zıplama gücü çarpanı — 1 = normal, 0.5 ≈ yaralı/bitkin (asansör kazası sonrası).
+    // JumpEnabled'dan ayrı: o "hiç zıplayamaz", bu "zar zor zıplar".
+    public float   JumpMultiplier  { get; set; } = 1f;
     public bool    SlideEnabled    { get; set; } = true;
     public bool    FlipEnabled     { get; private set; }   // yerçekimi flip modu aktif mi
     public CharacterController Controller => cc;
@@ -346,6 +349,11 @@ public class PlayerMovement : MonoBehaviour
 
     // Duvarda asılı kalırken kaymayı önler
     public void ZeroVerticalVelocity() => velocity.y = 0f;
+
+    // Sinematik sonrası bakış açısını dışarıdan ayarlamak için (ör. asansör kazasından
+    // sonra karanlık odada hafif aşağı bakarak uyanmak). pitch private ve Teleport() onu
+    // SIFIRLAMIYOR — bu olmadan oyuncu kabine girerken hangi açıyla bakıyorsa öyle uyanır.
+    public void SetLookPitch(float degrees) => pitch = Mathf.Clamp(degrees, -maxPitch, maxPitch);
 
     // Checkpoint ışınlaması — CharacterController'ı kapatıp aç (yoksa transform ezilir)
     public void Teleport(Vector3 pos, Quaternion rot)

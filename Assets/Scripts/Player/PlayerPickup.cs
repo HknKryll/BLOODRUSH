@@ -25,11 +25,18 @@ public class PlayerPickup : MonoBehaviour
         {
             if (shoot != null)
             {
-                var ammo = c.GetComponent<AmmoPickup>()
-                        ?? c.GetComponentInParent<AmmoPickup>()
-                        ?? c.GetComponentInChildren<AmmoPickup>(true);
-                if (ammo != null) { ammo.Collect(shoot); continue; }
+                // Silahsızken (asansör kazası) mermi toplamanın anlamı yok — elde silah yok.
+                if (PlayerLoadout.AnyFirearm)
+                {
+                    var ammo = c.GetComponent<AmmoPickup>()
+                            ?? c.GetComponentInParent<AmmoPickup>()
+                            ?? c.GetComponentInChildren<AmmoPickup>(true);
+                    if (ammo != null) { ammo.Collect(shoot); continue; }
+                }
 
+                // Yerden SİLAH almak her zaman serbest — kısıt altındayken bile.
+                // WeaponPickup.Collect ekipman maskesini de açar, yani karanlık odada
+                // bulunan silah bu yolla düzgün çalışır.
                 var weapon = c.GetComponent<WeaponPickup>()
                           ?? c.GetComponentInParent<WeaponPickup>()
                           ?? c.GetComponentInChildren<WeaponPickup>(true);

@@ -108,6 +108,7 @@ public class PlayerShoot : MonoBehaviour
     PlayerFirearm[] firearms;
     int             activeIndex;
     bool            switching;
+    bool            weaponsHidden;
 
     // Silah kilidi — bölüm ilerlemesine göre GameFlow kısar. Varsayılan hepsi AÇIK
     // (GameFlow'suz sahneler eskisi gibi tüm silahlar). Revolver (0) hep açık kalır.
@@ -155,6 +156,8 @@ public class PlayerShoot : MonoBehaviour
 
     void Update()
     {
+        if (!CanShoot) return;   // silahsız (bkz. PlayerLoadout) — hiçbir silah girdisi işlenmez
+
         if (Input.GetKeyDown(KeyBindings.Weapon1)) SwitchFirearm(Firearm.Revolver);
         if (Input.GetKeyDown(KeyBindings.Weapon2)) SwitchFirearm(Firearm.Shotgun);
         if (Input.GetKeyDown(KeyBindings.Weapon3)) SwitchFirearm(Firearm.Lmg);
@@ -210,11 +213,14 @@ public class PlayerShoot : MonoBehaviour
         StartCoroutine(SwitchRoutine(index));
     }
 
-    // Silah kilidi (GameFlow / WeaponPickup çağırır). Revolver her zaman açık.
+    // Silah kilidi (GameFlow / WeaponPickup / PlayerLoadout çağırır). Revolver ARTIK
+    // kilitlenebilir — asansör kazasında oyuncu istisnasız TÜM silahlarını kaybediyor.
+    // "Revolver varsayılan olarak açık" kuralı hâlâ geçerli, ama artık unlocked[] alan
+    // başlatıcısında duruyor (GameFlow'suz sahneler eskisi gibi tüm silahlarla başlar);
+    // neyin kapanacağına tek merci PlayerLoadout.
     public void SetUnlocked(Firearm w, bool value)
     {
         int i = (int)w;
-        if (i == (int)Firearm.Revolver) value = true;
         if (i >= 0 && i < unlocked.Length) unlocked[i] = value;
     }
 
@@ -237,12 +243,14 @@ public class PlayerShoot : MonoBehaviour
         switching = false;
     }
 
-    // Aktif silah modelini göster, diğerlerini gizle
+    // Aktif silah modelini göster, diğerlerini gizle. weaponsHidden ise HİÇBİRİ görünmez
+    // (eller boş) — SwitchFirearm kilitli bir silahtan ÇIKARMADIĞI için gizlemenin
+    // activeIndex'ten bağımsız olması şart.
     void UpdateWeaponModel()
     {
         if (weaponModels == null) return;
         for (int i = 0; i < weaponModels.Length; i++)
-            if (weaponModels[i]) weaponModels[i].SetActive(i == activeIndex);
+            if (weaponModels[i]) weaponModels[i].SetActive(!weaponsHidden && i == activeIndex);
     }
 
     // ───────────────── Launcher ─────────────────
@@ -280,6 +288,32 @@ public class PlayerShoot : MonoBehaviour
 
 
     // ───────────────── Public ─────────────────
+
+    // Silahsız mod (PlayerLoadout). enabled=false YERİNE property olmasının sebebi:
+    // GameFlow.RespawnRoutine checkpoint respawn'ında ps.enabled'ı kapatıp GERİ AÇIYOR —
+    // enabled'a bağlanan bir silahsızlık her ölümde sessizce bozulurdu.
+    public bool CanShoot { get; set; } = true;
+
+    // true iken elde hiçbir silah modeli görünmez (eller boş).
+    public bool WeaponsHidden
+    {
+        get => weaponsHidden;
+        set { weaponsHidden = value; UpdateWeaponModel(); }
+    }
+
+    // PlayerLoadout silahı geri verirken kullanır: SwitchFirearm'ın holster gecikmesini ve
+    // `switching` kilidini atlayıp silahı doğrudan ele verir (çekiş animasyonuyla birlikte).
+    public void ForceEquip(Firearm w)
+    {
+        if (firearms == null) return;              // Start() öncesi (sceneLoaded) çağrılabilir
+        int i = (int)w;
+        if (i < 0 || i >= firearms.Length) return;
+
+        activeIndex = i;
+        switching   = false;
+        UpdateWeaponModel();
+        Motion?.PlayDraw(ViaBottom(i));
+    }
 
     public void AddAmmo(int amount) => ActiveFirearm.AddAmmo(amount);
 

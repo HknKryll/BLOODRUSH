@@ -27,11 +27,23 @@ public class WeaponPickup : MonoBehaviour
         GameProgress.Unlock(weapon);        // kalıcı — CH2 kalanı + CH3'e taşınır
         shoot.SetUnlocked(weapon, true);    // hemen 2/3 ile seçilebilir
 
+        // Aktif bir ekipman kısıtı varsa (asansör kazası) maskeyi de aç — yoksa bir sonraki
+        // PlayerLoadout.Apply() yeni alınan silahı sessizce geri kilitlerdi. Yerden silah
+        // almak her zaman kısıttan güçlüdür: oyuncu onu fiilen eline aldı.
+        PlayerLoadout.Grant(GearOf(weapon));
+
         string label = string.IsNullOrEmpty(displayName) ? weapon.ToString().ToUpper() : displayName;
         Notification.Show($"{label} ELE GEÇİRİLDİ");
         SfxPlayer.PlayAtPoint(pickupClip, transform.position);
         Destroy(gameObject);
     }
+
+    static PlayerLoadout.Gear GearOf(PlayerShoot.Firearm w) => w switch
+    {
+        PlayerShoot.Firearm.Shotgun => PlayerLoadout.Gear.Shotgun,
+        PlayerShoot.Firearm.Lmg     => PlayerLoadout.Gear.Lmg,
+        _                           => PlayerLoadout.Gear.Revolver,
+    };
 
     void Update()
     {
