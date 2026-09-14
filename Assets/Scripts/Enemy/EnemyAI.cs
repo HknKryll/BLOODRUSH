@@ -24,6 +24,16 @@ public class EnemyAI : MonoBehaviour, IParryable
     [SerializeField] float playerKnockback = 0f;   // melee vuruşunda oyuncuyu itme (büyük düşman)
 
     // ───── Algılama ─────
+    [Tooltip("Agent NavMesh disina dusarse bu yaricap icinde en yakin gecerli noktaya " +
+             "geri yapistirilir. KUCUK TUT: buyuk deger ustteki/alttaki KATIN NavMesh'ini " +
+             "de kapsar ve dusmani oraya isinlar. 1.5 m bake bosluklarini kapatmaya yeter.")]
+    [SerializeField] float navRecoverRadius = 1.5f;
+
+    [Tooltip("Kurtarma sirasinda izin verilen en fazla KOT FARKI (m). Bulunan gecerli nokta " +
+             "bundan fazla yukarida/asagidaysa warp YAPILMAZ — dusman baska bir kata " +
+             "isinlanmaz. Arenada kattan kata mesafe 4 m.")]
+    [SerializeField] float navRecoverMaxRise = 1f;
+
     [Header("Algılama")]
     [SerializeField] float sightRange = 20f;
     [SerializeField] LayerMask obstacleMask;          // duvar/engel katmanı
@@ -31,6 +41,10 @@ public class EnemyAI : MonoBehaviour, IParryable
     // ───── Saldırı (melee) ─────
     [Header("Saldırı")]
     [SerializeField] float attackRange = 2f;
+    [Tooltip("Yumruğun DİKEY erişimi (m). Oyuncu bundan daha yukarıda/aşağıdaysa menzil " +
+             "dışı sayılır. Arenada kattan kata mesafe 4 m; 2 = alçak basamaktan " +
+             "vurabilir ama platformdan vuramaz, zıplamak da kaçınma aracı olur.")]
+    [SerializeField] float meleeVerticalReach = 2f;
     [SerializeField] float attackDamage = 15f;
     [SerializeField] float attackCooldown = 1.2f;
 
@@ -38,7 +52,13 @@ public class EnemyAI : MonoBehaviour, IParryable
     [Header("Menzilli")]
     [SerializeField] EnemyProjectile projectilePrefab;
     [SerializeField] Transform muzzle;
-    [SerializeField] float rangedRange      = 15f;
+    [Tooltip("ATEŞ menzili — melee'nin attackRange'inden AYRI bir alandır, ona dokunmaz. " +
+             "Düşman bu mesafeye girince durup ateş eder; yarısından yakına gelinirse " +
+             "mesafe açar (bkz. EnemyRangedAttack.GetChaseMove).")]
+    [SerializeField] float rangedRange      = 26f;
+    [Tooltip("Menzilli düşmanın NavMeshAgent durma mesafesi. 0 = otomatik (rangedRange × 0.8). " +
+             "SADECE behavior = Ranged için uygulanır; melee düşmanın durma mesafesi 0'da kalır.")]
+    [SerializeField] float rangedStopDistance = 0f;
     [SerializeField] int   magSize          = 10;
     [SerializeField] float fireRate         = 0.15f;
     [SerializeField] float reloadTime       = 2f;
@@ -133,12 +153,20 @@ public class EnemyAI : MonoBehaviour, IParryable
         sfx = SfxPlayer.Create(gameObject, spatialBlend: 1f);
 
         patrol = new EnemyPatrolBehavior(patrolPoints, patrolWaitTime, sightRange, obstacleMask);
-        meleeAttack = new EnemyMeleeAttack(attackRange, attackDamage, attackCooldown, telegraphDuration,
-            playerKnockback, attackIndicator, sfx, attackClip, attackVolume);
+        meleeAttack = new EnemyMeleeAttack(attackRange, meleeVerticalReach, attackDamage, attackCooldown,
+            telegraphDuration, playerKnockback, attackIndicator, sfx, attackClip, attackVolume);
         rangedAttack = new EnemyRangedAttack(rangedRange, magSize, fireRate, reloadTime,
             projectileSpeed, projectileDamage, spreadAngle, projectilePrefab, muzzle, sfx, attackClip, attackVolume);
         knockbackHandler = new EnemyKnockbackHandler();
         leap = new EnemyLeapBehavior(leapRangeMin, leapRangeMax, leapCooldown, leapSpeed, leapArcHeight);
+
+        // Menzilli düşman hedefe yürümeyi menzil kenarında bıraksın — yoksa
+        // GetChaseMove'un "Stop" kararı gelene kadar (pathInterval 0.2 sn) üstüne
+        // yürümeye devam ediyor. Melee'ye DOKUNULMUYOR: stoppingDistance 0'da kalır.
+        if (behavior == Behavior.Ranged)
+            agent.stoppingDistance = rangedStopDistance > 0f
+                                   ? rangedStopDistance
+                                   : rangedRange * 0.8f;
 
         var health = GetComponent<Health>();
         health.onDeath.AddListener(OnDeath);
@@ -156,17 +184,118 @@ public class EnemyAI : MonoBehaviour, IParryable
             agent.SetDestination(patrol.FirstPoint.position);
     }
 
+    float navRecoverAt;   // off-mesh kurtarmayi her karede denemeyelim
+    int   navRecoverCount;
+    Vector3 lastAnimPos;
+    float   animSpeed;
+
+    // ANIMASYON HIZI AGENT'TAN DEGIL GERCEK HAREKETTEN OLCULUR.
+    //
+    // Eskiden `anim.SetFloat("Speed", agent.velocity.magnitude)` idi. Agent bir an
+    // NavMesh disina dustugunde velocity 0 oluyor, KucukDusmanController'in 0.1 esigi
+    // animasyonu aninda Idle'a snap ediyordu — "platform altinda animasyon bozuluyor"
+    // sikayetinin ta kendisi. Transform yer degistirmesinden olcmek bunu KOKUNDEN cozer:
+    // agent'in ic durumu ne olursa olsun, dusman hareket ediyorsa kosma animasyonu oynar.
+    //
+    // Bu ayrim ayni zamanda kurtarma warp'ini animasyon icin GEREKSIZ kilar; boylece warp
+    // asagidaki gibi sikica sinirlanabiliyor (bkz. TryRecoverNavMesh).
+    void UpdateAnimSpeed()
+    {
+        if (anim == null) return;
+
+        float dt = Mathf.Max(Time.deltaTime, 1e-4f);
+        float measured = (transform.position - lastAnimPos).magnitude / dt;
+        lastAnimPos = transform.position;
+
+        // Isinlanma/warp gibi ani siramalar animasyonu patlatmasin.
+        if (measured > 50f) measured = animSpeed;
+
+        animSpeed = Mathf.Lerp(animSpeed, measured, dt * 10f);
+        anim.SetFloat("Speed", animSpeed);
+    }
+
+    // Bake kusurlu ya da bayat olsa bile dusman kendi kendine toparlansin diye sigorta.
+    //
+    // DIKKAT — DIKEY SINIR: eskiden yaricap 5 m ve dikey sinir yoktu. CH3 arenasinda
+    // zemin y 0.00, platform decki y 4.00; yani 5 m'lik ornekleme kuresi UST KATI da
+    // kapsiyordu. Dusman platformun altinda bir an off-mesh olunca en yakin gecerli
+    // poligon ustteki deck cikiyor ve Warp onu 4 m yukari isinliyordu — "altina girmiyor,
+    // ustune cikiyor" regresyonunun sebebi buydu. Artik kat degistiren bir kurtarma
+    // YAPILMIYOR: boyle bir durumda hic warp etmeyip agent'in kendi kendine oturmasini
+    // bekliyoruz (animasyon zaten artik bundan etkilenmiyor).
+    void TryRecoverNavMesh()
+    {
+        if (Time.time < navRecoverAt) return;
+        navRecoverAt = Time.time + 0.5f;
+
+        if (!NavMesh.SamplePosition(transform.position, out NavMeshHit hit,
+                                    navRecoverRadius, agent.areaMask))
+            return;
+
+        float rise = Mathf.Abs(hit.position.y - transform.position.y);
+        if (rise > navRecoverMaxRise)
+        {
+            Debug.Log($"[EnemyAI] '{name}' off-mesh, ama en yakin gecerli nokta {rise:0.00} m " +
+                      $"kot farkinda (sinir {navRecoverMaxRise:0.00}) — BASKA KATA isinlanmamak " +
+                      "icin warp yapilmadi.", this);
+            return;
+        }
+
+        agent.Warp(hit.position);
+        navRecoverCount++;
+        Debug.Log($"[EnemyAI] '{name}' NavMesh disinda kaldi, {hit.distance:0.00} m otedeki " +
+                  $"gecerli noktaya alindi (kot farki {rise:0.00} m).", this);
+    }
+
+    // HEDEF OYUNCUNUN AYAGINDAN ORNEKLENIR, PIVOTUNDAN DEGIL.
+    //
+    // player.position oyuncunun pivotu ve o pivot AYAKLARDAN 1.17 m YUKARIDA
+    // (CharacterController center.y = -0.17, height = 2). SetDestination hedefi kendi
+    // icinde en yakin NavMesh'e esliyor; baslangic noktasi 1.17 m yukarida olunca esleme
+    // ustteki platform deckine dogru egiliyor. Ayak hizasindan KUCUK bir yaricapla
+    // orneklemek hedefi platformun ALTINDAKI zemine sabitler.
+    Vector3 ChaseTarget()
+    {
+        Vector3 feet = EnemyVision.PlayerFeet(player);
+        if (NavMesh.SamplePosition(feet, out NavMeshHit hit, 2f, agent.areaMask))
+            return hit.position;
+        return player.position;   // yakinda gecerli nokta yoksa eski davranis
+    }
+
+    // ───── Debug (EnemyDebugOverlay okur — davranisi etkilemez) ─────
+    public string DebugState     => state.ToString();
+    public bool   OnNavMesh      => agent != null && agent.enabled && agent.isOnNavMesh;
+    public int    NavRecoverCount => navRecoverCount;
+    public Vector3 Destination   => agent != null && agent.enabled && agent.hasPath
+                                    ? agent.destination : transform.position;
+    public NavMeshPathStatus PathStatus => agent != null && agent.enabled && agent.hasPath
+                                    ? agent.path.status : NavMeshPathStatus.PathInvalid;
+    public float AgentSpeed      => agent != null && agent.enabled ? agent.velocity.magnitude : 0f;
+    public float AnimSpeed       => animSpeed;
+
     void Update()
     {
         if (player == null) return;
 
-        // Koşma/idle animasyonu için hız (Animator "Speed" parametresi)
-        if (anim) anim.SetFloat("Speed", agent.enabled ? agent.velocity.magnitude : 0f);
+        if (Input.GetKeyDown(KeyCode.F1)) {
+        NavMeshPath p = new NavMeshPath();
+        agent.CalculatePath(player.position, p);
+        Debug.Log($"{name} -> {p.status} | corners: {p.corners.Length}");
+    }
+
+        UpdateAnimSpeed();
 
         if (beingPulled) return;
         if (knockedBack) return;
         if (physicsFalling) return;
         if (leaping) return;
+
+        // Agent NavMesh'ten dustuyse KENDINI TOPARLA.
+        // Onceden DoChase basinda sessizce donuluyordu; dusman sonsuza kadar donup kaliyor,
+        // animasyon da agent.velocity'ye bagli oldugu icin Idle'a snap ediyordu ("platform
+        // altinda bozuluyor" sikayetinin kaynagi). WaveDirector'daki kanitlanmis desenle
+        // en yakin gecerli noktaya yapistiriyoruz.
+        if (agent.enabled && !agent.isOnNavMesh) { TryRecoverNavMesh(); return; }
 
         if (state == State.Stunned)
         {
@@ -221,10 +350,14 @@ public class EnemyAI : MonoBehaviour, IParryable
         if (pathTimer >= pathInterval)
         {
             pathTimer = 0f;
-            agent.SetDestination(player.position);
+            agent.SetDestination(ChaseTarget());
         }
 
-        if (meleeAttack.InRange(dist))
+        // Attack'e SADECE görüş hattı açıkken girilir. Kapalıyken girilseydi DoAttack'in
+        // agent.ResetPath()'i düşmanı bulunduğu yere çakardı — platformun üstüne çıkıp
+        // aşağı inmeyi bırakmasının sebebi tam olarak buydu. Artık engel varken
+        // kovalamaya devam eder.
+        if (meleeAttack.InRange(transform, player) && HasMeleeSight())
         {
             state = State.Attack;
             meleeAttack.EnterAttack();
@@ -283,7 +416,9 @@ public class EnemyAI : MonoBehaviour, IParryable
         if (agent.enabled && agent.isOnNavMesh) agent.ResetPath();
         FacePlayer();
 
-        if (meleeAttack.OutOfRange(dist))
+        // Menzilden çıkmak kadar GÖRÜŞÜ KAYBETMEK de Chase'e döndürür — yoksa oyuncu
+        // siperin arkasına geçtiğinde düşman yerinde durup boşluğa yumruk atardı.
+        if (meleeAttack.OutOfRange(transform, player) || !HasMeleeSight())
         {
             state = State.Chase;
             return;
@@ -301,7 +436,7 @@ public class EnemyAI : MonoBehaviour, IParryable
     {
         FacePlayer();
 
-        if (meleeAttack.OutOfRange(dist))
+        if (meleeAttack.OutOfRange(transform, player))
         {
             meleeAttack.HideIndicator();
             state = State.Chase;
@@ -311,10 +446,17 @@ public class EnemyAI : MonoBehaviour, IParryable
         if (meleeAttack.TickTelegraph())
         {
             meleeAttack.HideIndicator();
+            // Görüş kontrolü ResolveTelegraph'ın İÇİNDE — telegraph ortasında siper
+            // alan oyuncu hasar almasın diye son ana kadar bekleniyor.
             meleeAttack.ResolveTelegraph(transform, player, playerMovement);
             state = State.Attack;
         }
     }
+
+    // Göğüsten göğüse tek ışın + yakın alan muafiyeti (bkz. EnemyVision.ClearForMelee).
+    // Menzilli tarafın üç noktalı kontrolü burada gereksiz: yumruk mesafesi zaten kısa,
+    // asıl mesele araya zemin/duvar girip girmediği.
+    bool HasMeleeSight() => EnemyVision.ClearForMelee(transform, player);
 
     // ───────────────── Yardımcılar ─────────────────
 
@@ -328,6 +470,11 @@ public class EnemyAI : MonoBehaviour, IParryable
 
     public bool IsLarge      => isLarge;
     public bool IsParryable  => state == State.Telegraphing;
+
+    // Kancayla cekiliyor mu. Salt-okunur; davranisi degistirmez. ZoneAvoidance gibi
+    // disaridan yon veren bilesenler, oyuncu dusmani cekerken ARAYA GIRMESIN diye bunu
+    // yokluyor (bkz. Flow/Overload/ZoneAvoidance.cs).
+    public bool IsBeingPulled => beingPulled;
 
     // WaveDirector gibi "takviye" spawn'ları için: devriye/görüş beklemeden
     // doğrudan oyuncuyu avlamaya başlar — zaten nerede olduğunu biliyorlar.

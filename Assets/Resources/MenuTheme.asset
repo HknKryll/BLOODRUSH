@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d261eb186fdd254458d9315f2d3203ce, type: 3}
+  m_Name: MenuTheme
+  m_EditorClassIdentifier: 
+  background: {r: 0.9607843, g: 0.94509804, b: 0.9098039, a: 1}
+  surface: {r: 1, g: 1, b: 1, a: 1}
+  textPrimary: {r: 0.16470589, g: 0.16470589, b: 0.15686275, a: 1}
+  textSecondary: {r: 0.41960785, g: 0.40784314, b: 0.38431373, a: 1}
+  accent: {r: 0.72156864, g: 0.5294118, b: 0.23137255, a: 1}
+  accentText: {r: 0.5411765, g: 0.39215687, b: 0.15686275, a: 1}
+  destructive: {r: 0.60784316, g: 0.22745098, b: 0.18431373, a: 1}
+  hairline: {r: 0.165, g: 0.165, b: 0.157, a: 0.12}
+  hoverFill: {r: 0.722, g: 0.529, b: 0.231, a: 0.06}
+  focusRing: {r: 0.722, g: 0.529, b: 0.231, a: 0.9}
+  disabledAlpha: 0.38
+  focusRingWidth: 2
+  accentBarWidth: 2
+  displayFont: {fileID: 0}
+  bodyFont: {fileID: 0}
+  sizeCaption: 12
+  sizeBody: 14
+  sizeLabel: 18
+  sizeHeading: 28
+  sizeTitle: 56
+  trackingTitle: 18
+  trackingCaption: 8
+  trackingLabel: 4
+  unit: 8
+  enterDuration: 0.18
+  exitDuration: 0.12
+  stagger: 0.04
+  slideDistance: 14
+  buttonSize: {x: 320, y: 48}
+  panelSize: {x: 960, y: 620}

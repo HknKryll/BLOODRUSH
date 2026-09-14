@@ -206,22 +206,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   behavior: 1
   playerKnockback: 0
-  sightRange: 20
+  navRecoverRadius: 1.5
+  navRecoverMaxRise: 1
+  sightRange: 30.9
   obstacleMask:
     serializedVersion: 2
     m_Bits: 64
   attackRange: 2.59
+  meleeVerticalReach: 2
   attackDamage: 15
   attackCooldown: 1.2
   projectilePrefab: {fileID: 4498782448173875286, guid: a3efb1ecca6dae747807ced736850a82,
     type: 3}
   muzzle: {fileID: 0}
-  rangedRange: 15
+  rangedRange: 26
+  rangedStopDistance: 0
   magSize: 10
   fireRate: 0.15
   reloadTime: 2
   projectileSpeed: 22
-  projectileDamage: 5
+  projectileDamage: 12
   spreadAngle: 0
   patrolPoints: []
   patrolWaitTime: 2

@@ -26,6 +26,9 @@ public class CrosshairHUD : MonoBehaviour
     GameObject hookBarRoot;
     Image      hookBarFill;
 
+    readonly List<GameObject> normalLines = new List<GameObject>();
+    GameObject dotLine;
+
     void Awake()
     {
         if (Instance == null) Instance = this;
@@ -37,14 +40,14 @@ public class CrosshairHUD : MonoBehaviour
         gameObject.AddComponent<CanvasScaler>();
         gameObject.AddComponent<GraphicRaycaster>();
 
-        // Normal crosshair (+)
-        MakeLine(new Vector2( gap + lineSize * 0.5f,  0), new Vector2(lineSize, thickness), 0f, color);
-        MakeLine(new Vector2(-(gap + lineSize * 0.5f), 0), new Vector2(lineSize, thickness), 0f, color);
-        MakeLine(new Vector2( 0,  gap + lineSize * 0.5f),  new Vector2(lineSize, thickness), 90f, color);
-        MakeLine(new Vector2( 0, -(gap + lineSize * 0.5f)), new Vector2(lineSize, thickness), 90f, color);
+        // Normal crosshair (+) — referanslar saklanıyor ki ayarlardan tip/renk değişebilsin
+        normalLines.Add(MakeLine(new Vector2( gap + lineSize * 0.5f,  0), new Vector2(lineSize, thickness), 0f, color));
+        normalLines.Add(MakeLine(new Vector2(-(gap + lineSize * 0.5f), 0), new Vector2(lineSize, thickness), 0f, color));
+        normalLines.Add(MakeLine(new Vector2( 0,  gap + lineSize * 0.5f),  new Vector2(lineSize, thickness), 90f, color));
+        normalLines.Add(MakeLine(new Vector2( 0, -(gap + lineSize * 0.5f)), new Vector2(lineSize, thickness), 90f, color));
 
-        if (centerDot)
-            MakeLine(Vector2.zero, new Vector2(thickness, thickness), 0f, color);
+        // Nokta her zaman ÜRETİLİR, sadece görünürlüğü değişir — sonradan açılabilsin diye.
+        dotLine = MakeLine(Vector2.zero, new Vector2(thickness, thickness), 0f, color, centerDot);
 
         // Hit marker (X) — başta gizli
         float d = (gap + lineSize * 0.5f) * 0.707f;
@@ -116,6 +119,27 @@ public class CrosshairHUD : MonoBehaviour
 
         go.AddComponent<Image>().color = col;
         return go;
+    }
+
+    // Ayarlar panelinden çağrılır (SettingsApplier.ApplyGameplay).
+    // 0 = çizgi, 1 = çizgi + nokta, 2 = sadece nokta, 3 = kapalı.
+    public void ApplyStyle(int type, Color c)
+    {
+        bool linesOn = type == 0 || type == 1;
+        bool dotOn   = type == 1 || type == 2;
+
+        foreach (var l in normalLines)
+        {
+            if (l == null) continue;
+            if (l.activeSelf != linesOn) l.SetActive(linesOn);
+            if (l.TryGetComponent(out Image img)) img.color = c;
+        }
+
+        if (dotLine != null)
+        {
+            if (dotLine.activeSelf != dotOn) dotLine.SetActive(dotOn);
+            if (dotLine.TryGetComponent(out Image dimg)) dimg.color = c;
+        }
     }
 
     public void ShowHitMarker()

@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using Bloodrush.Flow;
+using Bloodrush.Shared.Audio;
 
 namespace Bloodrush.UI
 {
@@ -41,12 +43,61 @@ public class MainMenuManager : MonoBehaviour
 
     // ─── Aksiyonlar ──────────────────────────────────────────────────
 
-    [SerializeField] string firstSceneName = "OutdoorsScene"; // kampanya kurulunca "Ch1_Salon" yap
+    [SerializeField] string firstSceneName = "CH1";
+
+    [Header("Menü Müziği")]
+    [Tooltip("Menüdeki RoomMusic objesi. Boş bırakılırsa sahnede aranır.")]
+    [SerializeField] RoomMusic menuMusic;
+    [Tooltip("BAŞLAT'a basınca müziğin ve ekranın sönme süresi (sn).")]
+    [SerializeField] float exitFadeDuration = 1.5f;
+    [Tooltip("Sonraki sahne siyahtan açılırken kullanılacak süre (sn).")]
+    [SerializeField] float nextSceneFadeIn = 0.6f;
+
+    bool starting;
 
     void StartGame()
     {
+        if (starting) return;      // çift tıklama korumasi
+        starting = true;
+        StartCoroutine(StartGameRoutine());
+    }
+
+    // Müzik sönerken sahne ARKA PLANDA yüklenir; yani 1.5 sn'lik fade bir bekleme
+    // degil, zaten harcanacak yükleme süresinin üstüne biniyor. Fade bitince perde
+    // SceneFadeIn.CarryOverlay ile sonraki sahneye taşınır ve orada açılır — oyuncu
+    // menüden oyuna kesintisiz, karadan geçer.
+    IEnumerator StartGameRoutine()
+    {
         GameHUD.ResetProgress();   // yeni oyun = upload sıfır
-        SceneManager.LoadScene(firstSceneName);
+
+        var music = menuMusic != null ? menuMusic : FindObjectOfType<RoomMusic>();
+        if (music != null) music.FadeOut(exitFadeDuration);
+
+        var op = SceneManager.LoadSceneAsync(firstSceneName);
+        if (op == null)
+        {
+            Debug.LogError($"[MainMenuManager] '{firstSceneName}' yüklenemedi — " +
+                           "Build Settings'te ekli mi?", this);
+            starting = false;
+            yield break;
+        }
+        op.allowSceneActivation = false;
+
+        var img = GameFlow.CreateOverlay(Color.black);
+        float t = 0f;
+        while (t < exitFadeDuration)
+        {
+            t += Time.unscaledDeltaTime;   // menüde timeScale'e güvenme (AnimateIn de öyle)
+            img.color = new Color(0f, 0f, 0f, Mathf.Clamp01(t / exitFadeDuration));
+            yield return null;
+        }
+        img.color = Color.black;
+
+        // allowSceneActivation=false iken progress 0.9'da takılır — "hazır" demektir.
+        while (op.progress < 0.9f) yield return null;
+
+        SceneFadeIn.CarryOverlay(img, 0f, nextSceneFadeIn);
+        op.allowSceneActivation = true;
     }
 
     void ExitGame()      => Application.Quit();

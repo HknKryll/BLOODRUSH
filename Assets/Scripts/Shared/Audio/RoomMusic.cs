@@ -20,8 +20,9 @@ public class RoomMusic : MonoBehaviour
 {
     [Header("Muzik")]
     [SerializeField] AudioClip clip;
-    [Tooltip("Projede AudioMixer yok; ileride kurarsan muzik grubunu buraya baglarsin. " +
-             "Bos birakilabilir.")]
+    [Tooltip("BOS BIRAKILABILIR — bos ise Resources/GameMixer icindeki 'Music' grubu " +
+             "otomatik bulunur (bkz. AudioRouting). Sadece bu parcayi baska bir gruba " +
+             "yonlendirmek istersen doldur.")]
     [SerializeField] AudioMixerGroup mixerGroup;
 
     [Header("Ses")]
@@ -43,6 +44,14 @@ public class RoomMusic : MonoBehaviour
 
     public bool IsPlaying => src != null && src.isPlaying;
 
+    // ───── MusicDirector icin eklemeli API ─────
+    // Asagidakilerin hicbiri mevcut davranisi degistirmez; parametresiz FadeIn/FadeOut
+    // aynen serialize edilen surelere delege eder, yani CH1 resepsiyon kurulumu
+    // etkilenmez. Director bunlari kullanarak olcuye hizali crossfade yapabiliyor.
+    public AudioSource Source       => src;
+    public float       TargetVolume => volume;
+    public bool        HasClip      => clip != null;
+
     void Awake()
     {
         src = gameObject.AddComponent<AudioSource>();
@@ -50,7 +59,9 @@ public class RoomMusic : MonoBehaviour
         src.loop                 = true;
         src.playOnAwake          = false;
         src.spatialBlend         = spatialBlend;
-        src.outputAudioMixerGroup = mixerGroup;
+        // Slot bossa Music grubunu kendi bul — boylece mevcut dort muzik objesini
+        // (resepsiyon / tutorial / boss / ambiyans) tek tek elle baglamak gerekmiyor.
+        src.outputAudioMixerGroup = mixerGroup != null ? mixerGroup : AudioRouting.Music;
         src.volume               = 0f;
 
         if (clip == null)
@@ -79,6 +90,41 @@ public class RoomMusic : MonoBehaviour
     {
         if (src == null) return;
         StartFade(0f, fadeOutDuration);
+    }
+
+    // Acik sureli asiri yuklemeler — Director gecis suresini cagri basina veriyor.
+    public void FadeIn(float duration)
+    {
+        if (src == null || clip == null) return;
+        src.UnPause();
+        if (!src.isPlaying) src.Play();
+        StartFade(volume, duration);
+    }
+
+    public void FadeOut(float duration)
+    {
+        if (src == null) return;
+        StartFade(0f, duration);
+    }
+
+    // Ornek-hassasiyetinde baslatma: iki loop'un FAZI tutsun diye Director bunu
+    // AudioSettings.dspTime uzerinden bir sonraki olcu sinirina kuruyor. PlayScheduled
+    // calan bir kaynakta calismaz, o yuzden once durduruluyor.
+    public void PlayScheduledAt(double dspTime, float startVolume)
+    {
+        if (src == null || clip == null) return;
+        if (src.isPlaying) src.Stop();
+        src.timeSamples = 0;
+        src.volume      = Mathf.Clamp01(startVolume);
+        src.PlayScheduled(dspTime);
+    }
+
+    public void StopNow()
+    {
+        if (src == null) return;
+        if (fadeRoutine != null) { StopCoroutine(fadeRoutine); fadeRoutine = null; }
+        src.volume = 0f;
+        src.Stop();
     }
 
     // Tek coroutine slotu: oyuncu tetige girip cikip tekrar girerse fade'ler UST USTE
@@ -125,8 +171,10 @@ public class RoomMusic : MonoBehaviour
     void OnValidate()
     {
         if (src == null) return;
-        src.spatialBlend          = spatialBlend;
-        src.outputAudioMixerGroup = mixerGroup;
+        src.spatialBlend = spatialBlend;
+        // OnValidate'te Resources.Load cagirmiyoruz (Editor'da import sirasinda
+        // sorun cikarabilir); sadece elle atanan grup uygulanir.
+        if (mixerGroup != null) src.outputAudioMixerGroup = mixerGroup;
     }
 }
 }

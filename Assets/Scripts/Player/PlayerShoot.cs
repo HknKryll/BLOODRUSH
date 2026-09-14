@@ -12,7 +12,9 @@ public class PlayerShoot : MonoBehaviour
     public enum Firearm { Revolver, Shotgun, Lmg }
 
     [Header("Revolver")]
-    [SerializeField] float revolverDamage  = 40f;
+    // 25: dusman1 (35 can) iki atisla olur. 40'ken tek atisliktı ve fazla guclu
+    // hissettiriyordu. Zirhli/Buyuk_Dusman (100 can) 3 yerine 4 atis.
+    [SerializeField] float revolverDamage  = 25f;
     [SerializeField] float revolverRange   = 120f;
     [SerializeField] float revolverFireRate = 0.28f;
     [Tooltip("Tepme çarpanı — ProceduralWeaponMotion'daki temel recoil değerleriyle çarpılır.")]
@@ -162,7 +164,7 @@ public class PlayerShoot : MonoBehaviour
         if (Input.GetKeyDown(KeyBindings.Weapon2)) SwitchFirearm(Firearm.Shotgun);
         if (Input.GetKeyDown(KeyBindings.Weapon3)) SwitchFirearm(Firearm.Lmg);
 
-        if (Input.GetMouseButton(0) && !switching)
+        if (Input.GetKey(KeyBindings.Fire) && !switching)
             FireActive();
 
         if (LauncherEnabled && Input.GetButtonDown("Fire2"))

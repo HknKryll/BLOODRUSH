@@ -328,16 +328,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   behavior: 0
   playerKnockback: 0
-  sightRange: 20
+  navRecoverRadius: 1.5
+  navRecoverMaxRise: 1
+  sightRange: 23.5
   obstacleMask:
     serializedVersion: 2
     m_Bits: 0
-  attackRange: 3.01
+  attackRange: 2.7
+  meleeVerticalReach: 1.13
   attackDamage: 15
   attackCooldown: 0.6
   projectilePrefab: {fileID: 0}
   muzzle: {fileID: 0}
   rangedRange: 15
+  rangedStopDistance: 0
   magSize: 10
   fireRate: 0.15
   reloadTime: 2

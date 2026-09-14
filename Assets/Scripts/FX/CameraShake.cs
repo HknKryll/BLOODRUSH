@@ -43,8 +43,15 @@ public class CameraShake : MonoBehaviour
 
     // intensity = eklenecek tepe ofset (m). Üst üste binenler toplanır, tavanla sınırlı.
     // duration parametresi artık yok sayılır — sönümleme traumaDecay ile yapılır (API uyumu için kalıyor).
+    // Ayarlardaki "kamera sarsıntısı" kaydırıcısı (0..1). 0 = sarsıntı tamamen kapalı.
+    // Oyun kanca ve hızlı hareket içerdiği için bazı oyuncularda mide bulantısı
+    // yapabiliyor — bu yüzden sıfıra kadar inebilmeli (bkz. SettingsApplier).
+    public static float ShakeScale = 1f;
+
     public static void Shake(float intensity = 0.15f, float duration = 0.15f)
     {
+        intensity *= ShakeScale;
+        if (intensity <= 0f) return;
         if (Instance) Instance.trauma = Mathf.Min(Instance.maxTrauma, Instance.trauma + intensity);
     }
 

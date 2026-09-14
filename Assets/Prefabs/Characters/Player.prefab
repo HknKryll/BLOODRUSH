@@ -267,6 +267,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83240442aad6c42448d1ee653a167c41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  traumaDecay: 2.5
+  maxTrauma: 0.5
+  frequency: 40
 --- !u!1 &6250096070739900373
 GameObject:
   m_ObjectHideFlags: 0
@@ -419,13 +422,15 @@ MonoBehaviour:
   wallRunJumpUp: 12
   wallRunJumpOut: 9
   wallRunTilt: 14
-  slideKey: 306
   slideSpeed: 24
-  slideDuration: 0.65
+  slideFriction: 9
+  minSlideSpeed: 11
+  maxSlideTime: 3
   slideTilt: 6
   cameraHolder: {fileID: 2432791893899197368}
   sensitivityField: 2
   maxPitch: 85
+  flipEyeHeight: 1.6
   footstepClip: {fileID: 8300000, guid: 4e78e60e2b31109478073e86f506d5d1, type: 3}
   footstepVolume: 0.4
   jumpClip: {fileID: 8300000, guid: 5adb5e965c1860e488a62d3ef55d11f2, type: 3}
@@ -446,7 +451,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02188d9a530ed2942995e07f4ad480bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hookKey: 101
   maxRange: 50
   pullSpeed: 28
   arrivalDistance: 2.5
@@ -499,7 +503,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 590626825980f5a4d960b9a8206a19c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parryKey: 102
   parryRange: 5
   parryStun: 2
   weaponAnim: {fileID: 0}
@@ -552,7 +555,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b572e87d588c5aa4e89163954f78d750, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useKey: 99
   healthRestore: 30
   speedBoost: 1.5
   speedDuration: 6
@@ -571,7 +573,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 448cf91e98fde5443a36df3668c648ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  revolverDamage: 40
+  revolverDamage: 25
   revolverRange: 120
   revolverFireRate: 0.28
   revolverRecoilScale: 1
@@ -620,9 +622,6 @@ MonoBehaviour:
   lmgEmptyClickVolume: 0.6
   lmgReloadClip: {fileID: 8300000, guid: 1ae1c113d08837743a9d0c399fdda969, type: 3}
   lmgReloadVolume: 0.8
-  switchToRevolverKey: 49
-  switchToShotgunKey: 50
-  switchToLmgKey: 51
   grenadePrefab: {fileID: -5429060948216366912, guid: 0eada143ba6be6444b33168f3bf386ae,
     type: 3}
   flashPrefab: {fileID: -4499523240468417313, guid: 84ef268cb9b61294aa47ca080de8f971,

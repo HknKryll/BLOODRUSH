@@ -91,33 +91,31 @@ public class EnemyRangedAttack
         if (projectilePrefab == null || player == null) return;
 
         Vector3 origin = muzzle ? muzzle.position : enemy.position + Vector3.up * 1.4f;
-        Vector3 dir    = (player.position + Vector3.up * 0.5f - origin).normalized;
+
+        // NISAN GOVDE MERKEZINE. Eskiden `player.position + up*0.5` idi; ama oyuncunun
+        // pivotu AYAKLARDAN 1.17 m yukarida (CharacterController center.y −0.17,
+        // height 2), yani o nokta aslinda ayaktan 1.67 m — 2 m'lik kapsulun ust ucuna
+        // yakin ve siyirmaya cok musait. Ayak + 1.0 m tam govde merkezi.
+        Vector3 aim = EnemyVision.PlayerFeet(player) + Vector3.up * 1.0f;
+        Vector3 dir = (aim - origin).normalized;
 
         if (spreadAngle > 0f)   // makineli yayılımı
             dir = Quaternion.Euler(Random.Range(-spreadAngle, spreadAngle),
                                    Random.Range(-spreadAngle, spreadAngle), 0f) * dir;
 
         var proj = UnityEngine.Object.Instantiate(projectilePrefab, origin, Quaternion.LookRotation(dir));
-        proj.Launch(dir, projectileSpeed, projectileDamage);
+        proj.Launch(dir, projectileSpeed, projectileDamage, enemy);
         sfx.Play(attackClip, attackVolume);
         MuzzleFlash.Spawn(origin, muzzle);   // görünür ateş flaşı (namluda çakar)
     }
 
+    // Görüş hattı EnemyVision'a taşındı — yakın dövüş de aynı kontrole ihtiyaç duyuyor,
+    // iki kopya tutmak yerine tek kaynak. Davranış aynı: bel/göğüs/baş, üçü de açık olmalı.
     public bool HasLineOfSight(Transform enemy, Transform player)
     {
         if (player == null) return false;
         Vector3 origin = muzzle ? muzzle.position : enemy.position + Vector3.up * 1.4f;
-        Vector3 target = player.position + Vector3.up * 0.5f;
-        Vector3 dir    = target - origin;
-
-        foreach (var h in Physics.RaycastAll(origin, dir.normalized, dir.magnitude, ~0, QueryTriggerInteraction.Ignore))
-        {
-            if (h.collider.transform.IsChildOf(enemy)) continue;                       // kendi gövden
-            if (h.collider.GetComponentInParent<PlayerMovement>() != null) continue;    // oyuncu engel değil
-            if (h.collider.GetComponentInParent<EnemyAI>() != null) continue;           // diğer düşmanlar engel değil
-            return false;  // duvar
-        }
-        return true;
+        return EnemyVision.ClearToPlayer(origin, player, enemy, EnemyVision.TorsoHeights);
     }
 }
 }

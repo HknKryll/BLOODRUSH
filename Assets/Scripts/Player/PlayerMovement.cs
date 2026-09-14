@@ -49,6 +49,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] Transform cameraHolder;
     [SerializeField] float sensitivityField = 2f;
     public float sensitivity { get => sensitivityField; set => sensitivityField = value; }
+    [Tooltip("Ayarlardan sürülür — Look() içinde dikey bakışı ters çevirir.")]
+    public bool InvertY { get; set; }
     [SerializeField] float maxPitch    = 85f;
     [Tooltip("Flip'te (tavanda) gözün tavanın altında ne kadar aşağıda olacağı. Ayaklar tavanda hissi için ayarla.")]
     [SerializeField] float flipEyeHeight = 1.6f;
@@ -148,6 +150,9 @@ public class PlayerMovement : MonoBehaviour
         float mx = Input.GetAxisRaw("Mouse X") * sensitivity;
         float my = Input.GetAxisRaw("Mouse Y") * sensitivity;
 
+        // Ayarlardaki "Y Eksenini Ters Çevir" (SettingsApplier.ApplyControls yazar).
+        if (InvertY) my = -my;
+
         // Flip'te bakış tersine döner (ekran 180° dönük olduğu için kontroller ters gelmesin)
         if (flipped) { mx = -mx; my = -my; }
 
@@ -188,8 +193,8 @@ public class PlayerMovement : MonoBehaviour
             coyoteTimer -= Time.deltaTime;
         }
 
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        float h = KeyBindings.MoveX;
+        float v = KeyBindings.MoveZ;
 
         Vector3 wish = transform.right * h + transform.forward * v;
         if (wish.magnitude > 1f) wish.Normalize();
@@ -290,8 +295,8 @@ public class PlayerMovement : MonoBehaviour
             if (grounded) velocity.y = -gs * 2f;           // yüzeye hafif baskı (aşağı −2 / yukarı +2)
         }
 
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        float h = KeyBindings.MoveX;
+        float v = KeyBindings.MoveZ;
         if (flipped) h = -h;   // 180° roll'da sağ-sol görsel olarak ters — A/D'yi eşle
         Vector3 wish = transform.right * h + transform.forward * v;
         if (wish.magnitude > 1f) wish.Normalize();

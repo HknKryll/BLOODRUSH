@@ -193,7 +193,9 @@ public class ElevatorAccidentSequence : MonoBehaviour, IElevatorSequenceHook
             rider.GravityScale    = 1f;
             rider.SpeedMultiplier = 1f;
             rider.JumpEnabled     = true;
-            rider.SlideEnabled    = true;
+            // SlideEnabled BILEREK geri acilmiyor: kayma kazadan sonra kapali kalmali.
+            // Onceden burada true yaziyordu ve CH4'te kayma calisiyordu. Artik kaymayi
+            // PlayerLoadout yarali durumunun parcasi olarak yonetiyor.
         }
 
         if (disarmOnBlackout) PlayerLoadout.DisarmAll();

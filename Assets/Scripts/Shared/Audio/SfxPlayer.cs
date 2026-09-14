@@ -15,6 +15,7 @@ public class SfxPlayer
         var source = host.AddComponent<AudioSource>();
         source.playOnAwake  = false;
         source.spatialBlend = spatialBlend;
+        source.outputAudioMixerGroup = AudioRouting.Sfx;   // mixer yoksa null = eski davranış
         return new SfxPlayer(source);
     }
 
@@ -25,6 +26,7 @@ public class SfxPlayer
         if (source == null) source = host.AddComponent<AudioSource>();
         source.playOnAwake  = false;
         source.spatialBlend = spatialBlend;
+        source.outputAudioMixerGroup = AudioRouting.Sfx;
         return new SfxPlayer(source);
     }
 
@@ -35,10 +37,15 @@ public class SfxPlayer
     }
 
     // Sahibi olmayan, tek seferlik 3D ses (ör. AmmoPickup toplanınca).
+    //
+    // AudioSource.PlayClipAtPoint KULLANILMIYOR: Unity onu kendi gizli AudioSource'uyla
+    // çalıyor ve o kaynağa erişemediğimiz için AudioMixer'a YÖNLENDİRİLEMİYOR — efekt
+    // seviyesi ayarı bu sesleri atlardı. Aynı davranışı (3D, klip bitince yok olma)
+    // PlayDetached ile birebir veriyoruz, üstelik artık SFX grubundan geçiyor.
     public static void PlayAtPoint(AudioClip clip, Vector3 position, float volume = 1f)
     {
-        if (clip != null)
-            AudioSource.PlayClipAtPoint(clip, position, volume);
+        if (clip == null) return;
+        PlayDetached(clip, position, volume, spatialBlend: 1f, lifetime: clip.length + 0.1f);
     }
 
     // Kaynak obje yok edildikten sonra da çalmaya devam etmesi gereken sesler için
@@ -54,6 +61,7 @@ public class SfxPlayer
         source.spatialBlend = spatialBlend;
         source.volume = volume;
         source.clip = clip;
+        source.outputAudioMixerGroup = AudioRouting.Sfx;
         source.Play();
         Object.Destroy(sfxGO, lifetime);
     }

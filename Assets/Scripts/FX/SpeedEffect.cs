@@ -13,6 +13,10 @@ public class SpeedEffect : MonoBehaviour
     [SerializeField] float      maxSpeed       = 35f;
     [SerializeField] float      lerpSpeed      = 6f;
 
+    // Ayarlardaki FOV kaydırıcısı buraya yazar (0 = ayar yok, serialize edilen baseFov
+    // kullanılır). Hız artışı bunun ÜSTÜNE bindiği için ayar taban değeri değiştirir.
+    public static float FovOverride = 0f;
+
     CharacterController  cc;
     ChromaticAberration  ca;
 
@@ -41,9 +45,10 @@ public class SpeedEffect : MonoBehaviour
         float speed = cc.velocity.magnitude;
         float t     = Mathf.Clamp01((speed - speedThreshold) / (maxSpeed - speedThreshold));
 
+        float fovBase = FovOverride > 0f ? FovOverride : baseFov;
         playerCamera.fieldOfView = Mathf.Lerp(
             playerCamera.fieldOfView,
-            baseFov + maxFovBoost * t,
+            fovBase + maxFovBoost * t,
             Time.deltaTime * lerpSpeed);
 
         ca.intensity.value = Mathf.Lerp(ca.intensity.value, t, Time.deltaTime * lerpSpeed);

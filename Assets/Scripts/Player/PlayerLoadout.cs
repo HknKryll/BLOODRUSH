@@ -71,6 +71,14 @@ public static class PlayerLoadout
     {
         Injured   = value;
         JumpScale = value ? Mathf.Clamp01(jumpScale) : 1f;
+
+        // Iyilesince kaymayi geri ac (Apply sadece KISAR, asla vermez).
+        if (!value)
+        {
+            var go = FindPlayer();
+            var pm = go != null ? go.GetComponentInChildren<PlayerMovement>(true) : null;
+            if (pm != null) pm.SlideEnabled = true;
+        }
         Debug.Log($"[PlayerLoadout] Yaralı: {value} (zıplama ×{JumpScale:0.00})");
         Apply();
     }
@@ -152,7 +160,14 @@ public static class PlayerLoadout
 
         // Yaralı hâli — zıplama gücü. Varsayılan 1f olduğu için normal oyunda etkisiz.
         var pm = go.GetComponentInChildren<PlayerMovement>(true);
-        if (pm != null) pm.JumpMultiplier = JumpScale;
+        if (pm != null)
+        {
+            pm.JumpMultiplier = JumpScale;
+            // Yaraliyken kayma da kapali: kazadan cikmis biri kayarak ilerleyemez.
+            // Zipla kisiti (JumpScale) ile ayni yerden yonetiliyor, boylece sahne
+            // gecisini ve checkpoint respawn'i birlikte asiyorlar.
+            if (Injured) pm.SlideEnabled = false;
+        }
 
         // Kanca kendi CancelActive()'iyle güvenle geri sarılır (bkz. GrapplingHook:76-80).
         var hook = go.GetComponentInChildren<GrapplingHook>(true);
