@@ -166,6 +166,59 @@ dönüldüğünde bu düzeltilmeli.
 kaynak-of-truth seçip diğerini silip referansları güncellemek gerekiyor.
 Sırasıyla, büyükten küçüğe:
 
+> ✅ **UYGULANDI (2026-09-15)**: Bu bölüm ile §6.1'deki (Faz 5) karakter
+> konsolidasyonu **birlikte, tek bir GUID-doğrulamalı iş turunda**
+> gerçekleştirildi (plan zaten bunu öneriyordu). Önce bir araştırma ajanı
+> her 4 karakter için hangi dosyaların gerçekten sahne/prefab tarafından
+> referans edildiğini (GUID zinciriyle, prefab'ların `m_Modifications`
+> override'larına kadar inerek) çıkardı — sonuç, ilk varsayımdan çok
+> daha ince taneliydi:
+>
+> - **Büyük Düşman** ve **Crimson Wretch (düşman1)**: `Prefabs/Characters/`
+>   altındaki `.obj` tabanlı prefab, aslında `anim/` altındaki FBX rig'i
+>   **içine gömen bir "sarmalayıcı" PrefabInstance** — OBJ'nin kendi mesh'i
+>   `m_RemovedGameObjects` ile kaldırılıp yerine rigli FBX nest edilmiş,
+>   Animator Controller ve materyal override'larla `anim/` klasörünün
+>   dosyalarına yönlendirilmiş. **Bu yüzden `.obj`/`.mtl` dosyaları görsel
+>   olarak hiç render edilmese bile PrefabInstance zincirinin yapısal
+>   kaynağı olarak kalmak zorunda** — §5.4'teki "muhtemelen gereksiz ham
+>   export" varsayımı bu iki karakter için **yanlış** çıktı, silinemezler.
+> - **Zırhlı**: gerçekten tamamen kendi kendine yeten, saf OBJ — hiçbir
+>   `anim/` karşılığı yok.
+> - **Resepsiyonist**: canlı prefab kökte, ama Animator'ın Avatar'ı
+>   `resepsiyopnist düz/düz.fbx`'ten, materyalin albedo dokusu da aynı
+>   klasördeki `base_color.jpg`'den geliyordu — "düz" klasörü görünüşte
+>   tamamen atılabilir bir kopya gibi dururken aslında canlı bağımlılık
+>   taşıyordu.
+> - Adı "Büyük Düşman"a benzeyen `EnemyBig.prefab`, adında "zırhlı" geçen
+>   `ArmoredHazard.prefab`, ve `HighSpeedEnemy.prefab/.fbx` bu 4
+>   karakterle **hiç ilgisi olmayan**, ayrı, referanssız eski prototipler
+>   çıktı (zaten §5.2'nin 6 prefab'lık listesinde var) — isim
+>   benzerliğine aldanılmadı, dokunulmadı.
+>
+> **Sonuç yapı** (tüm taşımalar `git mv` ile, GUID'ler taşıma sonrası
+> tek tek doğrulandı — dört karakterin de kritik prefab/controller GUID'i
+> taşımadan önce/sonra birebir aynı, `CH3.unity`'nin `WaveDirector`
+> alanları hâlâ doğru şekilde çözülüyor):
+>
+> ```
+> Assets/Characters/
+>   BuyukDusman/           (.obj kabuğu + Rig/ altında canlı FBX+controller+materyal, kullanılmayan "Walking" animasyonu yedeklendi)
+>   Zirhli/                 (tamamen kendi kendine yeten .obj+.mtl+.png+.prefab)
+>   CrimsonWretch/           (.obj kabuğu + Hit_4_Red + vfx_Projectile_01 + Rig/ altında 3 farklı eski klasörden derlenen tek canlı gövde+2 animasyon+controller)
+>   Resepsiyonist/           (kök prefab+controller+materyal + Konusma/ + Duz/ alt klasörleri, sadece canlı dosyalarla)
+> ```
+>
+> `Assets/anim/` klasörü artık **tamamen yok** (tüm içeriği ya taşındı ya
+> yedeklendi). Referanssız kalan tüm dosyalar (~30+ dosya: kullanılmayan
+> animasyon klipleri, kullanılmayan materyal/doku setleri, `düz.prefab`,
+> `Material.001.mat` vb.) `_Yedek_Silinecekler/<Karakter>_orphan/`
+> altına taşındı, silinmedi.
+>
+> Henüz commit edilmedi — Unity Editor'de tüm 4 karakterin görsel/animasyon
+> olarak hâlâ doğru çalıştığı (CH2 "EnemyBigArena", CH3 dalga spawn'ları,
+> CH1 resepsiyon NPC'si) **kullanıcı tarafından doğrulanacak**.
+
 ### 4.1 Karakter doku setleri (asıl büyük kazanım, ~40 MB+)
 Aynı iki karakterin (Meshy AI ile üretilmiş "Crimson Wretch" zombi ve
 "Office Worker" resepsiyonist) doku setleri **3-4 farklı klasöre**
@@ -310,13 +363,16 @@ aktarılmış model/materyal referansı taşıdığı için genelde gereksiz —
 ama Unity `.obj` dosyasını da native import edebildiğinden, bazı
 prefab'lar `.obj`'u doğrudan mesh kaynağı olarak kullanıyor olabilir.
 
-**Karar (2026-09-15)**: "Dediğim gibi silinecekse yedek için klasöre
-atılabilir." Silmeden önce her `.obj`'un GUID'i ile ilgili prefab'ın
-gerçekten o `.obj`'u mu yoksa dönüştürülmüş bir `.fbx`/mesh asset'ini
-mi kullandığı doğrulanmalı (Faz 5 — karakter konsolidasyonu — sırasında
-yapılacak, çünkü zaten o fazda her karakterin referans zincirine tek
-tek bakılıyor). Silinecekse `_Yedek_Silinecekler/RawExports_OBJ/`
-klasörüne taşınacak.
+> ✅ **SONUÇ (2026-09-15) — varsayım YANLIŞ çıktı**: Karakter konsolidasyonu
+> sırasında yapılan GUID zinciri doğrulaması gösterdi ki Büyük Düşman ve
+> Crimson Wretch'in `.obj`/`.mtl` dosyaları **silinemez** — görsel olarak
+> render edilmeseler bile, `anim/` klasöründeki gerçek rigli FBX'i içine
+> gömen "sarmalayıcı" PrefabInstance'ın **yapısal kaynağı** olarak
+> kalıyorlar (Unity, bir PrefabInstance'ın kaynağı silinirse referansı
+> kırar). Zırhlı'nınki zaten tek temsil biçimi olduğu için hiç "ham
+> export" değil. **Hiçbiri yedek klasöre taşınmadı** — hepsi ilgili
+> karakterin `Assets/Characters/<İsim>/` klasörüne canlı içerik olarak
+> taşındı (bkz. §4 başındaki uygulama notu).
 
 ---
 
@@ -327,6 +383,10 @@ kapalıyken** toplu taşıma yapılması önerilir (Editor açıkken yapılan
 taşımalar Unity'nin kendi iç senkronizasyonuyla çakışabilir).
 
 ### 6.1 Karakter varlıklarını tek bir yapıya topla (asıl kök çözüm)
+
+> ✅ **UYGULANDI (2026-09-15)** — bkz. §4 başındaki uygulama notu, aynı
+> iş turunda tamamlandı.
+
 `anim/`, `anim/idlezombi/`, `Prefabs/Characters/` arasında dağılmış
 karakter içeriğini (bkz. §4.1 duplicate analizi) tek bir konvansiyona
 taşı. Önerilen hedef yapı:
@@ -415,6 +475,12 @@ UI (örn. `Kitap1.asset` içindeki `title: "GEÇMİŞ"` gibi) bu maddeyle
 **hiç ilgili değil** — sadece dosya sistemi isimleri değişiyor, oyunun
 gösterdiği Türkçe metinlere dokunulmuyor.
 
+> ✅ Tablodaki karakter-ilişkili 6 satır (Büyük_Düşman, BüyükDüşman,
+> Zırhlı, düşman1, KüçükDüşmanController, konuşma, resepsiyopnist düz)
+> §4/§6.1'in karakter konsolidasyonuyla birlikte uygulandı. Sadece
+> `Textures/Ch1/Asansör/` satırı hâlâ bekliyor (bölüm isimlendirmesiyle
+> birlikte ele alınacak, §6.3/6.4).
+
 **Kesin yeniden adlandırma listesi** (özel karakter içeren tüm öğeler):
 
 | Eski isim | Yeni isim | Not |
@@ -443,11 +509,11 @@ prefab'ın model referansı Editor'de teyit edilecek (dosya adı değişince
 Unity genelde GUID'i korur ama görsel kontrol önerilir).
 
 ### 6.6 Küçük isimlendirme temizlikleri
-- `Assets/anim/Meshy_AI_Crimson_Wretch_biped/Meshy_AI_Crimson_Wretch_biped 1/` — bu " 1" son eki klasik "aynı şeyi iki kez sürükle bıraktım" işareti; §6.1 konsolidasyonuyla zaten ortadan kalkacak
-- `Assets/Materials/New Material.mat`, `Assets/Textures/Ch3/Flooor/textures/New Material.mat` — varsayılan isimle bırakılmış materyaller, açıklayıcı isim verilmeli
-- `Assets/Textures/Ch3/Wall/Wall 1.mat` → `Wall_02.mat` gibi anlamlı bir isim
-- `Assets/Scenes/OutdoorsScene/NavMesh-Plane 1.asset` → " 1" kaldır
-- `Büyük_Düşman` (alt çizgi) vs `BüyükDüşman` (bitişik) — §6.1 ile tek isimde birleşecek
+- ✅ `Assets/anim/Meshy_AI_Crimson_Wretch_biped/Meshy_AI_Crimson_Wretch_biped 1/` — §6.1 konsolidasyonuyla ortadan kalktı (canlı gövde `Assets/Characters/CrimsonWretch/Rig/`'e taşındı)
+- `Assets/Materials/New Material.mat`, `Assets/Textures/Ch3/Flooor/textures/New Material.mat` — varsayılan isimle bırakılmış materyaller, açıklayıcı isim verilmeli (hâlâ bekliyor)
+- `Assets/Textures/Ch3/Wall/Wall 1.mat` → `Wall_02.mat` gibi anlamlı bir isim (hâlâ bekliyor)
+- `Assets/Scenes/OutdoorsScene/NavMesh-Plane 1.asset` → " 1" kaldır (hâlâ bekliyor)
+- ✅ `Büyük_Düşman` (alt çizgi) vs `BüyükDüşman` (bitişik) — §6.1 ile tek isimde (`BuyukDusman`) birleşti
 
 ---
 
