@@ -16,9 +16,7 @@ using Bloodrush.UI;
 
 namespace Bloodrush.Enemy
 {
-[RequireComponent(typeof(NavMeshAgent))]
-[RequireComponent(typeof(Health))]
-public class BossAI : MonoBehaviour, IParryable
+public class BossAI : BossAIBase
 {
     enum State { Chase, ShotgunAim, MeleeTelegraph, Dash, Blackout, Stunned }
 
@@ -63,10 +61,6 @@ public class BossAI : MonoBehaviour, IParryable
     [SerializeField] AudioClip meleeClip;
     [SerializeField] [Range(0f,1f)] float meleeVolume = 1f;
 
-    [Header("Can Barı")]
-    [SerializeField] string bossName     = "KONSEY DENETÇİSİ";
-    [SerializeField] float  barShowRange = 35f;
-
     [Header("Ölünce Düşen Silahlar")]
     [Tooltip("Boss ölünce yere düşen silah pickup prefabları (WeaponPickup içeren). CH2: Shotgun + LMG.")]
     [SerializeField] GameObject[] weaponDropPrefabs;
@@ -74,53 +68,25 @@ public class BossAI : MonoBehaviour, IParryable
     [SerializeField] float weaponDropSpread = 1.6f;
 
     State state = State.Chase;
-    int   phase = 1;              // 1: >66%, 2: 66-33%, 3: <33%
     float fireTimer;
     float farTimer;               // dash tetiği için "uzakta durma" süresi
     float stunUntil;
     float logTimer;
-    bool  dead;
-    bool  barShown;
-
-    NavMeshAgent   agent;
-    Health         health;
-    Transform      player;
-    Health         playerHealth;
-    PlayerMovement playerMovement;
-    SfxPlayer      sfx;
-    Renderer[]     renderers;
 
     BossShotgunAttack     shotgunAttack;
     BossMeleeAttack       meleeAttack;
     BossBlackoutSequence  blackout;
 
-    void Awake()
+    protected override void Awake()
     {
-        agent  = GetComponent<NavMeshAgent>();
-        health = GetComponent<Health>();
+        base.Awake();
         agent.updateRotation = false;   // nişan için elle döneceğiz
-
-        var pgo = GameObject.FindGameObjectWithTag("Player");
-        if (pgo != null)
-        {
-            player         = pgo.transform;
-            playerHealth   = pgo.GetComponent<Health>();
-            playerMovement = pgo.GetComponent<PlayerMovement>();
-        }
-
-        sfx = SfxPlayer.Create(gameObject, spatialBlend: 1f);
-
-        renderers = GetComponentsInChildren<Renderer>(true);
-        foreach (var smr in GetComponentsInChildren<SkinnedMeshRenderer>(true))
-            smr.updateWhenOffscreen = true;   // büyük model yanlış culling ile kaybolmasın
 
         shotgunAttack = new BossShotgunAttack(muzzle, shotgunRange, damageNear, damageFar,
             coneAngle, aimTime, obstacleMask, muzzleFlash, sfx, fireClip, fireVolume);
         meleeAttack = new BossMeleeAttack(meleeRange, meleeDamage, meleeKnockback,
             meleeTelegraph, meleeCooldown, sfx, meleeClip, meleeVolume);
         blackout = new BossBlackoutSequence(agent, teleportBehindDist, blackoutDuration, renderers);
-
-        health.onDeath.AddListener(OnDeath);
 
         HideIndicator(aimIndicator);
         HideIndicator(meleeIndicator);
@@ -143,13 +109,7 @@ public class BossAI : MonoBehaviour, IParryable
         float dist = Vector3.Distance(transform.position, player.position);
         FacePlayer();
         UpdateDashTimer(dist);
-
-        // Oyuncu boss alanına girince can barını göster (bir kez)
-        if (!barShown && dist <= barShowRange)
-        {
-            BossHealthUI.ShowBoss(health, bossName);
-            barShown = true;
-        }
+        UpdateHealthBar(dist);
 
         logTimer += Time.deltaTime;
         if (logTimer >= 1f)
@@ -192,12 +152,7 @@ public class BossAI : MonoBehaviour, IParryable
 
     // ───────── Faz ─────────
 
-    void CheckPhaseTransition()
-    {
-        float frac = health.Max > 0f ? health.Current / health.Max : 1f;
-        if (phase == 1 && frac <= 0.66f) { phase = 2; StartCoroutine(RunBlackout()); }
-        else if (phase == 2 && frac <= 0.33f) { phase = 3; StartCoroutine(RunBlackout()); }
-    }
+    protected override void OnPhaseAdvanced() => StartCoroutine(RunBlackout());
 
     float FireInterval => fireInterval[Mathf.Clamp(phase - 1, 0, fireInterval.Length - 1)];
     float PhaseSpeedMult => 1f + (phase - 1) * 0.15f;
@@ -283,9 +238,9 @@ public class BossAI : MonoBehaviour, IParryable
     }
 
     // IParryable — sadece kabza telegraph'ında parry'lenir
-    public bool IsParryable => state == State.MeleeTelegraph;
+    public override bool IsParryable => state == State.MeleeTelegraph;
 
-    public void Parry(float stunDuration)
+    public override void Parry(float stunDuration)
     {
         HideIndicator(meleeIndicator);
         state     = State.Stunned;
@@ -310,31 +265,16 @@ public class BossAI : MonoBehaviour, IParryable
 
     // ───────── Yardımcılar ─────────
 
-    void FacePlayer()
-    {
-        Vector3 dir = player.position - transform.position; dir.y = 0f;
-        if (dir.sqrMagnitude > 0.01f)
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 8f);
-    }
-
-    void SetRenderers(bool visible)
-    {
-        foreach (var r in renderers) if (r != null) r.enabled = visible;
-    }
-
     void ShowIndicator(GameObject go) { if (go) go.SetActive(true); }
     void HideIndicator(GameObject go) { if (go) go.SetActive(false); }
 
-    void OnDeath()
+    protected override void OnBossDeathEffects()
     {
-        if (dead) return;
-        dead = true;
-        StopAllCoroutines();
-        blackout.CleanupOnDeath();                         // karanlıkta öldüyse ışıkları geri ver + overlay'i kaldır
-        if (agent.enabled) agent.enabled = false;
-        SetRenderers(false);
-        enabled = false;
-        BossHealthUI.HideBoss();
+        blackout.CleanupOnDeath();   // karanlıkta öldüyse ışıkları geri ver + overlay'i kaldır
+    }
+
+    protected override void OnBossDeathFinish()
+    {
         DropWeapons();                 // silahlar yere düşer → oyuncu alır → kalıcı açılır
         Destroy(gameObject, 0.1f);
     }
@@ -351,8 +291,5 @@ public class BossAI : MonoBehaviour, IParryable
             Instantiate(prefab, pos, Quaternion.Euler(0f, Random.Range(0f, 360f), 0f));
         }
     }
-
-    // Boss büyük — kanca/yumruk işlemez (kancanın kontrol edeceği bilgi)
-    public bool IsLarge => true;
 }
 }

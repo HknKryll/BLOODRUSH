@@ -8,10 +8,8 @@ using Bloodrush.Player;
 
 namespace Bloodrush.Enemy
 {
-[RequireComponent(typeof(NavMeshAgent))]
-[RequireComponent(typeof(Health))]
 [RequireComponent(typeof(Rigidbody))]
-public class EnemyAI : MonoBehaviour, IParryable
+public class EnemyAI : EnemyAIBase
 {
     // ───── Durum makinesi ─────
     enum State { Patrol, Chase, Attack, Telegraphing, Stunned, RangedFire }
@@ -115,11 +113,7 @@ public class EnemyAI : MonoBehaviour, IParryable
     const float pathInterval = 0.2f;
 
     // ───── Referanslar ─────
-    NavMeshAgent agent;
     Rigidbody rb;
-    Transform player;
-    PlayerMovement playerMovement;
-    SfxPlayer sfx;
     Animator anim;   // opsiyonel — animasyonlu gövdesi olan düşmanlarda (yoksa null, atlanır)
     bool hasStunnedAnimParam;   // Animator'da "Stunned" bool'u var mı (varsa stun klibi oynar, yoksa dondurulur)
 
@@ -132,10 +126,11 @@ public class EnemyAI : MonoBehaviour, IParryable
 
     // ─────────────────────────────────────────────
 
-    void Awake()
+    protected override void Awake()
     {
-        agent  = GetComponent<NavMeshAgent>();
-        anim   = GetComponentInChildren<Animator>();   // animasyonlu gövde varsa
+        base.Awake();
+
+        anim = GetComponentInChildren<Animator>();   // animasyonlu gövde varsa
 
         // Animator'da "Stunned" bool'u tanımlı mı? Varsa stun'da o klibe geçilir;
         // yoksa fallback: animator DONDURULUR (yumruk ortada kalır — stun okunur).
@@ -146,11 +141,6 @@ public class EnemyAI : MonoBehaviour, IParryable
         rb     = GetComponent<Rigidbody>();
         rb.isKinematic = true;   // normalde NavMeshAgent sürer; sadece fırlatma/düşüş sırasında fizik açılır
         rb.useGravity  = false;
-        var pgo = GameObject.FindGameObjectWithTag("Player");
-        player = pgo ? pgo.transform : null;
-        playerMovement = pgo ? pgo.GetComponent<PlayerMovement>() : null;
-
-        sfx = SfxPlayer.Create(gameObject, spatialBlend: 1f);
 
         patrol = new EnemyPatrolBehavior(patrolPoints, patrolWaitTime, sightRange, obstacleMask);
         meleeAttack = new EnemyMeleeAttack(attackRange, meleeVerticalReach, attackDamage, attackCooldown,
@@ -168,14 +158,7 @@ public class EnemyAI : MonoBehaviour, IParryable
                                    ? rangedStopDistance
                                    : rangedRange * 0.8f;
 
-        var health = GetComponent<Health>();
-        health.onDeath.AddListener(OnDeath);
         health.onHealthChanged.AddListener(h => { if (h > 0f) PlayHurt(); });
-
-        // Ölçek büyütülünce (isLarge) skinned mesh sınırları bozulup yanlış
-        // frustum-culling ile görünmez olabiliyor — her kare bounds güncelle
-        foreach (var smr in GetComponentsInChildren<SkinnedMeshRenderer>(true))
-            smr.updateWhenOffscreen = true;
     }
 
     void Start()
@@ -460,16 +443,8 @@ public class EnemyAI : MonoBehaviour, IParryable
 
     // ───────────────── Yardımcılar ─────────────────
 
-    void FacePlayer()
-    {
-        Vector3 dir = player.position - transform.position;
-        dir.y = 0f;
-        if (dir.sqrMagnitude > 0.01f)
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 8f);
-    }
-
-    public bool IsLarge      => isLarge;
-    public bool IsParryable  => state == State.Telegraphing;
+    public override bool IsLarge      => isLarge;
+    public override bool IsParryable  => state == State.Telegraphing;
 
     // Kancayla cekiliyor mu. Salt-okunur; davranisi degistirmez. ZoneAvoidance gibi
     // disaridan yon veren bilesenler, oyuncu dusmani cekerken ARAYA GIRMESIN diye bunu
@@ -490,7 +465,7 @@ public class EnemyAI : MonoBehaviour, IParryable
             agent.SetDestination(patrol.FirstPoint.position);
     }
 
-    public void Parry(float stunDuration = 2f)
+    public override void Parry(float stunDuration = 2f)
     {
         meleeAttack.HideIndicator();
         state = State.Stunned;
@@ -642,7 +617,7 @@ public class EnemyAI : MonoBehaviour, IParryable
         sfx.Play(hurtClip, hurtVolume);
     }
 
-    void OnDeath()
+    protected override void OnDeath()
     {
         if (ammoPickupPrefab != null)
             Instantiate(ammoPickupPrefab, transform.position + Vector3.up * 0.3f, Quaternion.identity);
@@ -655,8 +630,7 @@ public class EnemyAI : MonoBehaviour, IParryable
 
         SfxPlayer.PlayDetached(deathClip, transform.position, deathVolume);
 
-        foreach (var r in GetComponentsInChildren<Renderer>())
-            r.enabled = false;
+        SetRenderersVisible(false);
 
         agent.enabled = false;
         enabled = false;

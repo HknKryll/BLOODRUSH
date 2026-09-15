@@ -19,10 +19,8 @@ using Bloodrush.UI;
 // olana kadar doğrudan EndingSequence.Begin bağlanabilir).
 namespace Bloodrush.Enemy
 {
-[RequireComponent(typeof(NavMeshAgent))]
-[RequireComponent(typeof(Health))]
 [RequireComponent(typeof(Rigidbody))]
-public class ExperimentBossAI : MonoBehaviour, IParryable
+public class ExperimentBossAI : BossAIBase
 {
     enum State { Chase, Volley, Leaping, MeleeTelegraph, Stunned, PhaseBurst }
 
@@ -85,60 +83,30 @@ public class ExperimentBossAI : MonoBehaviour, IParryable
     [SerializeField] AudioClip volleyClip;
     [SerializeField] [Range(0f,1f)] float volleyVolume = 0.8f;
 
-    [Header("Can Barı")]
-    [SerializeField] string bossName     = "DENEY";
-    [SerializeField] float  barShowRange = 35f;   // oyuncu bu mesafeye girince bar belirir
-
     [Header("Bitince")]
     public UnityEvent onDefeated;    // ara sahne / EndingSequence.Begin buraya bağlanır
 
     State state = State.Chase;
-    int   phase = 1;                 // 1: >66%, 2: 66-33%, 3: <33%
     float nextVolleyTime;
     float stunUntil;
-    bool  dead;
-    bool  barShown;
 
-    NavMeshAgent   agent;
-    Rigidbody      rb;
-    Health         health;
-    Transform      player;
-    Health         playerHealth;
-    PlayerMovement playerMovement;
-    SfxPlayer      sfx;
-    Renderer[]     renderers;
+    Rigidbody rb;
 
     BossMeleeAttack   meleeAttack;
     EnemyLeapBehavior leap;
 
-    void Awake()
+    protected override void Awake()
     {
-        agent  = GetComponent<NavMeshAgent>();
+        base.Awake();
+
         rb     = GetComponent<Rigidbody>();
-        health = GetComponent<Health>();
         agent.updateRotation = false;    // nişan için elle döneceğiz
         rb.isKinematic = true;           // sadece sıçrama sırasında fizik açılır
         rb.useGravity  = false;
 
-        var pgo = GameObject.FindGameObjectWithTag("Player");
-        if (pgo != null)
-        {
-            player         = pgo.transform;
-            playerHealth   = pgo.GetComponent<Health>();
-            playerMovement = pgo.GetComponent<PlayerMovement>();
-        }
-
-        sfx = SfxPlayer.Create(gameObject, spatialBlend: 1f);
-
-        renderers = GetComponentsInChildren<Renderer>(true);
-        foreach (var smr in GetComponentsInChildren<SkinnedMeshRenderer>(true))
-            smr.updateWhenOffscreen = true;   // büyük model yanlış culling ile kaybolmasın
-
         meleeAttack = new BossMeleeAttack(meleeRange, meleeDamage, meleeKnockback,
             meleeTelegraph, meleeCooldown, sfx, meleeClip, meleeVolume);
         leap = new EnemyLeapBehavior(leapRangeMin, leapRangeMax, leapCooldown, leapSpeed, leapArcHeight);
-
-        health.onDeath.AddListener(OnDeath);
 
         Hide(meleeIndicator);
         Hide(burstIndicator);
@@ -160,13 +128,7 @@ public class ExperimentBossAI : MonoBehaviour, IParryable
 
         float dist = Vector3.Distance(transform.position, player.position);
         FacePlayer();
-
-        // Oyuncu boss alanına girince can barını göster (bir kez)
-        if (!barShown && dist <= barShowRange)
-        {
-            BossHealthUI.ShowBoss(health, bossName);
-            barShown = true;
-        }
+        UpdateHealthBar(dist);
 
         switch (state)
         {
@@ -191,12 +153,7 @@ public class ExperimentBossAI : MonoBehaviour, IParryable
 
     // ───────── Faz ─────────
 
-    void CheckPhaseTransition()
-    {
-        float frac = health.Max > 0f ? health.Current / health.Max : 1f;
-        if      (phase == 1 && frac <= 0.66f) { phase = 2; StartCoroutine(PhaseBurstRoutine()); }
-        else if (phase == 2 && frac <= 0.33f) { phase = 3; StartCoroutine(PhaseBurstRoutine()); }
-    }
+    protected override void OnPhaseAdvanced() => StartCoroutine(PhaseBurstRoutine());
 
     float VolleyInterval => volleyInterval[Mathf.Clamp(phase - 1, 0, volleyInterval.Length - 1)];
     float PhaseSpeedMult => 1f + (phase - 1) * phaseSpeedStep;
@@ -346,9 +303,9 @@ public class ExperimentBossAI : MonoBehaviour, IParryable
 
     // ───────── IParryable ─────────
 
-    public bool IsParryable => state == State.MeleeTelegraph;
+    public override bool IsParryable => state == State.MeleeTelegraph;
 
-    public void Parry(float stunDuration)
+    public override void Parry(float stunDuration)
     {
         Hide(meleeIndicator);
         state     = State.Stunned;
@@ -356,50 +313,28 @@ public class ExperimentBossAI : MonoBehaviour, IParryable
         if (agent.enabled && agent.isOnNavMesh) agent.ResetPath();
     }
 
-    // Büyük — kanca/yumruk işlemez (GrapplingHook/PlayerParry kontrol eder)
-    public bool IsLarge => true;
-
     // ───────── Yardımcılar ─────────
 
+    // ExperimentBossAI'nin kendi kopyaladığı raycast mantığı yerine paylaşılan
+    // EnemyVision servisi kullanılıyor (bkz. BLOODRUSH_YENIDEN_YAPILANDIRMA_PLANI.md, Faz 4).
     bool HasLineOfSight()
     {
         Vector3 origin = muzzle ? muzzle.position : transform.position + Vector3.up * 1.6f;
         Vector3 target = player.position + Vector3.up * 0.5f;
-        Vector3 dir    = target - origin;
-
-        foreach (var h in Physics.RaycastAll(origin, dir.normalized, dir.magnitude, ~0, QueryTriggerInteraction.Ignore))
-        {
-            if (h.collider.transform.IsChildOf(transform)) continue;                      // kendi gövden
-            if (h.collider.GetComponentInParent<PlayerMovement>() != null) continue;      // oyuncu engel değil
-            return false;   // duvar
-        }
-        return true;
-    }
-
-    void FacePlayer()
-    {
-        Vector3 dir = player.position - transform.position; dir.y = 0f;
-        if (dir.sqrMagnitude > 0.01f)
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 8f);
+        return EnemyVision.Clear(origin, target, transform);
     }
 
     void Show(GameObject go) { if (go) go.SetActive(true); }
     void Hide(GameObject go) { if (go) go.SetActive(false); }
 
-    void OnDeath()
+    protected override void OnBossDeathEffects()
     {
-        if (dead) return;
-        dead = true;
-        StopAllCoroutines();
         Hide(meleeIndicator);
         Hide(burstIndicator);
-        if (agent.enabled) agent.enabled = false;
+    }
 
-        foreach (var r in renderers) if (r != null) r.enabled = false;
-        enabled = false;
-
-        BossHealthUI.HideBoss();
-
+    protected override void OnBossDeathFinish()
+    {
         // Obje YOK EDİLMEZ — ara sahne boss'un transform'una ihtiyaç duyabilir;
         // sahne zaten final akışıyla kapanacak.
         onDefeated?.Invoke();

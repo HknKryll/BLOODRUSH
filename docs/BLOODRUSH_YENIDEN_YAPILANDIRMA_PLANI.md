@@ -356,6 +356,46 @@ taban/state-machine iskeleti hedefleniyor.
   (blackout, phase burst, volley, dash vb.) fonksiyonel olarak korunuyor
   — her boss encounter'ı tek tek Editor'de test edilmeli.
 
+> ✅ **UYGULANDI (2026-09-15), test bekliyor**: İki yeni taban sınıf
+> eklendi — `Assets/Scripts/Enemy/EnemyAIBase.cs` (agent/health/oyuncu
+> referans kurulumu, `FacePlayer()`, renderer önbellekleme + skinned mesh
+> culling düzeltmesi, `HandleDeath()` üzerinden tek-seferlik ölüm bildirim
+> zinciri, `IParryable` arayüzünün abstract iskeleti) ve
+> `Assets/Scripts/Enemy/BossAIBase.cs` (`EnemyAIBase`'den türer; boss'a
+> özel 3 fazlı %66/%33 can-yüzdesi modeli, `BossHealthUI` entegrasyonu,
+> ortak `OnDeath` şablonu). `EnemyAI : EnemyAIBase`, `BossAI : BossAIBase`,
+> `ExperimentBossAI : BossAIBase` oldu.
+>
+> **State machine'ler BİLEREK birleştirilmedi** — bkz.
+> `BLOODRUSH_MIMARI_KURALLARI.md`daki "Açık Kalan Kararlar" notu: her
+> sınıfın kendi `State` enum'u ve `Update()`/switch akışı aynen kaldı,
+> taban sınıflar SADECE birebir aynı kurulum/yardımcı kodu topladı.
+>
+> **Kabul kriterinin `EnemyVision` kısmı yerine getirildi**:
+> `ExperimentBossAI`'nin kendi kopyaladığı `HasLineOfSight()` artık
+> `EnemyVision.Clear(origin, target, transform)` çağırıyor (aynı `~0`
+> katman maskesi, aynı kendi-gövde/oyuncu muafiyeti — **tek fark**:
+> `EnemyVision.Clear` ayrıca diğer küçük `EnemyAI` düşmanlarını da engel
+> saymıyor, eski kopya bunu yapmıyordu — kalabalık bir odada
+> ExperimentBossAI'nin oyuncuyu görme/yaylım atma ihtimali eskisine göre
+> hafifçe artabilir, davranış bozucu değil ama test sırasında fark
+> edilebilir). `BossShotgunAttack.HasLineOfSight()` (BossAI'nin kullandığı,
+> ayrı bir composition sınıfı) plan kapsamı dışında bırakıldı — kendi
+> `obstacleMask`'ı var, `EnemyVision.Clear`'ın sabit `~0`'ından farklı
+> davranıyor, birleştirmek maskeleme davranışını değiştirirdi.
+>
+> **Serileştirme güvenliği**: taşınan hiçbir `[SerializeField]` alanının
+> ADI değişmedi (sadece hangi sınıfta tanımlı olduğu değişti) — Unity
+> alan adına göre serileştirdiği için mevcut prefab'lardaki (Player,
+> CH2/CH3 boss'ları) kayıtlı Inspector değerleri bozulmadan kalıyor,
+> script GUID'leri de düzenleme (silme+yeniden oluşturma değil) yoluyla
+> korundu. Hiçbir `.prefab`/`.unity` dosyasında değişiklik gerekmedi.
+>
+> **Test listesi**: küçük düşman (patrol/chase/attack/menzilli varyant/
+> sıçrayıcı), CH2 boss (pompalı, kabza+parry, dash, karanlık faz geçişi,
+> ölünce silah düşürme), final boss/ExperimentBossAI (pençe+parry,
+> sıçrama+çakılma, yaylım, faz patlaması+asit halkası) — hepsi ayrı ayrı.
+
 ### Faz 5 — Dalga Sistemlerini Birleştir
 **Risk**: Orta-Yüksek. **Bağımlılık**: Faz 3 (WaveData), Faz 4 (Enemy AI
 tabanı — spawn edilen düşmanların tipini/kategorisini artık ortak

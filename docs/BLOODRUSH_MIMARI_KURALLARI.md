@@ -187,6 +187,20 @@ Bir refactor'a veya yeni sisteme başlamadan önce:
   adımında `BossAI`/`ExperimentBossAI` gibi karmaşık state setleri için
   ayrıca değerlendirilecek; basit enum+switch (`EnemyAI`'daki gibi) genel
   kural olarak kalıyor.
+
+  > ✅ **Karar (2026-09-15, Faz 4 sırasında)**: enum+switch olarak KALDI,
+  > ayrı state sınıflarına bölünmedi. Gerekçe: `EnemyAI`/`BossAI`/
+  > `ExperimentBossAI`'nin State enum'ları ve Update() akışları birbirinden
+  > yeterince farklı (kısa dövüş/menzilli hibrit vs. faz-tabanlı boss
+  > saldırı setleri) — zorla ortak bir FSM/state-object iskeletine
+  > sıkıştırmak, kullanıcının "davranış korunsun" önceliğine karşı
+  > gereksiz risk taşırdı. Bunun yerine `EnemyAIBase`/`BossAIBase` adında
+  > iki taban sınıf eklendi (`Assets/Scripts/Enemy/EnemyAIBase.cs`,
+  > `BossAIBase.cs`) — SADECE gerçekten birebir aynı olan kurulum/yardımcı
+  > kodu (agent/health/oyuncu referansları, `FacePlayer()`, renderer
+  > önbellekleme, ölüm bildirim zinciri, boss faz/can-barı mantığı)
+  > topluyor; her sınıfın kendi State enum'u ve switch'i olduğu gibi kaldı.
+  > Detay için `BLOODRUSH_YENIDEN_YAPILANDIRMA_PLANI.md` Faz 4 notuna bakın.
 - **Kalıcılık/Save sistemi** (§ `BLOODRUSH_YENIDEN_YAPILANDIRMA_PLANI.md`
   eski Faz 7) bu refactor'ın kapsamı **dışına** alındı — sonradan eklenecek
   ayrı bir mekanik olarak not edildi (2026-09-15 kararı).
