@@ -9,15 +9,22 @@ namespace Bloodrush.Player
 // saklanır (kalıcı). Pause menüsündeki Kontroller paneli Set/ResetDefaults çağırır.
 // Hareket (WASD) ve fare aksiyonları burada DEĞİL — onlar Unity Input axes/mouse.
 //
-// GIRDI BIRLESTIRME (2026-09-15, Refactor plani Faz 2a): depolama katmani
-// (cache/EnsureCache/WriteBack/Set/ResetDefaults) BILEREK KeyCode tabanli
-// birakildi — SettingsPanel.Tabs.cs'teki CaptureRebind() hala legacy Input
-// ile tum KeyCode degerlerini tarayip Set() cagiriyor, ona dokunmadik.
-// Bunun yerine AYNI cache uzerinden okuyan, yeni Input System (Keyboard/Mouse.current)
-// kullanan bir sorgu katmani (Down/Held/Up) EKLENDI. PlayerMovement/PlayerParry/
-// PlayerShoot/GrapplingHook bu yeni katmani kullaniyor; NpcDialogue/InteractionInput/
-// BookSession henuz eski KeyCode-donen ozelliklere (Grapple, Jump vb.) bagli —
-// onlar Faz 2b'de tasinacak. Iki katman ayni cache'i okudugu icin senkron kalirlar.
+// GIRDI BIRLESTIRME (2026-09-15, Refactor plani Faz 2a+2b TAMAMLANDI): depolama
+// katmani (cache/EnsureCache/WriteBack/Set/ResetDefaults) BILEREK KeyCode tabanli
+// birakildi — GameSettings.keyBindings (int[]) semasi hic degismedi, mevcut
+// kayitli ayar dosyalari bozulmadan calismaya devam ediyor. Bunun yerine AYNI
+// cache uzerinden okuyan, yeni Input System (Keyboard/Mouse.current) kullanan
+// bir sorgu katmani eklendi: Down/Held/Up (KeyBindings.Action tabanli tuketiciler
+// icin — PlayerMovement/PlayerParry/PlayerShoot/GrapplingHook/StimulantSystem/
+// PuzzleConsole), DownKey/HeldKey/UpKey (rebind sistemine hic bagli olmayan
+// ham KeyCode alanlari icin — NpcDialogue/BookSession/InteractableBook/
+// SeatInteractable/PresentationSequence/IntroSalonController/Flashlight/
+// ProximityInteractable/EnemyAI debug), ve TryGetAnyKeyDown (SettingsPanel.Tabs.cs'teki
+// CaptureRebind() icin — "hangi tusa basildi" genel tespiti). Proje genelinde
+// Assets/Scripts altinda artik UnityEngine.Input'a gercek bir kod referansi
+// kalmadi (EnemyDebugOverlay.cs haric — o, activeInputHandler ayari degisse
+// bile calismaya devam etsin diye BILEREK #if ile hem eskiyi hem yeniyi
+// destekliyor, dokunulmadi).
 public static class KeyBindings
 {
     // YENI: MoveForward..Fire eklendi. Bunlar eskiden Unity eksenlerinden
@@ -182,6 +189,7 @@ public static class KeyBindings
             case KeyCode.Space:        return Key.Space;
             case KeyCode.Escape:       return Key.Escape;
             case KeyCode.Return:       return Key.Enter;
+            case KeyCode.KeypadEnter:  return Key.NumpadEnter;
             case KeyCode.Tab:          return Key.Tab;
             case KeyCode.Backspace:    return Key.Backspace;
             case KeyCode.LeftControl:  return Key.LeftCtrl;
@@ -206,8 +214,126 @@ public static class KeyBindings
             case KeyCode.Minus:        return Key.Minus;
             case KeyCode.Equals:       return Key.Equals;
             case KeyCode.BackQuote:    return Key.Backquote;
+            case KeyCode.Insert:       return Key.Insert;
+            case KeyCode.Delete:       return Key.Delete;
+            case KeyCode.Home:         return Key.Home;
+            case KeyCode.End:          return Key.End;
+            case KeyCode.PageUp:       return Key.PageUp;
+            case KeyCode.PageDown:     return Key.PageDown;
+            case KeyCode.Pause:        return Key.Pause;
+            case KeyCode.Print:        return Key.PrintScreen;
+            case KeyCode.ScrollLock:   return Key.ScrollLock;
+            case KeyCode.LeftWindows:  return Key.LeftMeta;
+            case KeyCode.RightWindows: return Key.RightMeta;
+            case KeyCode.KeypadPeriod: return Key.NumpadPeriod;
+            case KeyCode.KeypadDivide: return Key.NumpadDivide;
+            case KeyCode.KeypadMultiply: return Key.NumpadMultiply;
+            case KeyCode.KeypadMinus: return Key.NumpadMinus;
+            case KeyCode.KeypadPlus:  return Key.NumpadPlus;
+            case KeyCode.KeypadEquals: return Key.NumpadEquals;
             default:                   return null;
         }
+    }
+
+    // Yukaridakinin tersi — CaptureRebind() "hangi tusa basildi" tespiti icin.
+    // Kapsam yukaridaki ile ayni (gercekci rebind hedefleri); haritalanmamis
+    // egzotik bir tusa basilirsa rebind sessizce yok sayilir (crash yok, veri
+    // bozulmaz — oyuncu baska bir tusa basar).
+    static KeyCode? FromInputSystemKey(Key key)
+    {
+        if (key >= Key.A && key <= Key.Z)
+            return (KeyCode)((int)KeyCode.A + (key - Key.A));
+        if (key >= Key.Digit0 && key <= Key.Digit9)
+            return (KeyCode)((int)KeyCode.Alpha0 + (key - Key.Digit0));
+        if (key >= Key.F1 && key <= Key.F12)
+            return (KeyCode)((int)KeyCode.F1 + (key - Key.F1));
+        if (key >= Key.Numpad0 && key <= Key.Numpad9)
+            return (KeyCode)((int)KeyCode.Keypad0 + (key - Key.Numpad0));
+
+        switch (key)
+        {
+            case Key.Space:        return KeyCode.Space;
+            case Key.Escape:       return KeyCode.Escape;
+            case Key.Enter:        return KeyCode.Return;
+            case Key.NumpadEnter:  return KeyCode.KeypadEnter;
+            case Key.Tab:          return KeyCode.Tab;
+            case Key.Backspace:    return KeyCode.Backspace;
+            case Key.LeftCtrl:     return KeyCode.LeftControl;
+            case Key.RightCtrl:    return KeyCode.RightControl;
+            case Key.LeftShift:    return KeyCode.LeftShift;
+            case Key.RightShift:   return KeyCode.RightShift;
+            case Key.LeftAlt:      return KeyCode.LeftAlt;
+            case Key.RightAlt:     return KeyCode.RightAlt;
+            case Key.UpArrow:      return KeyCode.UpArrow;
+            case Key.DownArrow:    return KeyCode.DownArrow;
+            case Key.LeftArrow:    return KeyCode.LeftArrow;
+            case Key.RightArrow:   return KeyCode.RightArrow;
+            case Key.CapsLock:     return KeyCode.CapsLock;
+            case Key.LeftBracket:  return KeyCode.LeftBracket;
+            case Key.RightBracket: return KeyCode.RightBracket;
+            case Key.Semicolon:    return KeyCode.Semicolon;
+            case Key.Quote:        return KeyCode.Quote;
+            case Key.Comma:        return KeyCode.Comma;
+            case Key.Period:       return KeyCode.Period;
+            case Key.Slash:        return KeyCode.Slash;
+            case Key.Backslash:    return KeyCode.Backslash;
+            case Key.Minus:        return KeyCode.Minus;
+            case Key.Equals:       return KeyCode.Equals;
+            case Key.Backquote:    return KeyCode.BackQuote;
+            case Key.Insert:       return KeyCode.Insert;
+            case Key.Delete:       return KeyCode.Delete;
+            case Key.Home:         return KeyCode.Home;
+            case Key.End:          return KeyCode.End;
+            case Key.PageUp:       return KeyCode.PageUp;
+            case Key.PageDown:     return KeyCode.PageDown;
+            case Key.Pause:        return KeyCode.Pause;
+            case Key.PrintScreen:  return KeyCode.Print;
+            case Key.ScrollLock:   return KeyCode.ScrollLock;
+            case Key.LeftMeta:     return KeyCode.LeftWindows;
+            case Key.RightMeta:    return KeyCode.RightWindows;
+            case Key.NumpadPeriod:   return KeyCode.KeypadPeriod;
+            case Key.NumpadDivide:   return KeyCode.KeypadDivide;
+            case Key.NumpadMultiply: return KeyCode.KeypadMultiply;
+            case Key.NumpadMinus:    return KeyCode.KeypadMinus;
+            case Key.NumpadPlus:     return KeyCode.KeypadPlus;
+            case Key.NumpadEquals:   return KeyCode.KeypadEquals;
+            default:                 return null;
+        }
+    }
+
+    // Bu karede yeni basilan HERHANGI bir tus/fare dugmesi var mi? Rebind
+    // yakalama (SettingsPanel.Tabs.cs) icin — eskiden tum KeyCode enum'unu
+    // Input.GetKeyDown ile tarardi, simdi Keyboard/Mouse.current uzerinden
+    // ayni kapsami (Mouse0-4 dahil, Escape haric — cagiran taraf ayrica
+    // ele aliyor) tarar.
+    public static bool TryGetAnyKeyDown(out KeyCode result)
+    {
+        var kb = Keyboard.current;
+        if (kb != null)
+        {
+            foreach (var control in kb.allKeys)
+            {
+                if (!control.wasPressedThisFrame) continue;
+                if (control.keyCode == Key.Escape) continue;   // cagiran taraf ayri ele aliyor
+                var mapped = FromInputSystemKey(control.keyCode);
+                if (!mapped.HasValue) continue;
+                result = mapped.Value;
+                return true;
+            }
+        }
+
+        var m = Mouse.current;
+        if (m != null)
+        {
+            if (m.leftButton.wasPressedThisFrame)    { result = KeyCode.Mouse0; return true; }
+            if (m.rightButton.wasPressedThisFrame)   { result = KeyCode.Mouse1; return true; }
+            if (m.middleButton.wasPressedThisFrame)  { result = KeyCode.Mouse2; return true; }
+            if (m.backButton.wasPressedThisFrame)    { result = KeyCode.Mouse3; return true; }
+            if (m.forwardButton.wasPressedThisFrame) { result = KeyCode.Mouse4; return true; }
+        }
+
+        result = KeyCode.None;
+        return false;
     }
 
     static ButtonControl ResolveControl(KeyCode kc)
@@ -237,6 +363,14 @@ public static class KeyBindings
     public static bool Down(Action a) { var c = ResolveControl(Get(a)); return c != null && c.wasPressedThisFrame; }
     public static bool Held(Action a) { var c = ResolveControl(Get(a)); return c != null && c.isPressed; }
     public static bool Up(Action a)   { var c = ResolveControl(Get(a)); return c != null && c.wasReleasedThisFrame; }
+
+    // Genel amacli KeyCode sorgusu (Faz 2b) — KeyBindings rebind sistemine hic
+    // bagli olmayan, dogrudan [SerializeField] KeyCode alani tutan tuketiciler icin
+    // (NpcDialogue.talkKey, InteractableBook.interactKey, SeatInteractable'daki
+    // menu navigasyonu vb.). Ayni ResolveControl esleme tablosunu kullanir.
+    public static bool DownKey(KeyCode kc) { var c = ResolveControl(kc); return c != null && c.wasPressedThisFrame; }
+    public static bool HeldKey(KeyCode kc) { var c = ResolveControl(kc); return c != null && c.isPressed; }
+    public static bool UpKey(KeyCode kc)   { var c = ResolveControl(kc); return c != null && c.wasReleasedThisFrame; }
 
     // Fare deltasi — eskiden Input.GetAxisRaw("Mouse X"/"Mouse Y") kullanilirdi.
     // ProjectSettings/InputManager.asset'teki "Mouse X"/"Mouse Y" eksenlerinin

@@ -259,41 +259,33 @@ public partial class SettingsPanel
         ShowTab(SettingsSection.Controls);   // satiri "BEKLENIYOR..." haline getir
     }
 
-    // Rebind dinleyicisi: legacy Input ile, cunku KeyBindings KeyCode tabanli.
-    // (Oyun zaten legacy Input kullaniyor; menu navigasyonu ayri sistemde, carpismaz.)
+    // Rebind dinleyicisi (Faz 2b, 2026-09-15): artik Keyboard/Mouse.current
+    // (yeni Input System) uzerinden — KeyBindings.TryGetAnyKeyDown() tum
+    // klavye/fare basislarini tarayip Set() icin uygun bir KeyCode donuyor.
+    // KeyBindings'in kendi deposu (Set/cache) hala KeyCode tabanli, degismedi.
     void CaptureRebind()
     {
         if (rebindIndex < 0) return;
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (KeyBindings.DownKey(KeyCode.Escape))
         {
             rebindIndex = -1;
             ShowTab(SettingsSection.Controls);
             return;
         }
 
-        foreach (KeyCode k in System.Enum.GetValues(typeof(KeyCode)))
-        {
-            // FARE TUSLARI ARTIK KABUL EDILIYOR (Mouse0-4). Joystick tuslarini atliyoruz:
-            // gamepad navigasyonu menude zaten Input System uzerinden calisiyor, legacy
-            // joystick kodlari yanlislikla atanmasin.
-            if (k == KeyCode.Escape) continue;
-            if (k >= KeyCode.JoystickButton0) continue;
-            if (k > KeyCode.Mouse6 && k < KeyCode.Backspace) continue;   // sayisal bosluklar
-            if (!Input.GetKeyDown(k)) continue;
+        if (!KeyBindings.TryGetAnyKeyDown(out KeyCode k)) return;
 
-            var action  = (KeyBindings.Action)rebindIndex;
-            var cleared = KeyBindings.Set(action, k);
+        var action  = (KeyBindings.Action)rebindIndex;
+        var cleared = KeyBindings.Set(action, k);
 
-            // Cakisma: ayni tusu kullanan eski aksiyon bosaltildi, kullaniciya soyle.
-            conflictNote = cleared.HasValue
-                ? $"“{KeyBindings.DisplayNames[(int)cleared.Value]}” ÇAKIŞTI — BOŞALTILDI, YENİDEN ATA"
-                : null;
+        // Cakisma: ayni tusu kullanan eski aksiyon bosaltildi, kullaniciya soyle.
+        conflictNote = cleared.HasValue
+            ? $"“{KeyBindings.DisplayNames[(int)cleared.Value]}” ÇAKIŞTI — BOŞALTILDI, YENİDEN ATA"
+            : null;
 
-            rebindIndex = -1;
-            ShowTab(SettingsSection.Controls);
-            return;
-        }
+        rebindIndex = -1;
+        ShowTab(SettingsSection.Controls);
     }
 
     // ───────────────── OYUN ─────────────────

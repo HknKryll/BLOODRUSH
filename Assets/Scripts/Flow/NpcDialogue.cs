@@ -1,5 +1,6 @@
 using UnityEngine;
 using Bloodrush.UI;
+using Bloodrush.Player;
 
 namespace Bloodrush.Flow
 {
@@ -86,14 +87,14 @@ public class NpcDialogue : MonoBehaviour
         if (talking)
         {
             if (!inRange) { Close(); return; }               // uzaklaşınca kapat (firstDone bozulmaz)
-            if (Input.GetKeyDown(talkKey)) Advance();
+            if (KeyBindings.DownKey(talkKey)) Advance();
             return;
         }
 
         if (inRange)
         {
             DialogueUI.ShowPrompt(promptText, this, UIIcons.Chat);
-            if (Input.GetKeyDown(talkKey)) Begin();
+            if (KeyBindings.DownKey(talkKey)) Begin();
         }
         else
         {

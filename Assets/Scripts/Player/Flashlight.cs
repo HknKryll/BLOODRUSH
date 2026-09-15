@@ -230,7 +230,7 @@ public class Flashlight : MonoBehaviour
     {
         if (lamp == null) return;
 
-        if (Input.GetKeyDown(toggleKey)) Toggle();
+        if (KeyBindings.DownKey(toggleKey)) Toggle();
 
         // Gecikmeli takip: fener kameranın bakışına yumuşakça yetişir.
         if (followLag > 0f && camTr != null)

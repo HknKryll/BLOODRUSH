@@ -78,7 +78,7 @@ public class SeatInteractable : MonoBehaviour
         {
             DialogueUI.ShowPrompt(sitPrompt, this, UIIcons.Chair);
             promptShown = true;
-            if (Input.GetKeyDown(interactKey) && InteractionInput.TryConsume()) StartCoroutine(Sit());
+            if (KeyBindings.DownKey(interactKey) && InteractionInput.TryConsume()) StartCoroutine(Sit());
         }
         else
         {
@@ -94,17 +94,17 @@ public class SeatInteractable : MonoBehaviour
 
         if (count > 0)
         {
-            if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+            if (KeyBindings.DownKey(KeyCode.S) || KeyBindings.DownKey(KeyCode.DownArrow))
             {
                 selectedIndex = (selectedIndex + 1) % count;
                 ShowMenu();
             }
-            else if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+            else if (KeyBindings.DownKey(KeyCode.W) || KeyBindings.DownKey(KeyCode.UpArrow))
             {
                 selectedIndex = (selectedIndex - 1 + count) % count;
                 ShowMenu();
             }
-            else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+            else if (KeyBindings.DownKey(KeyCode.Return) || KeyBindings.DownKey(KeyCode.KeypadEnter))
             {
                 OpenBook(selectedIndex);
                 return;
@@ -113,7 +113,7 @@ public class SeatInteractable : MonoBehaviour
             {
                 for (int n = 0; n < count; n++)
                 {
-                    if (!Input.GetKeyDown((KeyCode)((int)KeyCode.Alpha1 + n))) continue;
+                    if (!KeyBindings.DownKey((KeyCode)((int)KeyCode.Alpha1 + n))) continue;
                     selectedIndex = n;
                     OpenBook(n);
                     return;
@@ -123,7 +123,7 @@ public class SeatInteractable : MonoBehaviour
 
         DialogueUI.ShowPrompt(standPrompt, this, UIIcons.Exit);
         promptShown = true;
-        if (Input.GetKeyDown(interactKey) && InteractionInput.TryConsume()) StartCoroutine(Stand());
+        if (KeyBindings.DownKey(interactKey) && InteractionInput.TryConsume()) StartCoroutine(Stand());
     }
 
     void OpenBook(int index)

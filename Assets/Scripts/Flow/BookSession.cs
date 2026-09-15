@@ -68,10 +68,10 @@ public class BookSession : MonoBehaviour
     {
         if (data == null) return;
 
-        if (Input.GetKeyDown(KeyCode.Escape)) { CloseInternal(); return; }
+        if (KeyBindings.DownKey(KeyCode.Escape)) { CloseInternal(); return; }
 
         // TryConsume: kapatan/sayfa çeviren E'nin aynı frame'de koltuğu da tetiklemesini önler.
-        if (!Input.GetKeyDown(key) || !InteractionInput.TryConsume()) return;
+        if (!KeyBindings.DownKey(key) || !InteractionInput.TryConsume()) return;
 
         if (page < data.PageCount - 1) { page++; ShowPage(); }
         else                            CloseInternal();

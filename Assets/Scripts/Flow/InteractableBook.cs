@@ -1,5 +1,6 @@
 using UnityEngine;
 using Bloodrush.UI;
+using Bloodrush.Player;
 
 namespace Bloodrush.Flow
 {
@@ -47,7 +48,7 @@ public class InteractableBook : MonoBehaviour
         {
             DialogueUI.ShowPrompt(promptText, this, UIIcons.Book);
             promptShown = true;
-            if (Input.GetKeyDown(interactKey) && InteractionInput.TryConsume())
+            if (KeyBindings.DownKey(interactKey) && InteractionInput.TryConsume())
             {
                 ClearPrompt();
                 BookSession.Open(data, interactKey);

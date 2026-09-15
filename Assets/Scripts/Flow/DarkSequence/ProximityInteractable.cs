@@ -1,5 +1,6 @@
 using UnityEngine;
 using Bloodrush.UI;
+using Bloodrush.Player;
 
 namespace Bloodrush.Flow
 {
@@ -55,7 +56,7 @@ public abstract class ProximityInteractable : MonoBehaviour
             DialogueUI.ShowPrompt(prompt, this, PromptIcon);
             promptShown = true;
 
-            if (Input.GetKeyDown(interactKey) && InteractionInput.TryConsume())
+            if (KeyBindings.DownKey(interactKey) && InteractionInput.TryConsume())
             {
                 ClearPrompt();
                 OnInteract();

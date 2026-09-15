@@ -38,7 +38,7 @@ public class StimulantSystem : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyBindings.Stimulant))
+        if (KeyBindings.Down(KeyBindings.Action.Stimulant))
             UseStimulant();
     }
 

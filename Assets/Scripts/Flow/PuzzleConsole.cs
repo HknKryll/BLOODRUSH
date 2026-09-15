@@ -64,7 +64,7 @@ public class PuzzleConsole : MonoBehaviour
             if (prompt.enabled != show) prompt.enabled = show;
         }
 
-        if (show && Input.GetKeyDown(KeyBindings.Interact))
+        if (show && KeyBindings.Down(KeyBindings.Action.Interact))
             lockCtrl.OnConsoleActivated(this);
     }
 

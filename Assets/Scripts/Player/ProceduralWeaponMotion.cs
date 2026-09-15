@@ -163,8 +163,9 @@ public class ProceduralWeaponMotion : MonoBehaviour
             target += Vector3.forward * grappleExtend;
 
         // ── Fare Sway ─────────────────────────
-        float mx = Input.GetAxisRaw("Mouse X");
-        float my = Input.GetAxisRaw("Mouse Y");
+        Vector2 mouseDelta = KeyBindings.MouseDelta;
+        float mx = mouseDelta.x;
+        float my = mouseDelta.y;
         Vector3 swayTarget = new Vector3(-mx, -my, 0f) * swayAmount;
         swayPos = Vector3.Lerp(swayPos, swayTarget, Time.deltaTime * swaySmoothing);
 

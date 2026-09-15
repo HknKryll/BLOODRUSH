@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 // oturma pozuna kayar → fade → sonraki sahne.
 using Bloodrush.UI;
 using Bloodrush.Player;
+using Bloodrush.Player;
 
 namespace Bloodrush.Flow
 {
@@ -93,7 +94,7 @@ public class IntroSalonController : MonoBehaviour
         bool canSit = dist <= sitRange && dot >= sitLookDot;
         if (promptLabel) promptLabel.enabled = canSit;
 
-        if (canSit && Input.GetKeyDown(KeyCode.E))
+        if (canSit && KeyBindings.DownKey(KeyCode.E))
             StartCoroutine(SitAndExit());
     }
 

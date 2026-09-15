@@ -101,7 +101,7 @@ public class PresentationSequence : MonoBehaviour
 
     void Update()
     {
-        if (playing && allowSkip && Input.GetKeyDown(skipKey))
+        if (playing && allowSkip && KeyBindings.DownKey(skipKey))
         {
             StartCoroutine(SkipOut());
             return;
@@ -120,7 +120,7 @@ public class PresentationSequence : MonoBehaviour
             DialogueUI.ShowPrompt(sitPrompt, this);
             promptShown = true;
 
-            if (Input.GetKeyDown(interactKey) && InteractionInput.TryConsume())
+            if (KeyBindings.DownKey(interactKey) && InteractionInput.TryConsume())
             {
                 ClearPrompt();
                 StartCoroutine(Run());

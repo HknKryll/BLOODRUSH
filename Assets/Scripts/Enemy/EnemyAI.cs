@@ -277,7 +277,7 @@ public class EnemyAI : MonoBehaviour, IParryable
     {
         if (player == null) return;
 
-        if (Input.GetKeyDown(KeyCode.F1)) {
+        if (KeyBindings.DownKey(KeyCode.F1)) {
         NavMeshPath p = new NavMeshPath();
         agent.CalculatePath(player.position, p);
         Debug.Log($"{name} -> {p.status} | corners: {p.corners.Length}");

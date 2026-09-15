@@ -201,6 +201,49 @@ diyalog, kitap etkileşimi — aynı anda etkiliyor; otomatik test yok).
   yeni Input System üzerinden çalışıyor; `KeyBindings.cs` tamamen
   kaldırılmış, legacy `Input` sınıfına hiçbir yeni referans yok.
 
+> ✅ **UYGULANDI (2026-09-15), test bekliyor — plandan daha geniş kapsamlı**:
+> Kod taraması, planın öngördüğü 3 dosyanın (`NpcDialogue`, `InteractionInput`,
+> `BookSession`) çok ötesinde, projenin **13 farklı dosyasının** hâlâ
+> legacy `Input.Get*` kullandığını ortaya çıkardı — bunların çoğu, bu
+> plan yazıldıktan SONRA keşfedilen sistemlerdi (Karanlık Sekans'ın
+> `ProximityInteractable` tabanı, `PuzzleConsole`, `PresentationSequence`,
+> `SeatInteractable`'ın kitap-seçim menüsü, `IntroSalonController`,
+> `Flashlight`, `ProceduralWeaponMotion`'ın silah sway'i, `StimulantSystem`,
+> `EnemyAI`'daki bir F1 debug tuşu). Hepsi de taşındı.
+>
+> **`KeyBindings.cs` "tamamen kaldırılmadı"** — bilinçli bir sapma: dosya
+> hâlâ var ve depolama katmanı (`KeyCode[]` cache, `GameSettings.keyBindings`
+> int[] şeması) **hiç değişmedi**. Gerekçe: şemayı Input-System-binding-path
+> string'lerine çevirmek, kayıtlı ayar dosyalarının (`bloodrush_settings.json`)
+> geçersiz kalması riskini taşıyordu ve hiçbir işlevsel fayda getirmiyordu —
+> zaten yeni sorgu katmanı `Keyboard.current`/`Mouse.current` üzerinden
+> okuyup eski `KeyCode` cache'ini sadece "hangi fiziksel tuş" bilgisi
+> olarak kullanıyor. Bunun yerine üç yeni API eklendi:
+> - `Down/Held/Up(Action)` — rebind edilebilir aksiyonlar için (Faz 2a'da eklenmişti)
+> - `DownKey/HeldKey/UpKey(KeyCode)` — rebind sistemine hiç bağlı olmayan
+>   ham `KeyCode` alanları için (örn. `NpcDialogue.talkKey`)
+> - `TryGetAnyKeyDown(out KeyCode)` — `CaptureRebind()`'in "hangi tuşa
+>   basıldı" genel tespiti için; `KeyCode↔Key` eşleme tablosu gerçekçi
+>   rebind hedeflerini kapsıyor (harfler, rakamlar, F1-F12, yön tuşları,
+>   noktalama, Numpad, Insert/Delete/Home/End/PageUp/PageDown vb.) —
+>   haritalanmamış egzotik bir tuşa basılırsa rebind sessizce yok sayılır,
+>   hata vermez.
+>
+> **Bilerek dokunulmayan tek dosya**: `EnemyDebugOverlay.cs` (F3 debug
+> paneli) — zaten kendi içinde `#if ENABLE_INPUT_SYSTEM` /
+> `#if ENABLE_LEGACY_INPUT_MANAGER` ile **her iki sistemi de** destekleyecek
+> şekilde tasarlanmıştı, ona dokunmak gereksizdi.
+>
+> `Assets/TextMesh Pro/Examples & Extras/` altındaki legacy Input
+> kullanımları (TMP paketinin kendi demo scriptleri, oyunda hiç
+> kullanılmıyor) kapsam dışı bırakıldı.
+>
+> **Test listesi (Faz 2a'nınkine ek olarak)**: NPC ile konuşma (E),
+> kitap okuma (E ile aç/sayfa çevir, Esc ile kapat), okuma köşesi
+> (otur, W/S ile kitap seç, Enter veya sayı tuşuyla aç, E ile kalk),
+> el feneri (F), uyarıcı kullanma (C), ayarlardan tuş yeniden atama
+> (Kontroller sekmesi — birkaç farklı tuşu ve fare tuşunu deneyerek).
+
 ### Faz 3 — Veri Katmanı: ScriptableObject
 **Risk**: Orta-Yüksek (denge değerlerinin taşınması, dikkatli test
 gerekir). **Bağımlılık**: Faz 1.
