@@ -257,11 +257,15 @@ sessizce kırılır. **Öneri**: hiçbir dosyayı silme; CH2.unity'de
 proje-içi kopyaya değiştir). Bu bir "gereksiz dosya" maddesi değil,
 "kırılgan bağımlılık" maddesi — Faz 3'ten çıkarıp ayrı not ediyorum.
 
-### 4.3 `Audio/damage.wav` = `Audio/mixkit-fast-blow-2144.wav` (197 KB)
-Aynı ses dosyası iki farklı isimle mevcut. Hangi isim kod içinde
-referans ediliyorsa (`grep "damage.wav\|mixkit-fast-blow"`  ile
-`AudioClip` alanlarını kontrol et — muhtemelen Inspector'da direkt
-dosya referansı var, isim önemli değil) o kalsın, diğeri silinsin.
+### 4.3 `Audio/damage.wav` = `Audio/mixkit-fast-blow-2144.wav` (197 KB) — **DÜZELTME: sil durumu değil**
+GUID taraması yapıldı: ikisi de gerçekten kullanılıyor, farklı
+prefab'lardan — `damage.wav` → `Enemy.prefab`/`Enemy2.prefab`
+(OutdoorsScene'in eski prototipleri), `mixkit-fast-blow-2144.wav` →
+`Assets/Characters/BuyukDusman/...prefab` ve
+`Assets/Characters/CrimsonWretch/dusman1.prefab` (yeni konsolide
+edilen canlı karakterler). Aynı `vfx_Explosion_01` durumu gibi —
+tesadüfen aynı içerikli ama ayrı ayrı kullanılan iki dosya.
+**İkisi de kalıyor, silinmiyor.**
 
 ### 4.4 `Scenes/CH3` ve `Scenes/CH4` içindeki `VolumeProfileAsset.png`/`Volume.png` (düşük öncelik)
 Muhtemelen HDRP'nin sahne başına otomatik ürettiği Volume önizleme
@@ -320,11 +324,19 @@ değil, "henüz kullanılmayan gelecek içerik". `ArmoredHazard.prefab` da
 aynı şekilde bir düşman varyantı gibi duruyor.
 
 **Karar (2026-09-15)**: "Sonradan ekleme maliyeti çok değilse silebilirsin,
-ama yedek için bir klasöre atabiliriz." Bu 6 prefab kalıcı silinmeyecek —
+ama yedek için bir klasöre atabiliriz." Bu prefab'lar kalıcı silinmedi —
 `_Yedek_Silinecekler/Prefabs_Kullanilmayan/` klasörüne taşınacak. Böylece
 `Assets/`'ten çıkıyorlar (proje temizleniyor) ama fiziksel olarak
 duruyorlar — ileride bu düşman tipleri oyuna girerse maliyetsiz geri
 taşınabilir.
+
+> ✅ **UYGULANDI (2026-09-15)**: `ArmoredHazard.prefab`, `EnemyBig.prefab`,
+> `HighSpeedEnemy.prefab` (+ sadece onun kullandığı `HighSpeedEnemy.fbx`),
+> `Cube.prefab`, `HorizontalBlock.prefab` — hepsi `_Yedek_Silinecekler/Prefabs_Kullanilmayan/`'a
+> taşındı (`Door.prefab` zaten Faz 1'de silinmişti). `EnemyBig.prefab`'ın
+> kullandığı `Enemy2Character.fbx` **taşınmadı** — GUID kontrolüyle hâlâ
+> `Enemy2.prefab` (OutdoorsScene'de canlı) tarafından paylaşıldığı
+> doğrulandı.
 
 **Kapı prefabı netleşti (GUID doğrulaması yapıldı)**: `Assets/door.prefab`
 (kök, küçük harf `d`) **`Assets/Scenes/CH4.unity` tarafından kullanılıyor**
@@ -427,9 +439,8 @@ Animator Controller'ının/materyalin referanslarının bu taşımadan sonra
 hâlâ doğru çalıştığı Editor'de tek tek doğrulanmalı.
 
 ### 6.2 Kök seviyedeki başıboş dosyalar
-- `Assets/door.prefab` → `Assets/Prefabs/Environment/` (bu adımda artık
-  isim çakışması yok — ölü `Door.prefab`, büyük harf, zaten Faz 1'de
-  silinmiş olacak, bkz. §2 ve §5.2)
+- ✅ **UYGULANDI**: `Assets/door.prefab` → `Assets/Prefabs/Environment/door.prefab`
+  taşındı (ölü `Door.prefab` zaten Faz 1'de silinmişti, çakışma yok).
 - `Assets/DefaultNetworkPrefabs.asset` → zaten
   `BLOODRUSH_YENIDEN_YAPILANDIRMA_PLANI.md` Faz 1'de Netcode paketiyle
   birlikte silinmesi planlanmış, bu planla çakışmıyor.
@@ -503,10 +514,11 @@ Kullanıcı isteği üzerine `Prefabs/Characters/` ve `Prefabs/Weapons/`
 genelinde benzer prefab-adı/kaynak-model-adı case uyuşmazlıkları için
 tarama yapıldı (prefab ile aynı isimdeki `.fbx`/`.obj` dosyaları
 karşılaştırıldı). **Sonuç**: `Boss.prefab`/`boss.fbx` dışında başka bir
-uyuşmazlık bulunamadı — bu tek başına duran bir örnek. **Karar**:
-düzeltilecek — `boss.fbx` → `Boss.fbx` olarak yeniden adlandırılıp
-prefab'ın model referansı Editor'de teyit edilecek (dosya adı değişince
-Unity genelde GUID'i korur ama görsel kontrol önerilir).
+uyuşmazlık bulunamadı — bu tek başına duran bir örnek.
+
+✅ **UYGULANDI (2026-09-15)**: `boss.fbx` → `Boss.fbx` olarak yeniden
+adlandırıldı (GUID korunarak). Editor'de görsel teyit kullanıcı
+tarafından yapılacak.
 
 ### 6.6 Küçük isimlendirme temizlikleri
 - ✅ `Assets/anim/Meshy_AI_Crimson_Wretch_biped/Meshy_AI_Crimson_Wretch_biped 1/` — §6.1 konsolidasyonuyla ortadan kalktı (canlı gövde `Assets/Characters/CrimsonWretch/Rig/`'e taşındı)
