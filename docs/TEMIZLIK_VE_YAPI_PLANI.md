@@ -140,6 +140,13 @@ test edilmeli.
 ## 3. Faz 2 — Kontrol Sonrası Silinecekler
 **Risk: Düşük — kontrol tamamlandı (2026-09-15), silinebilir.**
 
+> ✅ **UYGULANDI (2026-09-15)**: 3 yabancı format dosyası (`.tres`/`.usdc`/`.mtlx`)
+> ve 3 `.blend` kaynak dosyası `git rm` ile silindi (yanlarındaki
+> `textures/` alt klasörleri dokunulmadan korundu). `plastered_wall_02_4k.blend/`
+> klasörü ve eşlik eden `.meta`'sı `plastered_wall_02_4k/` olarak
+> `git mv` ile yeniden adlandırıldı — GUID'ler korunarak (rename olarak
+> izlendi, içerik/GUID değişmedi).
+
 | Öğe | Yol | Sonuç |
 |---|---|---|
 | `.tres`/`.usdc`/`.mtlx` (3 dosya) | `Assets/Ch1 Palette/metalzeminch2/Metal024_2K-JPG.{tres,usdc,mtlx}` | Bunlar Godot/USD/MaterialX formatı — Unity'nin import pipeline'ı hiç tanımıyor. **Doğrudan silinebilir**. |
