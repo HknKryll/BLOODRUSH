@@ -4,6 +4,7 @@ using UnityEngine.AI;
 using UnityEngine.Events;
 using Bloodrush.Shared;
 using Bloodrush.Shared.Audio;
+using Bloodrush.Shared.Pooling;
 using Bloodrush.FX;
 using Bloodrush.Player;
 using Bloodrush.UI;
@@ -251,7 +252,7 @@ public class ExperimentBossAI : BossAIBase
             dir = Quaternion.Euler(Random.Range(-volleySpread, volleySpread),
                                    Random.Range(-volleySpread, volleySpread), 0f) * dir;
 
-        var proj = Instantiate(projectilePrefab, origin, Quaternion.LookRotation(dir));
+        var proj = PoolManager.Get(projectilePrefab, origin, Quaternion.LookRotation(dir));
         proj.Launch(dir, projectileSpeed, projectileDamage);
         sfx.Play(volleyClip, volleyVolume);
     }

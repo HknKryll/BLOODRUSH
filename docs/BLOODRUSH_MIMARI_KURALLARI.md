@@ -86,6 +86,16 @@ düşman spawn'ları) merkezi bir `PoolManager` üzerinden yönetilir.
   ve Enemy AI ortak tabanı oturduktan **sonra** kurulacak — böylece aynı
   entegrasyon işi iki kez yapılmaz. Detay: `BLOODRUSH_YENIDEN_YAPILANDIRMA_PLANI.md`.
 
+> ✅ **UYGULANDI (2026-09-15)**: `Assets/Scripts/Shared/Pooling/IPoolable.cs`
+> + `PoolManager.cs`. `PoolManager.Get<T>(prefab, pos, rot)` prefab-tabanlı
+> nesneler için (`LauncherProjectile`, `EnemyProjectile`); prefab'ı OLMAYAN,
+> kod-içinde prosedürel kurulan nesneler için (`HitEffect`, `BloodEffect` —
+> `new GameObject()+AddComponent` ile kuruluyorlardı) ikinci bir aşırı
+> yüklenmiş `Get<T>(pos, rot)` eklendi — ilk çağrıda gizli bir şablon
+> oluşturup ondan çoğaltıyor. **Düşman spawn'ları (Faz 5'in birleşik
+> `WaveDirector`'ı) bilerek pool'lanmadı** — bkz.
+> `BLOODRUSH_YENIDEN_YAPILANDIRMA_PLANI.md` Faz 6 notu, gerekçe orada.
+
 ---
 
 ## 4. Adlandırma ve Namespace Kuralları

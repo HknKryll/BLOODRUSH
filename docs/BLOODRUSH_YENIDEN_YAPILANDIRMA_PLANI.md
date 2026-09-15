@@ -476,6 +476,57 @@ iki kez entegrasyon işi yapılmıyor**).
   çağrısı kalmıyor (tek seferlik nesneler — `WeaponPickup`,
   `AmmoPickup` — muaf).
 
+> ✅ **UYGULANDI (2026-09-15), test bekliyor — kısmi kapsam (bkz. aşağı)**:
+> `Assets/Scripts/Shared/Pooling/IPoolable.cs` + `PoolManager.cs` eklendi.
+> `PoolManager` ilk kullanımda kendini lazy oluşturan bir singleton
+> (`DontDestroyOnLoad` KULLANILMIYOR — her sahne kendi havuzuyla başlar/
+> biter, bölümler arası bayat referans riski yok). İki `Get<T>` aşırı
+> yüklemesi var: prefab-tabanlı (`LauncherProjectile`/`EnemyProjectile`)
+> ve prefab'sız/şablon-tabanlı (`HitEffect`/`BloodEffect` — ikisi de
+> `new GameObject()+AddComponent` ile prosedürel kuruluyordu, gerçek bir
+> prefab'ları hiç yoktu; ilk `Get<T>()` çağrısında gizli bir şablon
+> oluşturulup ondan çoğaltılıyor).
+>
+> **4 tüketici de dönüştürüldü**: `LauncherProjectile` (grenade/flash —
+> `PlayerShoot.SpawnProjectile`), `EnemyProjectile` (küçük düşman menzilli
+> ateşi + `ExperimentBossAI`'nin yaylımı), `HitEffect`/`BloodEffect`
+> (`PlayerFirearm`'ın isabet efektleri). Her birinde eskiden `Start()`'ta
+> olan "sıfırdan kurulum" mantığı `OnSpawned()`'a taşındı (Start() havuzda
+> sadece İLK üreyimde bir kez çalışır), `Destroy(gameObject, ...)` çağrıları
+> `PoolManager.Release(...)`'a çevrildi. `EnemyProjectile`'ın
+> `TrailRenderer`'ı artık `OnSpawned()`'da `.Clear()` ediliyor (yoksa
+> önceki uçuşun izi görünürdü). `BloodEffect`'in `ParticleSystem`'i artık
+> get-or-add (bir GameObject'e ikinci `ParticleSystem` eklenemez) —
+> yeniden kullanımda AYNI bileşen sıfırdan yapılandırılıyor.
+>
+> **Bilerek tam çözülmeyen bir verimlilik notu**: `HitEffect.Spark()`
+> her kıvılcım için `new Material(...)` oluşturuyor (5-8 kıvılcım × her
+> isabet), `BloodEffect` de kendi renderer'ı için aynısını yapıyor — üst
+> seviye GameObject'i pool'lamak bunu ÇÖZMÜYOR, çünkü asıl GC/GPU
+> maliyeti bu iç materyal alaşımında. Bu ayrı, daha küçük bir iyileştirme
+> fırsatı (materyal önbellekleme) — bu faz kapsamına dahil edilmedi.
+>
+> **BİLEREK KAPSAM DIŞI BIRAKILDI — düşman spawn'ları (WaveDirector)**:
+> plan bunu bir tüketici olarak listeliyordu ama düşman nesneleri (`EnemyAI`/
+> `BossAI`/`ExperimentBossAI`) mermi/efektlerden ÇOK daha zengin durum
+> taşıyor (NavMeshAgent, Health, FSM state, stun/knockback/leap bayrakları,
+> renderer'lar, Faz 4'te yeni oturmuş `EnemyAIBase` altyapısı). Doğru
+> havuzlama, `EnemyAIBase`'e tam bir "yeniden doğuş" sözleşmesi eklemeyi
+> gerektirir (`Health.Revive()`, FSM'i Patrol'e sıfırlama, agent'ı yeniden
+> etkinleştirip warp'lama, tüm bayrakları temizleme) — bunu bu genel
+> altyapı commit'ine sessizce bindirmek yerine, ayrı ve TEK BAŞINA test
+> edilebilir bir faz olarak bırakmak daha güvenli. `WaveData.enemyPoolSize`
+> alanı bu ileriki iş için hazır duruyor ama henüz okunmuyor. Düşman
+> spawn'ları hâlâ düz `Instantiate`, ölüm hâlâ `Destroy`/`enabled=false`
+> ile hallediliyor (Faz 4'te değişmedi).
+>
+> **Test listesi**: launcher (grenade/flash) art arda ateşleme (havuzdan
+> geri gelen mermi doğru davranıyor mu — hız/fuse/patlama), menzilli küçük
+> düşmanların ateşi + final boss'un yaylımı (iz/hasar/ıska tespiti bozuk
+> değil), her isabet/kan efektinin görsel olarak eskisiyle aynı görünmesi
+> (özellikle art arda hızlı ateşte — havuzdan dönen efektin "bayat" bir
+> önceki isabetin izini taşımadığından emin olun).
+
 ### Faz 7 — Hafif CI
 **Risk**: Düşük. **Bağımlılık**: Yok, herhangi bir zamanda eklenebilir.
 

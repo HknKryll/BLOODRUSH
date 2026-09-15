@@ -1,17 +1,35 @@
 using System.Collections;
 using UnityEngine;
+using Bloodrush.Shared.Pooling;
 
 namespace Bloodrush.Player
 {
-public class HitEffect : MonoBehaviour
+public class HitEffect : MonoBehaviour, IPoolable
 {
-    void Start()
+    const float lifetime = 0.25f;
+
+    // Havuzdan her alınışta sıfırdan kurulur (bkz. IPoolable) — eskiden Start()'taydı,
+    // Start() havuzlanan bir nesnede sadece İLK üreyiminde bir kez çalışır.
+    public void OnSpawned()
     {
         int count = Random.Range(5, 9);
         for (int i = 0; i < count; i++)
             StartCoroutine(Spark());
-        Destroy(gameObject, 0.25f);
+        Invoke(nameof(ReleaseSelf), lifetime);
     }
+
+    public void OnDespawned()
+    {
+        CancelInvoke();
+        StopAllCoroutines();
+        // Onceki omurden kalmis olabilecek kivilcim cocuklarini (Spark()'in kendi
+        // child GameObject'leri) temizle — normalde kendi sureleri (0.07-0.18 sn)
+        // bu 0.25 sn'lik omurden once dolup kendini yok eder, ama savunmacı olsun.
+        for (int i = transform.childCount - 1; i >= 0; i--)
+            Destroy(transform.GetChild(i).gameObject);
+    }
+
+    void ReleaseSelf() => PoolManager.Release(gameObject);
 
     IEnumerator Spark()
     {
@@ -40,15 +58,15 @@ public class HitEffect : MonoBehaviour
         Vector3 dir = (transform.forward * Random.Range(0.3f, 1f)
                      + Random.insideUnitSphere * 0.8f).normalized;
 
-        float speed    = Random.Range(4f, 9f);
-        float lifetime = Random.Range(0.07f, 0.18f);
-        float elapsed  = 0f;
-        Vector3 tip    = origin;
+        float speed      = Random.Range(4f, 9f);
+        float sparkLife  = Random.Range(0.07f, 0.18f);
+        float elapsed    = 0f;
+        Vector3 tip      = origin;
 
-        while (elapsed < lifetime)
+        while (elapsed < sparkLife)
         {
             elapsed += Time.deltaTime;
-            float t = elapsed / lifetime;
+            float t = elapsed / sparkLife;
 
             dir.y -= 9.8f * Time.deltaTime * 0.4f;
             tip   += dir * speed * Time.deltaTime;

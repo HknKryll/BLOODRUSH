@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using Bloodrush.Flow;
 using Bloodrush.Weapons;
 using Bloodrush.Shared.Audio;
+using Bloodrush.Shared.Pooling;
 
 namespace Bloodrush.Player
 {
@@ -214,7 +215,7 @@ public class PlayerShoot : MonoBehaviour
     {
         // Prefab/namlu atanmamışsa sessizce çık — eksik referans oyunu patlatmasın.
         if (prefab == null || launcherBarrel == null) return;
-        var proj = Instantiate(prefab, launcherBarrel.position, playerCamera.transform.rotation);
+        var proj = PoolManager.Get(prefab, launcherBarrel.position, playerCamera.transform.rotation);
         proj.Launch(playerCamera.transform.forward * launchSpeed);
     }
 

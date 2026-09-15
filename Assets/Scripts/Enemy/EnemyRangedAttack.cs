@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using Bloodrush.Shared.Audio;
+using Bloodrush.Shared.Pooling;
 using Bloodrush.Player;
 using Bloodrush.FX;
 
@@ -103,7 +104,7 @@ public class EnemyRangedAttack
             dir = Quaternion.Euler(Random.Range(-spreadAngle, spreadAngle),
                                    Random.Range(-spreadAngle, spreadAngle), 0f) * dir;
 
-        var proj = UnityEngine.Object.Instantiate(projectilePrefab, origin, Quaternion.LookRotation(dir));
+        var proj = PoolManager.Get(projectilePrefab, origin, Quaternion.LookRotation(dir));
         proj.Launch(dir, projectileSpeed, projectileDamage, enemy);
         sfx.Play(attackClip, attackVolume);
         MuzzleFlash.Spawn(origin, muzzle);   // görünür ateş flaşı (namluda çakar)

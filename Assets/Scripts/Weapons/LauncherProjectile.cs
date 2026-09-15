@@ -1,11 +1,12 @@
 using UnityEngine;
 using Bloodrush.Shared;
+using Bloodrush.Shared.Pooling;
 using Bloodrush.Enemy;
 
 namespace Bloodrush.Weapons
 {
 [RequireComponent(typeof(Rigidbody))]
-public class LauncherProjectile : MonoBehaviour
+public class LauncherProjectile : MonoBehaviour, IPoolable
 {
     [Header("Ortak")]
     [SerializeField] float fuseTime = 3f;
@@ -25,7 +26,17 @@ public class LauncherProjectile : MonoBehaviour
 
     void Awake() => rb = GetComponent<Rigidbody>();
 
-    void Start() => Invoke(nameof(Detonate), fuseTime);
+    // Havuzdan her alınışta sıfırdan kurulur (bkz. IPoolable) — eskiden Start()'taydı,
+    // Start() havuzlanan bir nesnede sadece İLK üreyiminde bir kez çalışır.
+    public void OnSpawned()
+    {
+        detonated = false;
+        rb.velocity        = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        Invoke(nameof(Detonate), fuseTime);
+    }
+
+    public void OnDespawned() => CancelInvoke();
 
     public void Launch(Vector3 velocity)
     {
@@ -52,7 +63,7 @@ public class LauncherProjectile : MonoBehaviour
                 ApplyBlast(col);
         }
 
-        Destroy(gameObject);
+        PoolManager.Release(gameObject);
     }
 
     void ApplyBlast(Collider col)

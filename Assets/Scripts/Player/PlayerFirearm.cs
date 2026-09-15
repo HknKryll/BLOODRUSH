@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using Bloodrush.Shared;
 using Bloodrush.Shared.Audio;
+using Bloodrush.Shared.Pooling;
 using Bloodrush.Enemy;
 using Bloodrush.Weapons;
 using Bloodrush.UI;
@@ -128,20 +129,10 @@ public class PlayerFirearm
         isReloading  = false;
     }
 
-    static void SpawnHitEffect(Vector3 point, Vector3 normal)
-    {
-        var go = new GameObject("HitFX");
-        go.transform.position = point;
-        go.transform.rotation = Quaternion.LookRotation(normal);
-        go.AddComponent<HitEffect>();
-    }
+    static void SpawnHitEffect(Vector3 point, Vector3 normal) =>
+        PoolManager.Get<HitEffect>(point, Quaternion.LookRotation(normal));
 
-    static void SpawnBloodEffect(Vector3 point, Vector3 normal)
-    {
-        var go = new GameObject("BloodFX");
-        go.transform.position = point;
-        go.transform.rotation = Quaternion.LookRotation(normal);
-        go.AddComponent<BloodEffect>();
-    }
+    static void SpawnBloodEffect(Vector3 point, Vector3 normal) =>
+        PoolManager.Get<BloodEffect>(point, Quaternion.LookRotation(normal));
 }
 }

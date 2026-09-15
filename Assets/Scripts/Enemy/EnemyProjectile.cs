@@ -3,15 +3,18 @@ using UnityEngine;
 // Menzilli düşmanların attığı kaçılabilir mermi. İleri uçar, oyuncuya değince
 // hasar verir, duvara değince/süresi dolunca yok olur.
 using Bloodrush.Shared;
+using Bloodrush.Shared.Pooling;
 using Bloodrush.Player;
 
 namespace Bloodrush.Enemy
 {
-public class EnemyProjectile : MonoBehaviour
+public class EnemyProjectile : MonoBehaviour, IPoolable
 {
+    const float lifeDuration = 5f;
+
     float speed;
     float damage;
-    float life = 5f;
+    float life = lifeDuration;
 
     [Tooltip("Carpma taramasinin yaricapi (m). Buyuk = daha affedici isabet.")]
     [SerializeField] float hitRadius = 0.22f;
@@ -44,13 +47,16 @@ public class EnemyProjectile : MonoBehaviour
     Transform shooter;
     Vector3   prevPos;
 
+    TrailRenderer trail;
+
     void Awake()
     {
         // Asset'siz parlak iz (tracer) — gelen ateş net görünür. Prefab'a zaten
         // TrailRenderer eklenmemişse ekle.
-        if (GetComponent<TrailRenderer>() == null)
+        trail = GetComponent<TrailRenderer>();
+        if (trail == null)
         {
-            var trail = gameObject.AddComponent<TrailRenderer>();
+            trail = gameObject.AddComponent<TrailRenderer>();
             trail.time            = trailTime;
             trail.startWidth      = trailWidth;
             trail.endWidth        = 0f;
@@ -58,6 +64,18 @@ public class EnemyProjectile : MonoBehaviour
             trail.sharedMaterial  = GetTrailMat();
         }
     }
+
+    // Havuzdan her alınışta sıfırdan kurulur (bkz. IPoolable) — bayat iz/mesafe
+    // verisi önceki uçuştan taşınmasın.
+    public void OnSpawned()
+    {
+        life = lifeDuration;
+        closestApproach = float.MaxValue;
+        shooter = null;
+        trail.Clear();
+    }
+
+    public void OnDespawned() { }
 
     static Material GetTrailMat()
     {
@@ -132,7 +150,7 @@ public class EnemyProjectile : MonoBehaviour
                               $"(layer {LayerMask.LayerToName(hit.collider.gameObject.layer)}, " +
                               $"{hit.distance:0.00} m sonra). " +
                               $"Oyuncuya en yakın mesafe: {closestApproach:0.00} m", this);
-                Destroy(gameObject);
+                PoolManager.Release(gameObject);
                 return;
             }
         }
@@ -146,7 +164,7 @@ public class EnemyProjectile : MonoBehaviour
             if (logHits)
                 Debug.Log($"[EnemyProjectile] ISKA — suresi doldu. " +
                           $"Oyuncuya en yakin mesafe: {closestApproach:0.00} m", this);
-            Destroy(gameObject);
+            PoolManager.Release(gameObject);
         }
     }
 
@@ -164,7 +182,7 @@ public class EnemyProjectile : MonoBehaviour
             Debug.LogWarning("[EnemyProjectile] Oyuncuya degdi ama Health bulunamadi — " +
                              "hasar UYGULANMADI.", this);
         }
-        Destroy(gameObject);
+        PoolManager.Release(gameObject);
     }
 
     // Iska teshisi icin: oyuncuya en fazla ne kadar yaklasti. Sadece log acikken calisir.

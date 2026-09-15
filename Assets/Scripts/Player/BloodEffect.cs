@@ -1,13 +1,21 @@
 using UnityEngine;
 using Bloodrush.FX;
+using Bloodrush.Shared.Pooling;
 
 namespace Bloodrush.Player
 {
-public class BloodEffect : MonoBehaviour
+public class BloodEffect : MonoBehaviour, IPoolable
 {
-    void Start()
+    const float lifetime = 2.5f;
+
+    // Havuzdan her alınışta sıfırdan kurulur (bkz. IPoolable) — eskiden Start()'taydı,
+    // Start() havuzlanan bir nesnede sadece İLK üreyiminde bir kez çalışır.
+    // ParticleSystem ilk seferde eklenir, sonraki her OnSpawned()'da AYNI bileşen
+    // yeniden yapılandırılır (bir GameObject'e ikinci bir ParticleSystem eklenemez).
+    public void OnSpawned()
     {
-        var ps = gameObject.AddComponent<ParticleSystem>();
+        var ps = GetComponent<ParticleSystem>();
+        if (ps == null) ps = gameObject.AddComponent<ParticleSystem>();
         // AddComponent playOnAwake ile hemen oynamaya başlar — süre/emisyon gibi
         // ayarları değiştirmeden önce durdurup, konfigürasyon bitince elle başlatıyoruz.
         ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -38,7 +46,11 @@ public class BloodEffect : MonoBehaviour
         renderer.material   = SoftDotVFX.CreateMaterial(new Color(0.6f, 0f, 0f));
 
         ps.Play();
-        Destroy(gameObject, 2.5f);
+        Invoke(nameof(ReleaseSelf), lifetime);
     }
+
+    public void OnDespawned() => CancelInvoke();
+
+    void ReleaseSelf() => PoolManager.Release(gameObject);
 }
 }
