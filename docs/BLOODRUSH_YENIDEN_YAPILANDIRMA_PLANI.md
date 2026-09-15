@@ -103,6 +103,19 @@ alınmalı — bir şey ters giderse tek fazı geri almak mümkün olsun.
 ### Faz 1 — Ölü Bağımlılıkları Temizle
 **Risk**: Sıfır. **Bağımlılık**: Yok.
 
+> ✅ **UYGULANDI (2026-09-15)**: `com.unity.netcode.gameobjects` ve
+> `com.unity.postprocessing` `Packages/manifest.json`'dan kaldırıldı
+> (`com.unity.transport` zaten manifest'te doğrudan bağımlılık değildi
+> — transitive'di, netcode kalkınca `packages-lock.json`'dan Unity
+> açılışta otomatik düşecek, elle dokunulmadı). `Assets/DefaultNetworkPrefabs.asset`
+> silindi. `FPSHandsWeaponAnimation/` zaten Temizlik planının Faz 1'inde
+> silinmişti (iki plan arasındaki bilinen çakışma, bkz. not). `CasualHit/`
+> dokunulmadı, doğrulandı. Proje genelinde `using Unity.Netcode` veya
+> `using UnityEngine.Rendering.PostProcessing` içeren hiçbir script
+> bulunmadığı grep ile teyit edildi — derleme hatası riski yok. Unity
+> Editor'de doğrulama (proje hatasız açılıyor mu) **kullanıcı tarafından
+> yapılacak**.
+
 - `Packages/manifest.json`: `com.unity.netcode.gameobjects` ve
   `com.unity.transport` paketlerini kaldır.
 - `Assets/DefaultNetworkPrefabs.asset` dosyasını sil.
@@ -243,6 +256,24 @@ iki kez entegrasyon işi yapılmıyor**).
 - Ağır bir unit test paketi şu aşamada gerekmiyor; kritik state
   machine'ler (`PlayerMovement`, birleşmiş Enemy AI tabanı, dalga
   sistemi) olgunlaştıkça ayrıca değerlendirilir.
+
+> ✅ **UYGULANDI (2026-09-15)**: `.github/workflows/unity-build-check.yml`
+> eklendi — `main`'e her push/PR'da `game-ci/unity-builder@v4` ile
+> `StandaloneWindows64` hedefine build alıp sadece derleme hatası olup
+> olmadığını kontrol ediyor (gerçek bir test paketi değil), `Library/`
+> klasörü önbelleğe alınıyor (hız için), LFS dosyaları checkout'ta
+> dahil ediliyor.
+>
+> ⚠️ **Senin yapman gereken tek adım**: bu workflow GitHub repo'sunda
+> `UNITY_LICENSE` (ya da `UNITY_EMAIL`+`UNITY_PASSWORD`) secret'ları
+> tanımlanmadan **çalışmaz** (kimlik doğrulama hatasıyla başarısız
+> olur, kod tabanına zarar vermez, sadece kırmızı X görürsün). Bunlar
+> senin Unity hesap bilgilerin olduğu için ben ekleyemem —
+> `game-ci/unity-builder`'ın "Activation" dokümantasyonundaki adımları
+> izleyip GitHub repo → Settings → Secrets and variables → Actions'a
+> eklemen gerekiyor. İstemezsen workflow dosyasını `.github/workflows/`'tan
+> silmen ya da devre dışı bırakman yeterli, projeye başka hiçbir etkisi
+> yok.
 
 ---
 
