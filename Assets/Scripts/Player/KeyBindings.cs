@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 namespace Bloodrush.Player
 {
@@ -6,6 +8,16 @@ namespace Bloodrush.Player
 // scriptler artık kendi sabit tuşlarını değil bunu kullanır. Atamalar PlayerPrefs'te
 // saklanır (kalıcı). Pause menüsündeki Kontroller paneli Set/ResetDefaults çağırır.
 // Hareket (WASD) ve fare aksiyonları burada DEĞİL — onlar Unity Input axes/mouse.
+//
+// GIRDI BIRLESTIRME (2026-09-15, Refactor plani Faz 2a): depolama katmani
+// (cache/EnsureCache/WriteBack/Set/ResetDefaults) BILEREK KeyCode tabanli
+// birakildi — SettingsPanel.Tabs.cs'teki CaptureRebind() hala legacy Input
+// ile tum KeyCode degerlerini tarayip Set() cagiriyor, ona dokunmadik.
+// Bunun yerine AYNI cache uzerinden okuyan, yeni Input System (Keyboard/Mouse.current)
+// kullanan bir sorgu katmani (Down/Held/Up) EKLENDI. PlayerMovement/PlayerParry/
+// PlayerShoot/GrapplingHook bu yeni katmani kullaniyor; NpcDialogue/InteractionInput/
+// BookSession henuz eski KeyCode-donen ozelliklere (Grapple, Jump vb.) bagli —
+// onlar Faz 2b'de tasinacak. Iki katman ayni cache'i okudugu icin senkron kalirlar.
 public static class KeyBindings
 {
     // YENI: MoveForward..Fire eklendi. Bunlar eskiden Unity eksenlerinden
@@ -137,13 +149,108 @@ public static class KeyBindings
 
     // Hareket eksenleri — eskiden Input.GetAxisRaw("Horizontal"/"Vertical") ile
     // okunuyordu, o yuzden yeniden atanamiyordu. Ayni -1..1 araligini doner.
-    public static float MoveX => (Input.GetKey(MoveRight) ? 1f : 0f) - (Input.GetKey(MoveLeft) ? 1f : 0f);
-    public static float MoveZ => (Input.GetKey(MoveForward) ? 1f : 0f) - (Input.GetKey(MoveBack) ? 1f : 0f);
+    // (Faz 2a: artik Input.GetKey degil, asagidaki yeni Held() kullanir.)
+    public static float MoveX => (Held(Action.MoveRight) ? 1f : 0f) - (Held(Action.MoveLeft) ? 1f : 0f);
+    public static float MoveZ => (Held(Action.MoveForward) ? 1f : 0f) - (Held(Action.MoveBack) ? 1f : 0f);
 
     public static KeyCode Weapon1      => Get(Action.Weapon1);
     public static KeyCode Weapon2      => Get(Action.Weapon2);
     public static KeyCode Weapon3      => Get(Action.Weapon3);
     public static KeyCode Interact     => Get(Action.Interact);
     public static KeyCode Jump         => Get(Action.Jump);
+
+    // ══════════════ YENI INPUT SYSTEM SORGU KATMANI (Faz 2a) ══════════════
+    // Asagidakiler UnityEngine.Input'a HIC dokunmuyor — Keyboard.current /
+    // Mouse.current uzerinden okuyor. Hangi KeyCode'un atali oldugunu yine
+    // yukaridaki (degismemis) cache'ten aliyor, sadece OKUMA yontemi yeni.
+
+    // KeyCode -> Input System Key eslemesi. Rebind UI'da zaten sadece
+    // klavye + Mouse0-4 kabul ediliyor (CaptureRebind, joystick/garip
+    // araliklari eliyor) — bu yuzden tam KeyCode enum'unu degil, gercekci
+    // rebind hedeflerini kapsiyor.
+    static Key? ToInputSystemKey(KeyCode kc)
+    {
+        if (kc >= KeyCode.A && kc <= KeyCode.Z)
+            return (Key)((int)Key.A + (kc - KeyCode.A));
+        if (kc >= KeyCode.Alpha0 && kc <= KeyCode.Alpha9)
+            return (Key)((int)Key.Digit0 + (kc - KeyCode.Alpha0));
+        if (kc >= KeyCode.F1 && kc <= KeyCode.F12)
+            return (Key)((int)Key.F1 + (kc - KeyCode.F1));
+
+        switch (kc)
+        {
+            case KeyCode.Space:        return Key.Space;
+            case KeyCode.Escape:       return Key.Escape;
+            case KeyCode.Return:       return Key.Enter;
+            case KeyCode.Tab:          return Key.Tab;
+            case KeyCode.Backspace:    return Key.Backspace;
+            case KeyCode.LeftControl:  return Key.LeftCtrl;
+            case KeyCode.RightControl: return Key.RightCtrl;
+            case KeyCode.LeftShift:    return Key.LeftShift;
+            case KeyCode.RightShift:   return Key.RightShift;
+            case KeyCode.LeftAlt:      return Key.LeftAlt;
+            case KeyCode.RightAlt:     return Key.RightAlt;
+            case KeyCode.UpArrow:      return Key.UpArrow;
+            case KeyCode.DownArrow:    return Key.DownArrow;
+            case KeyCode.LeftArrow:    return Key.LeftArrow;
+            case KeyCode.RightArrow:   return Key.RightArrow;
+            case KeyCode.CapsLock:     return Key.CapsLock;
+            case KeyCode.LeftBracket:  return Key.LeftBracket;
+            case KeyCode.RightBracket: return Key.RightBracket;
+            case KeyCode.Semicolon:    return Key.Semicolon;
+            case KeyCode.Quote:        return Key.Quote;
+            case KeyCode.Comma:        return Key.Comma;
+            case KeyCode.Period:       return Key.Period;
+            case KeyCode.Slash:        return Key.Slash;
+            case KeyCode.Backslash:    return Key.Backslash;
+            case KeyCode.Minus:        return Key.Minus;
+            case KeyCode.Equals:       return Key.Equals;
+            case KeyCode.BackQuote:    return Key.Backquote;
+            default:                   return null;
+        }
+    }
+
+    static ButtonControl ResolveControl(KeyCode kc)
+    {
+        if (kc >= KeyCode.Mouse0 && kc <= KeyCode.Mouse6)
+        {
+            var m = Mouse.current;
+            if (m == null) return null;
+            switch (kc)
+            {
+                case KeyCode.Mouse0: return m.leftButton;
+                case KeyCode.Mouse1: return m.rightButton;
+                case KeyCode.Mouse2: return m.middleButton;
+                case KeyCode.Mouse3: return m.backButton;
+                case KeyCode.Mouse4: return m.forwardButton;
+                default:             return null;   // Mouse5/6 icin Input System karsiligi yok
+            }
+        }
+
+        var kb = Keyboard.current;
+        if (kb == null) return null;
+        var key = ToInputSystemKey(kc);
+        return key.HasValue ? kb[key.Value] : null;
+    }
+
+    // Aksiyonun bu karede basildi / basili / birakildi mi? (Input.GetKeyDown/GetKey/GetKeyUp yerine)
+    public static bool Down(Action a) { var c = ResolveControl(Get(a)); return c != null && c.wasPressedThisFrame; }
+    public static bool Held(Action a) { var c = ResolveControl(Get(a)); return c != null && c.isPressed; }
+    public static bool Up(Action a)   { var c = ResolveControl(Get(a)); return c != null && c.wasReleasedThisFrame; }
+
+    // Fare deltasi — eskiden Input.GetAxisRaw("Mouse X"/"Mouse Y") kullanilirdi.
+    // ProjectSettings/InputManager.asset'teki "Mouse X"/"Mouse Y" eksenlerinin
+    // sensitivity degeri 0.1 idi (gravity=0, tip=Mouse Movement); Input System'in
+    // ham piksel deltasi bu carpanla ayni davranisi verir. Cagiran taraf (PlayerMovement)
+    // kendi 'sensitivity' alanini ustune carpmaya devam ediyor, formul sekli aynen korunuyor.
+    const float LegacyMouseAxisSensitivity = 0.1f;
+    public static Vector2 MouseDelta
+    {
+        get
+        {
+            var m = Mouse.current;
+            return m != null ? m.delta.ReadValue() * LegacyMouseAxisSensitivity : Vector2.zero;
+        }
+    }
 }
 }

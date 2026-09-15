@@ -79,8 +79,8 @@ public class GrapplingHook : MonoBehaviour
             return;
         }
 
-        if (Input.GetKeyDown(KeyBindings.Grapple)) TryGrapple();
-        if (Input.GetKeyUp(KeyBindings.Grapple))
+        if (KeyBindings.Down(KeyBindings.Action.Grapple)) TryGrapple();
+        if (KeyBindings.Up(KeyBindings.Action.Grapple))
         {
             // Uçuş sırasında bırakmak iptal ETMEZ — kanca varınca kısa çekişle fırlatır (tap desteği)
             if (firing) releasedDuringFlight = true;
@@ -182,7 +182,7 @@ public class GrapplingHook : MonoBehaviour
         }
 
         // Uçuş sırasında tuş bırakıldıysa (tap): varır varmaz fırlatmalı bırakış
-        if (releasedDuringFlight || !Input.GetKey(KeyBindings.Grapple))
+        if (releasedDuringFlight || !KeyBindings.Held(KeyBindings.Action.Grapple))
         {
             releasedDuringFlight = false;
             releasedManually     = true;
@@ -332,7 +332,7 @@ public class GrapplingHook : MonoBehaviour
         hangTimer -= Time.deltaTime;
 
         // Zıpla tuşu → duvardan zıpla
-        if (Input.GetKeyDown(KeyBindings.Jump))
+        if (KeyBindings.Down(KeyBindings.Action.Jump))
         {
             movement.Launch(hangWallNormal * wallHangJumpOut + Vector3.up * wallHangJumpUp);
             EndHang();

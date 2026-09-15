@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Bloodrush.Flow;
 using Bloodrush.Weapons;
 using Bloodrush.Shared.Audio;
@@ -160,20 +161,25 @@ public class PlayerShoot : MonoBehaviour
     {
         if (!CanShoot) return;   // silahsız (bkz. PlayerLoadout) — hiçbir silah girdisi işlenmez
 
-        if (Input.GetKeyDown(KeyBindings.Weapon1)) SwitchFirearm(Firearm.Revolver);
-        if (Input.GetKeyDown(KeyBindings.Weapon2)) SwitchFirearm(Firearm.Shotgun);
-        if (Input.GetKeyDown(KeyBindings.Weapon3)) SwitchFirearm(Firearm.Lmg);
+        if (KeyBindings.Down(KeyBindings.Action.Weapon1)) SwitchFirearm(Firearm.Revolver);
+        if (KeyBindings.Down(KeyBindings.Action.Weapon2)) SwitchFirearm(Firearm.Shotgun);
+        if (KeyBindings.Down(KeyBindings.Action.Weapon3)) SwitchFirearm(Firearm.Lmg);
 
-        if (Input.GetKey(KeyBindings.Fire) && !switching)
+        if (KeyBindings.Held(KeyBindings.Action.Fire) && !switching)
             FireActive();
 
-        if (LauncherEnabled && Input.GetButtonDown("Fire2"))
+        // Eskiden Input.GetButtonDown("Fire2") — Input Manager'da "Fire2" varsayilani
+        // Sol Alt VEYA Mouse1 (sag tik) idi (bkz. ProjectSettings/InputManager.asset),
+        // KeyBindings'e hic bagli degildi (rebind edilemez). Ayni ikili davranis korundu.
+        bool fire2 = (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame) ||
+                     (Keyboard.current != null && Keyboard.current.leftAltKey.wasPressedThisFrame);
+        if (LauncherEnabled && fire2)
             FireLauncher();
 
-        if (LauncherEnabled && Input.GetKeyDown(KeyBindings.LauncherMode))
+        if (LauncherEnabled && KeyBindings.Down(KeyBindings.Action.LauncherMode))
             SwitchMode();
 
-        if (Input.GetKeyDown(KeyBindings.Reload) && !ActiveFirearm.IsReloading)
+        if (KeyBindings.Down(KeyBindings.Action.Reload) && !ActiveFirearm.IsReloading)
             StartCoroutine(ActiveFirearm.Reload());
     }
 

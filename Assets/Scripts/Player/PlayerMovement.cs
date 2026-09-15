@@ -128,7 +128,7 @@ public class PlayerMovement : MonoBehaviour
         Look();
         Move();
 
-        slide.Tick(Input.GetKeyDown(KeyBindings.Jump), Input.GetKey(KeyBindings.Slide),
+        slide.Tick(KeyBindings.Down(KeyBindings.Action.Jump), KeyBindings.Held(KeyBindings.Action.Slide),
                    out bool slideEnded, out bool slideJumpedOut, out Vector3 slideLaunch);
         if (slideEnded)
         {
@@ -147,8 +147,9 @@ public class PlayerMovement : MonoBehaviour
     void Look()
     {
         if (Time.timeScale == 0f) return;
-        float mx = Input.GetAxisRaw("Mouse X") * sensitivity;
-        float my = Input.GetAxisRaw("Mouse Y") * sensitivity;
+        Vector2 mouseDelta = KeyBindings.MouseDelta;
+        float mx = mouseDelta.x * sensitivity;
+        float my = mouseDelta.y * sensitivity;
 
         // Ayarlardaki "Y Eksenini Ters Çevir" (SettingsApplier.ApplyControls yazar).
         if (InvertY) my = -my;
@@ -226,7 +227,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         bool jumpAllowed = coyoteTimer > 0f || Time.time < slide.SlideJumpDeadline || wallRun.CanWallJump;
-        if (Input.GetKeyDown(KeyBindings.Jump) && jumpAllowed && JumpEnabled)
+        if (KeyBindings.Down(KeyBindings.Action.Jump) && jumpAllowed && JumpEnabled)
         {
             if (wallRun.CanWallJump)
                 Launch(wallRun.ConsumeWallJump() * wallJumpPushForce); // duvardan yatay itiş
@@ -261,7 +262,7 @@ public class PlayerMovement : MonoBehaviour
             if (grounded) coyoteTimer = coyoteTime; // zıplama hakkını geri ver
         }
 
-        if (SlideEnabled && slide.CanStart(Input.GetKeyDown(KeyBindings.Slide), grounded, wish))
+        if (SlideEnabled && slide.CanStart(KeyBindings.Down(KeyBindings.Action.Slide), grounded, wish))
         {
             slide.Start(wish, new Vector2(cc.velocity.x, cc.velocity.z).magnitude);
             sfx.Play(slideClip, slideVolume);
@@ -278,7 +279,7 @@ public class PlayerMovement : MonoBehaviour
                                 : ((lastFlags & CollisionFlags.Below) != 0 || cc.isGrounded);
 
         bool jumped = false;
-        if (Input.GetKeyDown(KeyBindings.Jump) && JumpEnabled)
+        if (KeyBindings.Down(KeyBindings.Action.Jump) && JumpEnabled)
         {
             flipped    = !flipped;              // yerçekimini ters çevir
             velocity.y = 0f;                    // yeni yüzeye taze düşüş
@@ -307,7 +308,7 @@ public class PlayerMovement : MonoBehaviour
 
     void TickWallRun()
     {
-        wallRun.Update(Input.GetKeyDown(KeyBindings.Jump) && JumpEnabled, out bool jumpedOff, out Vector3 jumpOutHorizontal);
+        wallRun.Update(KeyBindings.Down(KeyBindings.Action.Jump) && JumpEnabled, out bool jumpedOff, out Vector3 jumpOutHorizontal);
         if (jumpedOff)
         {
             velocity.y = wallRunJumpUp * JumpMultiplier;

@@ -32,7 +32,7 @@ public class PlayerParry : MonoBehaviour
 
     void Update()
     {
-        if (!Input.GetKeyDown(KeyBindings.ParryPunch)) return;
+        if (!KeyBindings.Down(KeyBindings.Action.ParryPunch)) return;
 
         // 1) Önce parry dene — telegraph yapan düşman/boss varsa
         Collider[] cols = Physics.OverlapSphere(transform.position, parryRange);

@@ -150,6 +150,46 @@ diyalog, kitap etkileşimi — aynı anda etkiliyor; otomatik test yok).
   — hepsi yeni Input System üzerinden çalışıyor; bir CH sahnesinde uçtan
   uca test edildi (düşman öldürme, hareket, kanca kullanımı).
 
+> ✅ **UYGULANDI (2026-09-15), test bekliyor**: Plan `InputActionAsset`
+> önermişti, ama proje genelinde her şeyin kod-içinde inşa edildiği
+> (prefab'sız UI, procedural builder'lar) tutarlı tarzına uyması için
+> **tamamen kod-içi** bir çözüm seçildi — ayrı bir `.inputactions`
+> asset dosyası yerine `KeyBindings.cs`'e `Keyboard.current`/
+> `Mouse.current` (yeni Input System) kullanan bir sorgu katmanı
+> (`Down`/`Held`/`Up`/`MouseDelta`) eklendi.
+>
+> **Kritik tasarım kararı**: `KeyBindings`'in depolama katmanı
+> (`KeyCode[]` cache, `Set`/`ResetDefaults`/`EnsureCache`) **bilerek
+> hiç değiştirilmedi** — çünkü `SettingsPanel.Tabs.cs`'teki asıl tuş
+> yakalama kodu (`CaptureRebind()`) hâlâ legacy `Input` ile tüm
+> `KeyCode` değerlerini tarayıp bu cache'e yazıyor ve Faz 2a'nın
+> kapsamında değil. Yeni sorgu katmanı aynı cache'i okuyor, böylece
+> iki katman senkron kalıyor ve henüz dokunulmamış dosyalar
+> (`NpcDialogue`, `InteractionInput`, `BookSession`, `SettingsPanel.Tabs.cs`)
+> bozulmadan derlenmeye devam ediyor. Proje ayarı `activeInputHandler: 2`
+> ("Both") olduğu için eski ve yeni sistem aynı anda çalışabiliyor —
+> kontrol edildi.
+>
+> **Ayrıca fark edilip düzeltilen bir ince nokta**: `PlayerMovement.Look()`
+> eskiden `Input.GetAxisRaw("Mouse X") * sensitivity` kullanıyordu.
+> Yeni Input System'in `Mouse.current.delta`'sı **ham piksel** değeri
+> döndürüyor, eski Input Manager'ın "Mouse X" ekseni ise
+> `ProjectSettings/InputManager.asset`'te `sensitivity: 0.1` ile
+> ölçekleniyordu (kontrol edildi) — bu çarpan `KeyBindings.MouseDelta`
+> içine bilerek gömüldü ki fare hassasiyeti hissi bozulmasın.
+> `PlayerShoot.cs`'deki `Input.GetButtonDown("Fire2")` (launcher ateşi,
+> KeyBindings'e hiç bağlı değildi) de taşındı — Input Manager'daki
+> varsayılanı (`Sol Alt` VEYA `Mouse1`, kontrol edildi) birebir
+> `Mouse.current.rightButton`/`Keyboard.current.leftAltKey` ile
+> korundu.
+>
+> **Test listesi (senin yapman gerekiyor)**: WASD hareket, fare bakış
+> hassasiyeti (eskisiyle aynı hissetmeli), zıplama (Space), wall-jump,
+> wall-run, slide (Ctrl), parry/yumruk (F), ateş etme (sol tık), silah
+> değiştirme (1/2/3), reload (R), launcher modu (Q), launcher ateşi
+> (sağ tık veya Sol Alt), kanca (E) — atma/çekme/bırakma/duvarda asılı
+> kalma/oradan zıplama. Bir CH sahnesinde uçtan uca.
+
 **Faz 2b — Diyalog/etkileşim/UI girdisi (sonra, daha izole risk):**
 - `NpcDialogue.cs`, `InteractionInput.cs`, `BookSession.cs`'i Input
   System'e taşı (UI/Interact action map).
