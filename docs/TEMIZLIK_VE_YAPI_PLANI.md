@@ -457,6 +457,12 @@ hâlâ doğru çalıştığı Editor'de tek tek doğrulanmalı.
   birlikte silinmesi planlanmış, bu planla çakışmıyor.
 
 ### 6.3 Bölüm (chapter) isimlendirme tutarsızlığını düzelt (ONAYLANDI)
+
+> ✅ **UYGULANDI (2026-09-15)**: `core.ignorecase=true` olduğu için
+> `Ch1`→`CH1`/`Ch3`→`CH3` geçici isim üzerinden iki aşamalı taşındı.
+> `Ch1 Palette/` → `Textures/CH1/Palette/`'e taşındı. Tüm GUID'ler
+> korunarak.
+
 Şu an üç farklı kural aynı anda kullanılıyor:
 - `Assets/Scenes/`: `CH2`, `CH3`, `CH4` (büyük harf, `CH1` yok — muhtemelen `CH1.unity` kök seviyede duruyor, alt klasör değil)
 - `Assets/Textures/`: `Ch1`, `Ch3` (karışık case, `Ch2`/`Ch4` yok)
@@ -480,13 +486,10 @@ alt klasörü olacak (Ch3'ün `Wall/`, `Flooor/` alt klasörleriyle aynı
 mantık).
 
 ### 6.4 Yazım hatalarını düzelt
-- `Ch1/Asansör/Asasnsör.mat` → `Asansor.mat` (hem yazım hatası hem
-  Türkçe karakter düzeltilir — materyal ismindeki referanslar
-  güncellenmeli)
-- `Ch3/Flooor/` → `Floor/`
-- `anim/Resepsiyonist/resepsiyopnist düz/` → §6.1'deki konsolidasyonla
-  ortadan kalkacak (klasör tamamen `Assets/Characters/Resepsiyonist/`
-  içine eritilecek)
+- ✅ `Ch1/Asansör/Asasnsör.mat` → `CH1/Asansor/Asansor.mat` (uygulandı)
+- ✅ `Ch3/Flooor/` → `CH3/Floor/` (uygulandı)
+- ✅ `anim/Resepsiyonist/resepsiyopnist düz/` → §6.1'deki konsolidasyonla
+  ortadan kalktı (`Assets/Characters/Resepsiyonist/Duz/`)
 
 ### 6.5 Türkçe özel karakterleri kaldır (ONAYLANDI — kapsam netleşti)
 **Karar**: sadece Türkçe özel karakterler (ı, ğ, ü, ş, ö, ç, İ) dosya/
@@ -533,9 +536,15 @@ tarafından yapılacak.
 
 ### 6.6 Küçük isimlendirme temizlikleri
 - ✅ `Assets/anim/Meshy_AI_Crimson_Wretch_biped/Meshy_AI_Crimson_Wretch_biped 1/` — §6.1 konsolidasyonuyla ortadan kalktı (canlı gövde `Assets/Characters/CrimsonWretch/Rig/`'e taşındı)
-- `Assets/Materials/New Material.mat`, `Assets/Textures/Ch3/Flooor/textures/New Material.mat` — varsayılan isimle bırakılmış materyaller, açıklayıcı isim verilmeli (hâlâ bekliyor)
-- `Assets/Textures/Ch3/Wall/Wall 1.mat` → `Wall_02.mat` gibi anlamlı bir isim (hâlâ bekliyor)
-- `Assets/Scenes/OutdoorsScene/NavMesh-Plane 1.asset` → " 1" kaldır (hâlâ bekliyor)
+- ✅ `Assets/Materials/New Material.mat` → `Tavan.mat` (CH1'de tavan objesinde kullanıldığı GUID ile doğrulandı, oraya göre adlandırıldı)
+- ✅ `Assets/Textures/Ch3/Flooor/textures/New Material.mat` → `Floor.mat` (CH3 zemin dokularını kullandığı doğrulandı)
+- ✅ `Assets/Textures/Ch3/Wall/Wall 1.mat` → `Wall_02.mat`
+- ✅ `Assets/Scenes/OutdoorsScene/NavMesh-Plane 1.asset` → " 1" kaldırıldı.
+  **Beklenmedik bulgu**: GUID kontrolü, " 1" son ekli dosyanın aslında
+  **canlı** (sahne tarafından referans edilen), son eksiz `NavMesh-Plane.asset`'in
+  ise **referanssız eski bir bake** olduğunu gösterdi — isimlendirme
+  görünüşün tam tersiydi. Referanssız olan `_Yedek_Silinecekler/NavMesh_orphan/`'a
+  taşındı, canlı olan " 1" son eki kaldırılarak yerine geçti.
 - ✅ `Büyük_Düşman` (alt çizgi) vs `BüyükDüşman` (bitişik) — §6.1 ile tek isimde (`BuyukDusman`) birleşti
 
 ---
