@@ -23,69 +23,39 @@ public class PlayerFirearm
 
     public readonly string displayName;
 
-    readonly float damageNear;
-    readonly float damageFar;
-    readonly float range;
-    readonly float fireRate;
-    readonly int   pelletCount;
-    readonly float spreadAngle;
-    readonly int   magazineSize;
-    readonly float reloadTime;
-    readonly int   reserveCap;
-    readonly LayerMask hitMask;
+    readonly WeaponData data;
+    readonly LayerMask  hitMask;
 
     readonly Camera         playerCamera;
     readonly ParticleSystem muzzleFlash;
     readonly SfxPlayer      sfx;
-    readonly AudioClip      fireClip;
-    readonly float          fireVolume;
-    readonly AudioClip      emptyClickClip;
-    readonly float          emptyClickVolume;
-    readonly AudioClip      reloadClip;
-    readonly float          reloadVolume;
 
     int   currentAmmo;
     int   totalAmmo;
     bool  isReloading;
     float nextFireTime;
 
-    public PlayerFirearm(string displayName, float damageNear, float damageFar, float range, float fireRate,
-        int pelletCount, float spreadAngle, int magazineSize, int startingReserve, float reloadTime,
-        LayerMask hitMask, Camera playerCamera, ParticleSystem muzzleFlash,
-        SfxPlayer sfx, AudioClip fireClip, float fireVolume,
-        AudioClip emptyClickClip, float emptyClickVolume, AudioClip reloadClip, float reloadVolume)
+    public PlayerFirearm(WeaponData data, LayerMask hitMask, Camera playerCamera,
+        ParticleSystem muzzleFlash, SfxPlayer sfx)
     {
-        this.displayName = displayName;
-        this.damageNear = damageNear;
-        this.damageFar = damageFar;
-        this.range = range;
-        this.fireRate = fireRate;
-        this.pelletCount = Mathf.Max(1, pelletCount);
-        this.spreadAngle = spreadAngle;
-        this.magazineSize = magazineSize;
-        this.reloadTime = reloadTime;
-        this.reserveCap = startingReserve;
+        this.data = data;
+        this.displayName = data.displayName;
         this.hitMask = hitMask;
         this.playerCamera = playerCamera;
         this.muzzleFlash = muzzleFlash;
         this.sfx = sfx;
-        this.fireClip = fireClip;
-        this.fireVolume = fireVolume;
-        this.emptyClickClip = emptyClickClip;
-        this.emptyClickVolume = emptyClickVolume;
-        this.reloadClip = reloadClip;
-        this.reloadVolume = reloadVolume;
 
-        currentAmmo = magazineSize;
-        totalAmmo   = Mathf.Max(0, startingReserve - magazineSize);
+        currentAmmo = data.magazineSize;
+        totalAmmo   = Mathf.Max(0, data.startingReserve - data.magazineSize);
     }
 
-    public int  CurrentAmmo  => currentAmmo;
-    public int  TotalAmmo    => totalAmmo;
-    public int  MagazineSize => magazineSize;
-    public bool IsReloading  => isReloading;
+    public int   CurrentAmmo  => currentAmmo;
+    public int   TotalAmmo    => totalAmmo;
+    public int   MagazineSize => data.magazineSize;
+    public bool  IsReloading  => isReloading;
+    public float RecoilScale  => data.recoilScale;
 
-    public void AddAmmo(int amount) => totalAmmo = Mathf.Min(totalAmmo + amount, reserveCap);
+    public void AddAmmo(int amount) => totalAmmo = Mathf.Min(totalAmmo + amount, data.startingReserve);
 
     public FireResult TryFire(float damageMultiplier)
     {
@@ -94,13 +64,13 @@ public class PlayerFirearm
 
         if (currentAmmo <= 0)
         {
-            sfx.Play(emptyClickClip, emptyClickVolume);
+            sfx.Play(data.emptyClickClip, data.emptyClickVolume);
             return FireResult.Empty;
         }
 
         currentAmmo--;
-        nextFireTime = Time.time + fireRate;
-        sfx.Play(fireClip, fireVolume);
+        nextFireTime = Time.time + data.fireRate;
+        sfx.Play(data.fireClip, data.fireVolume);
 
         if (muzzleFlash != null)
         {
@@ -109,7 +79,7 @@ public class PlayerFirearm
         }
         CameraShake.Shake(0.04f, 0.08f);
 
-        for (int i = 0; i < pelletCount; i++)
+        for (int i = 0; i < data.pelletCount; i++)
             FirePellet(damageMultiplier);
 
         return FireResult.Fired;
@@ -118,13 +88,13 @@ public class PlayerFirearm
     void FirePellet(float damageMultiplier)
     {
         Vector3 dir = playerCamera.transform.forward;
-        if (spreadAngle > 0f)
-            dir = Quaternion.Euler(Random.Range(-spreadAngle, spreadAngle),
-                                   Random.Range(-spreadAngle, spreadAngle), 0f) * dir;
+        if (data.spreadAngle > 0f)
+            dir = Quaternion.Euler(Random.Range(-data.spreadAngle, data.spreadAngle),
+                                   Random.Range(-data.spreadAngle, data.spreadAngle), 0f) * dir;
 
         Ray ray = new Ray(playerCamera.transform.position, dir);
         // Görünmez trigger hacimleri mermiyi emmesin (bkz. PlayerShoot.FireRevolver notu)
-        if (!Physics.Raycast(ray, out RaycastHit hit, range, hitMask, QueryTriggerInteraction.Ignore)) return;
+        if (!Physics.Raycast(ray, out RaycastHit hit, data.range, hitMask, QueryTriggerInteraction.Ignore)) return;
 
         LauncherProjectile proj = hit.collider.GetComponent<LauncherProjectile>();
         if (proj != null) { proj.Detonate(); return; }
@@ -132,7 +102,7 @@ public class PlayerFirearm
         var health = hit.collider.GetComponentInParent<Health>();
         if (health == null) return;
 
-        float dmg = Mathf.Lerp(damageNear, damageFar, Mathf.Clamp01(hit.distance / range)) * damageMultiplier;
+        float dmg = Mathf.Lerp(data.damageNear, data.damageFar, Mathf.Clamp01(hit.distance / data.range)) * damageMultiplier;
 
         // Yönlü zırh (önden az hasar / arkadan tam) kaldırıldı — zırhlı düşman
         // artık her yönden tam hasar alır. DirectionalArmor component'i ArmoredHazard
@@ -147,11 +117,11 @@ public class PlayerFirearm
 
     public IEnumerator Reload()
     {
-        if (currentAmmo >= magazineSize || totalAmmo <= 0) yield break;
+        if (currentAmmo >= data.magazineSize || totalAmmo <= 0) yield break;
         isReloading = true;
-        sfx.Play(reloadClip, reloadVolume);
-        yield return new WaitForSeconds(reloadTime);
-        int need    = magazineSize - currentAmmo;
+        sfx.Play(data.reloadClip, data.reloadVolume);
+        yield return new WaitForSeconds(data.reloadTime);
+        int need    = data.magazineSize - currentAmmo;
         int take    = Mathf.Min(need, totalAmmo);
         currentAmmo += take;
         totalAmmo   -= take;

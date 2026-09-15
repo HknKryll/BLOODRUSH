@@ -28472,57 +28472,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 448cf91e98fde5443a36df3668c648ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  revolverDamage: 40
-  revolverRange: 120
-  revolverFireRate: 0.28
-  revolverRecoilScale: 1
+  m_Name:
+  m_EditorClassIdentifier:
+  revolverData: {fileID: 11400000, guid: be968e7a07777cbe4613142e2613fca1, type: 2}
+  shotgunData: {fileID: 11400000, guid: 58cccc4bd5bf0dcf809557484faf32fd, type: 2}
+  lmgData: {fileID: 11400000, guid: 046ff167c306b38606f922172e346007, type: 2}
   hitMask:
     serializedVersion: 2
     m_Bits: 4294967295
   muzzleFlash: {fileID: 0}
-  magazineSize: 10
-  startingAmmo: 60
-  reloadTime: 3
-  revolverFireClip: {fileID: 8300000, guid: f5fa0116c6db99549a9098754ae07da2, type: 3}
-  revolverFireVolume: 1
-  emptyClickClip: {fileID: 0}
-  emptyClickVolume: 0.6
-  reloadClip: {fileID: 8300000, guid: 83fabc45c44008a49a3932a53ca0cfae, type: 3}
-  reloadVolume: 0.8
-  shotgunDamageNear: 18
-  shotgunDamageFar: 4
-  shotgunRange: 14
-  shotgunFireRate: 0.85
-  shotgunPellets: 8
-  shotgunSpread: 4.5
-  shotgunMagazineSize: 6
-  shotgunStartingReserve: 24
-  shotgunReloadTime: 2.4
-  shotgunRecoilScale: 1.8
   shotgunMuzzleFlash: {fileID: 0}
-  shotgunFireClip: {fileID: 0}
-  shotgunFireVolume: 1
-  shotgunEmptyClickClip: {fileID: 0}
-  shotgunEmptyClickVolume: 0.6
-  shotgunReloadClip: {fileID: 0}
-  shotgunReloadVolume: 0.8
-  lmgDamage: 9
-  lmgRange: 60
-  lmgFireRate: 0.09
-  lmgSpread: 1.5
-  lmgMagazineSize: 45
-  lmgStartingReserve: 135
-  lmgReloadTime: 3.2
-  lmgRecoilScale: 0.45
   lmgMuzzleFlash: {fileID: 0}
-  lmgFireClip: {fileID: 0}
-  lmgFireVolume: 0.9
-  lmgEmptyClickClip: {fileID: 0}
-  lmgEmptyClickVolume: 0.6
-  lmgReloadClip: {fileID: 0}
-  lmgReloadVolume: 0.8
   grenadePrefab: {fileID: 0}
   flashPrefab: {fileID: -4499523240468417313, guid: 84ef268cb9b61294aa47ca080de8f971,
     type: 3}
@@ -33519,14 +33479,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1685945719877225633, guid: 4e2a5460b3f9f134c8819c09645712c9,
         type: 3}
-      propertyPath: lmgReloadTime
-      value: 1.5
-      objectReference: {fileID: 0}
+      propertyPath: lmgData
+      value:
+      objectReference: {fileID: 11400000, guid: 87b554fb83439dce04518313d4262855, type: 2}
     - target: {fileID: 1685945719877225633, guid: 4e2a5460b3f9f134c8819c09645712c9,
         type: 3}
-      propertyPath: revolverFireVolume
-      value: 0.63
-      objectReference: {fileID: 0}
+      propertyPath: revolverData
+      value:
+      objectReference: {fileID: 11400000, guid: 6a8365cd5ea87060f199a779a6d20fed, type: 2}
     - target: {fileID: 3829253042066982541, guid: 4e2a5460b3f9f134c8819c09645712c9,
         type: 3}
       propertyPath: m_Center.y

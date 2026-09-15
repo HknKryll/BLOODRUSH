@@ -266,6 +266,72 @@ gerekir). **Bağımlılık**: Faz 1.
   değişmiyor. `WaveData` henüz hiçbir sisteme bağlanmadı (sadece veri
   şeması hazır) — bağlama işi Faz 5'te.
 
+> ✅ **UYGULANDI (2026-09-15), test bekliyor — silah verisi tarafı**:
+> `Assets/Scripts/Weapons/Data/WeaponData.cs` oluşturuldu (hasar/menzil/
+> ateş hızı/pellet/spread/recoil/şarjör/yedek mühimmat/reload/ses klipleri
+> + Faz 6 için `poolSize` alanı). `Assets/Veri/Weapons/` altında
+> `WeaponData_Revolver/Shotgun/LMG.asset` üç varlığı, **`Player.prefab`'ın
+> GERÇEK serileştirilmiş değerleri** temel alınarak elle yazıldı (kod
+> içi `[SerializeField]` varsayılanları DEĞİL — üçü arasında fark vardı,
+> aşağıda). `PlayerFirearm.cs`'in constructor'ı artık tek bir `WeaponData`
+> parametresi alıyor; sahne-bağımlı referanslar (kamera, `muzzleFlash`
+> `ParticleSystem`'i, `SfxPlayer`) ayrı parametreler olarak kaldı —
+> bir ScriptableObject sahne objesine referans tutamayacağı için bilerek
+> `WeaponData` dışında bırakıldı. `PlayerShoot.cs`'deki ~40 alanlık
+> monolitik blok `revolverData/shotgunData/lmgData` + ortak `hitMask` +
+> 3 `muzzleFlash` referansına indirgendi.
+>
+> **Kod varsayılanı ile prefab'taki gerçek değer arasında bulunan 3 fark**
+> (asset'lere prefab değeri yazıldı, kod varsayılanı değil):
+> - `revolverFireVolume`: kod `1f`, prefab `0.02`
+> - `shotgunReloadTime`: kod `2.4f`, prefab `4`
+> - `lmgEmptyClickClip`: kodda boş bırakılabiliyordu, prefab'ta gerçek
+>   bir klip atanmıştı (`2e5f63d7...`)
+>
+> **`CH3.unity`'de ayrıca iki önemli bulgu çıktı** (Player.prefab'ın bu
+> sahnedeki instance'ı taranırken):
+> 1. **Meşru sahne-özel override**: bu instance'ta `lmgReloadTime: 1.5`
+>    ve `revolverFireVolume: 0.63` şeklinde 2 alan override edilmişti
+>    (muhtemelen CH3'ün kendi zorluk ayarı). Bu, artık tek bir değer
+>    değil bir *asset referansı* olduğu için, iki yeni CH3'e özel varyant
+>    asset'i oluşturuldu (`WeaponData_Revolver_CH3.asset`,
+>    `WeaponData_LMG_CH3.asset` — temel asset'in birebir kopyası, sadece
+>    o tek alan farklı) ve PrefabInstance'ın `m_Modifications` listesi bu
+>    iki asset'e referans verecek şekilde güncellendi. Davranış birebir
+>    korundu.
+> 2. **Muhtemelen önceden var olan bir hata (kapsam dışı, ELLE
+>    DÜZELTİLMEDİ)**: aynı Player GameObject'inde PlayerShoot'un
+>    prefab'tan gelen kopyasına EK olarak, `m_AddedComponents` ile
+>    sahne-instance seviyesinde eklenmiş **ikinci, tamamen bağımsız bir
+>    PlayerShoot komponenti** bulundu (kendi `revolverDamage: 40`,
+>    kendi ses klipleri, `weaponModels: []`). Bu muhtemelen prefab'ın
+>    geçmişte yeniden yapılandırılmasından (komponent silinip yeniden
+>    eklenmesinden) kalan bir kalıntı — CH3'te ateş edildiğinde hasar/
+>    mermi mantığının İKİ KEZ çalışıyor olma ihtimali var. Bu refactor'ın
+>    kapsamı dışında olduğu ve PrefabInstance'ı elle metin üzerinden
+>    yeniden yapılandırmak riskli olduğu için (bkz. CH2'deki
+>    `vfx_Explosion_01` notu), SADECE çökmesin diye alan isimleri yeni
+>    şemaya taşındı (kendi değerleriyle deynı davranışı koruyacak şekilde
+>    temel asset'lere bağlandı) — **silinmedi**. **Editor'de kontrol
+>    edilmeli**: CH3.unity'de Player GameObject'inin Inspector'ında
+>    PlayerShoot iki kez görünüyor mu, görünüyorsa fazladan olanı silmek
+>    muhtemelen doğru olacaktır.
+>
+> `OutdoorsScene.unity`'de de eski bir "stripped" PlayerShoot referansı
+> bulundu ama `m_GameObject: {fileID: 0}` olduğu için zaten bağlı/işlevsiz
+> bir kalıntı — dokunulmadı.
+>
+> **Test listesi**: revolver/shotgun/LMG ateş etme (hasar, ses, reload
+> süresi eskisiyle aynı hissetmeli), CH3'te ekstra dikkat (yukarıdaki
+> 2. bulgu — çift hasar/çift mermi tüketimi var mı gözlemle).
+>
+> `WaveData.cs` (`Assets/Scripts/Arena/Data/WaveData.cs`) planda
+> öngörüldüğü gibi sadece şema olarak eklendi — hem `WaveManager`'ın
+> sabit-dalga alanlarını hem `WaveDirector`'ın heat/eskalasyon alanlarını
+> içeriyor, artı düşman ağırlıkları (`EnemyWeight[]`), yükseltilmiş-spawn
+> olasılığı, Faz 6 için `enemyPoolSize`. Hiçbir asset instance'ı
+> oluşturulmadı, hiçbir sisteme bağlanmadı — plan öyle diyor (Faz 5'te).
+
 ### Faz 4 — Enemy AI Ortak Taban
 **Risk**: Yüksek (üç bağımsız AI sınıfı birleştiriliyor). **Bağımlılık**:
 Faz 3 (veri katmanı deseni referans alınır — faz-eşiği/denge değerleri

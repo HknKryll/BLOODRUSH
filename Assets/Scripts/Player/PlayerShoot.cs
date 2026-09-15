@@ -12,71 +12,18 @@ public class PlayerShoot : MonoBehaviour
     public enum LauncherMode { Grenade, Flash }
     public enum Firearm { Revolver, Shotgun, Lmg }
 
-    [Header("Revolver")]
-    // 25: dusman1 (35 can) iki atisla olur. 40'ken tek atisliktı ve fazla guclu
-    // hissettiriyordu. Zirhli/Buyuk_Dusman (100 can) 3 yerine 4 atis.
-    [SerializeField] float revolverDamage  = 25f;
-    [SerializeField] float revolverRange   = 120f;
-    [SerializeField] float revolverFireRate = 0.28f;
-    [Tooltip("Tepme çarpanı — ProceduralWeaponMotion'daki temel recoil değerleriyle çarpılır.")]
-    [SerializeField] float revolverRecoilScale = 1f;
-    [SerializeField] LayerMask hitMask     = ~0;
+    [Header("Silah Verisi")]
+    [Tooltip("Hasar/menzil/ateş hızı/şarjör/ses değerleri artık burada değil — " +
+             "Assets/Scripts/Weapons/Data/WeaponData.cs asset'lerinde (bkz. WeaponData_Revolver/Shotgun/LMG).")]
+    [SerializeField] WeaponData revolverData;
+    [SerializeField] WeaponData shotgunData;
+    [SerializeField] WeaponData lmgData;
+
+    [Header("Ortak")]
+    [SerializeField] LayerMask hitMask = ~0;
     [SerializeField] ParticleSystem muzzleFlash;
-
-    [Header("Revolver Ammo")]
-    [SerializeField] int   magazineSize = 10;
-    [SerializeField] int   startingAmmo = 60;
-    [SerializeField] float reloadTime   = 3f;
-
-    [Header("Revolver Ses")]
-    [SerializeField] AudioClip revolverFireClip;
-    [SerializeField] [Range(0f,1f)] float revolverFireVolume = 1f;
-    [SerializeField] AudioClip emptyClickClip;
-    [SerializeField] [Range(0f,1f)] float emptyClickVolume = 0.6f;
-    [SerializeField] AudioClip reloadClip;
-    [SerializeField] [Range(0f,1f)] float reloadVolume = 0.8f;
-
-    [Header("Shotgun")]
-    [SerializeField] float shotgunDamageNear      = 18f;
-    [SerializeField] float shotgunDamageFar       = 4f;
-    [SerializeField] float shotgunRange           = 14f;
-    [SerializeField] float shotgunFireRate        = 0.85f;
-    [SerializeField] int   shotgunPellets         = 8;
-    [SerializeField] float shotgunSpread          = 4.5f;
-    [SerializeField] int   shotgunMagazineSize    = 6;
-    [SerializeField] int   shotgunStartingReserve = 24;
-    [SerializeField] float shotgunReloadTime      = 2.4f;
-    [Tooltip("Tepme çarpanı — shotgun sert teper.")]
-    [SerializeField] float shotgunRecoilScale     = 1.8f;
     [SerializeField] ParticleSystem shotgunMuzzleFlash;
-
-    [Header("Shotgun Ses")]
-    [SerializeField] AudioClip shotgunFireClip;
-    [SerializeField] [Range(0f,1f)] float shotgunFireVolume = 1f;
-    [SerializeField] AudioClip shotgunEmptyClickClip;
-    [SerializeField] [Range(0f,1f)] float shotgunEmptyClickVolume = 0.6f;
-    [SerializeField] AudioClip shotgunReloadClip;
-    [SerializeField] [Range(0f,1f)] float shotgunReloadVolume = 0.8f;
-
-    [Header("LMG (Hafif Makineli Tüfek)")]
-    [SerializeField] float lmgDamage          = 9f;
-    [SerializeField] float lmgRange           = 60f;
-    [SerializeField] float lmgFireRate        = 0.09f;
-    [SerializeField] float lmgSpread          = 1.5f;
-    [SerializeField] int   lmgMagazineSize    = 45;
-    [SerializeField] int   lmgStartingReserve = 135;
-    [SerializeField] float lmgReloadTime      = 3.2f;
-    [Tooltip("Tepme çarpanı — LMG hafif ama seri teper.")]
-    [SerializeField] float lmgRecoilScale     = 0.45f;
     [SerializeField] ParticleSystem lmgMuzzleFlash;
-
-    [Header("LMG Ses")]
-    [SerializeField] AudioClip lmgFireClip;
-    [SerializeField] [Range(0f,1f)] float lmgFireVolume = 0.9f;
-    [SerializeField] AudioClip lmgEmptyClickClip;
-    [SerializeField] [Range(0f,1f)] float lmgEmptyClickVolume = 0.6f;
-    [SerializeField] AudioClip lmgReloadClip;
-    [SerializeField] [Range(0f,1f)] float lmgReloadVolume = 0.8f;
 
     [Header("Launcher")]
     [SerializeField] LauncherProjectile grenadePrefab;
@@ -125,24 +72,9 @@ public class PlayerShoot : MonoBehaviour
         sfx = SfxPlayer.CreateOrGet(gameObject, spatialBlend: 0f);
 
         firearms = new PlayerFirearm[3];
-        firearms[(int)Firearm.Revolver] = new PlayerFirearm("REVOLVER",
-            revolverDamage, revolverDamage, revolverRange, revolverFireRate,
-            1, 0f, magazineSize, startingAmmo, reloadTime, hitMask, playerCamera, muzzleFlash,
-            sfx, revolverFireClip, revolverFireVolume, emptyClickClip, emptyClickVolume, reloadClip, reloadVolume);
-
-        firearms[(int)Firearm.Shotgun] = new PlayerFirearm("SHOTGUN",
-            shotgunDamageNear, shotgunDamageFar, shotgunRange, shotgunFireRate,
-            shotgunPellets, shotgunSpread, shotgunMagazineSize, shotgunStartingReserve, shotgunReloadTime,
-            hitMask, playerCamera, shotgunMuzzleFlash,
-            sfx, shotgunFireClip, shotgunFireVolume, shotgunEmptyClickClip, shotgunEmptyClickVolume,
-            shotgunReloadClip, shotgunReloadVolume);
-
-        firearms[(int)Firearm.Lmg] = new PlayerFirearm("LMG",
-            lmgDamage, lmgDamage, lmgRange, lmgFireRate,
-            1, lmgSpread, lmgMagazineSize, lmgStartingReserve, lmgReloadTime,
-            hitMask, playerCamera, lmgMuzzleFlash,
-            sfx, lmgFireClip, lmgFireVolume, lmgEmptyClickClip, lmgEmptyClickVolume,
-            lmgReloadClip, lmgReloadVolume);
+        firearms[(int)Firearm.Revolver] = new PlayerFirearm(revolverData, hitMask, playerCamera, muzzleFlash, sfx);
+        firearms[(int)Firearm.Shotgun]  = new PlayerFirearm(shotgunData, hitMask, playerCamera, shotgunMuzzleFlash, sfx);
+        firearms[(int)Firearm.Lmg]      = new PlayerFirearm(lmgData, hitMask, playerCamera, lmgMuzzleFlash, sfx);
 
         // weaponMotion atanmamışsa otomatik bul (PlayerShoot Player kökünde,
         // ProceduralWeaponMotion bir child'da) — referans kopması recoil'i öldürmesin.
@@ -191,9 +123,7 @@ public class PlayerShoot : MonoBehaviour
         weaponMotion != null ? weaponMotion : ProceduralWeaponMotion.Instance;
 
     // Aktif silahın tepme çarpanı
-    float ActiveRecoilScale => activeIndex == (int)Firearm.Shotgun ? shotgunRecoilScale
-                             : activeIndex == (int)Firearm.Lmg     ? lmgRecoilScale
-                             :                                       revolverRecoilScale;
+    float ActiveRecoilScale => ActiveFirearm.RecoilScale;
 
     void FireActive()
     {
