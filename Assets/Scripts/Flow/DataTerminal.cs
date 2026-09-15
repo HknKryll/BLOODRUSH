@@ -10,6 +10,7 @@ using Bloodrush.FX;
 using Bloodrush.Player;
 using Bloodrush.Enemy;
 using Bloodrush.Shared.Audio;
+using Bloodrush.Arena;
 
 namespace Bloodrush.Flow
 {

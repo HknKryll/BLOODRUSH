@@ -734,7 +734,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1329107351}
-        m_TargetAssemblyTypeName: WaveManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: Bloodrush.Arena.WaveDirector, Assembly-CSharp
         m_MethodName: ReturnToMenu
         m_Mode: 1
         m_Arguments:
@@ -1679,7 +1679,7 @@ GameObject:
   - component: {fileID: 1329107350}
   - component: {fileID: 1329107351}
   m_Layer: 0
-  m_Name: WaveManager
+  m_Name: WaveDirector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1709,13 +1709,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1329107349}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5adf99078692cb4da48942c6811144d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxWaves: 10
-  baseEnemyCount: 3
-  enemyCountPerWave: 1
-  timeBetweenWaves: 5
+  m_Script: {fileID: 11500000, guid: a33a022eb742b62746a5264420220e9b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  data: {fileID: 11400000, guid: 87a845305cec3e8f5d84a23d80f22349, type: 2}
   spawnPoints:
   - {fileID: 712035081}
   - {fileID: 651248666}
@@ -1729,9 +1726,16 @@ MonoBehaviour:
   - {fileID: 629004797}
   - {fileID: 1503855365}
   - {fileID: 406528157}
-  enemyPrefabs:
+  elevatedSpawnPoints: []
+  fixedWaveEnemyPrefabs:
   - {fileID: 5855480116065803830, guid: c4fa6c20342968d49a7ef34523ba1b3c, type: 3}
   - {fileID: 6566291682012906877, guid: acecc5710b8c8a94284f809dc70b42a0, type: 3}
+  smallEnemy: {fileID: 0}
+  bigEnemy: {fileID: 0}
+  armoredEnemy: {fileID: 0}
+  fastEnemy: {fileID: 0}
+  jumperEnemy: {fileID: 0}
+  exploderEnemy: {fileID: 0}
   playerHealth: {fileID: 0}
   playerShoot: {fileID: 548125325}
   waveText: {fileID: 1635407672}
@@ -1739,12 +1743,7 @@ MonoBehaviour:
   messageText: {fileID: 1628475805}
   victoryPanel: {fileID: 339736732}
   defeatPanel: {fileID: 1198280537}
-  waveStartClip: {fileID: 0}
-  waveStartVolume: 0.8
-  victoryClip: {fileID: 0}
-  victoryVolume: 1
-  defeatClip: {fileID: 0}
-  defeatVolume: 1
+  exitBarrier: {fileID: 0}
 --- !u!1 &1424176227
 GameObject:
   m_ObjectHideFlags: 0
@@ -2956,7 +2955,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1329107351}
-        m_TargetAssemblyTypeName: WaveManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: Bloodrush.Arena.WaveDirector, Assembly-CSharp
         m_MethodName: ReturnToMenu
         m_Mode: 1
         m_Arguments:

@@ -2869,9 +2869,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 137918269}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba6732198c301fc4f944835cc91b6f61, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Script: {fileID: 11500000, guid: a33a022eb742b62746a5264420220e9b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  data: {fileID: 11400000, guid: a048d2110607f8755ae2abf14926e86a, type: 2}
   spawnPoints:
   - {fileID: 1078286088}
   - {fileID: 258047525}
@@ -2881,7 +2882,7 @@ MonoBehaviour:
   - {fileID: 530801233}
   - {fileID: 266076247}
   - {fileID: 747884448}
-  elevatedChance: 0.71
+  fixedWaveEnemyPrefabs: []
   smallEnemy: {fileID: 4832845689085647430, guid: 1f8a83ae503c59b428f2ce5710f06070,
     type: 3}
   bigEnemy: {fileID: 6101441825516228872, guid: 0ea1631446a877940a4853b36272f242,
@@ -2891,14 +2892,13 @@ MonoBehaviour:
   fastEnemy: {fileID: 0}
   jumperEnemy: {fileID: 0}
   exploderEnemy: {fileID: 0}
-  timeHeatRate: 0.05
-  terminalHeatStep: 1.5
-  heatMax: 10
-  baseSpawnInterval: 3.5
-  minSpawnInterval: 0.8
-  baseAliveCap: 6
-  maxAliveCap: 20
-  totalTerminals: 4
+  playerHealth: {fileID: 0}
+  playerShoot: {fileID: 0}
+  waveText: {fileID: 0}
+  enemyCountText: {fileID: 0}
+  messageText: {fileID: 0}
+  victoryPanel: {fileID: 0}
+  defeatPanel: {fileID: 0}
   exitBarrier: {fileID: 669129317}
 --- !u!4 &137918271
 Transform:

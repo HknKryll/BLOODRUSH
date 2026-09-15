@@ -4,6 +4,7 @@ using UnityEngine.AI;
 using UnityEngine.Events;
 using Bloodrush.Enemy;
 using Bloodrush.Player;
+using Bloodrush.Arena;
 
 // Sıralı güvenlik kilidi denetleyicisi. Konsollar kendini Register eder. Oyuncu
 // konsolları HEDEF SIRADA aktive etmeli: doğru adım o konsolun düşman dalgasını

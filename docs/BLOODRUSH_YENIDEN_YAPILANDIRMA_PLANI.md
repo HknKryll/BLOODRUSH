@@ -421,6 +421,45 @@ kaybolmamalı.
   çalışıyor; her iki kazanma/bitiş koşulu da (dalga tükenmesi / terminal
   tamamlanması) test edildi.
 
+> ✅ **UYGULANDI (2026-09-15), test bekliyor**: `Assets/Scripts/Arena/WaveManager.cs`
+> ve `Assets/Scripts/Flow/WaveDirector.cs` silindi, yerine tek
+> `Assets/Scripts/Arena/WaveDirector.cs` geldi. Mod seçimi `WaveData.hasFixedWaveCount`
+> ile yapılıyor (plandaki öneriyle birebir) — `WaveData_Arena.asset` (sabit
+> dalga, `OutdoorsScene`'in eski değerleriyle) ve `WaveData_CH3ServerCore.asset`
+> (heat modu, CH3'ün eski değerleriyle) `Assets/Veri/Arena/` altında oluşturuldu.
+>
+> **İki mod BİLEREK ayrı algoritmalarını korudu, birleştirilmedi**: sabit-dalga
+> tarafı hâlâ coroutine+`Health.onDeath` event tabanlı (eski `WaveManager`),
+> heat tarafı hâlâ `Update()`'te sürekli çalışıyor (eski `WaveDirector`) —
+> `WaveDirector.PickEnemy()`'nin elle ayarlanmış heat-eşikli düşman seçim
+> mantığını genel bir `WaveData.enemyWeights[]` sistemine zorlamak ayrı,
+> daha riskli bir iş olurdu; `enemyWeights[]` alanı şema olarak duruyor ama
+> hâlâ kullanılmıyor (ileride ayrı bir iyileştirme). Ortak olan sadece:
+> `Instance` singleton'ı, `SfxPlayer`, ve `WaveData`'dan okunan sayısal
+> parametreler.
+>
+> **`GameHUD.cs` güncellendi**: `WaveDirector.Instance != null` kontrolü artık
+> "VERİ x/y" satırını Arena'da da (yeni birleşik sistem orada da bir
+> `WaveDirector` instance'ı olduğu için) yanlışlıkla gösterirdi — kontrol
+> `director != null && !director.IsFixedWaveMode`'a çevrildi.
+> `SequenceLock.cs`/`DataTerminal.cs` sadece namespace güncellemesi aldı
+> (`Bloodrush.Arena` using'i eklendi) — `SequenceLock` şu an hiçbir sahnede
+> kullanılmıyor (GUID taramasıyla doğrulandı), bu yüzden davranış riski yok.
+>
+> **Kritik bulgu — GUID'le değil TİP ADIYLA bağlı bir referans**:
+> `OutdoorsScene.unity`'de bir buton `OnClick()`'i eski `WaveManager`
+> bileşenini `m_TargetAssemblyTypeName: WaveManager, Assembly-CSharp`
+> (UnityEvent'in persistent-call serileştirmesi, GUID değil TİP ADI string'i
+> kullanıyor) ile çağırıyordu — sınıf adı `WaveDirector`'a değişince bu iki
+> referans `Bloodrush.Arena.WaveDirector, Assembly-CSharp`'a güncellendi
+> (projedeki diğer persistent-call'ların kullandığı tam-nitelikli biçimle
+> aynı), yoksa buton sessizce çalışmaz kalırdı.
+>
+> **Test listesi**: OutdoorsScene'de dalga temizleme (zafer/yenilgi ekranları,
+> "Ana Menüye Dön" butonu, mermi/can dolumu), CH3'te Server Core (4 terminal
+> tamamlama, çıkış bariyerinin açılması, HUD'daki "VERİ x/y" satırı, Arena'da
+> bu satırın GÖRÜNMEDİĞİNİN doğrulanması).
+
 ### Faz 6 — Object Pooling Altyapısı
 **Risk**: Orta. **Bağımlılık**: Faz 3 (veri katmanındaki pool boyutu
 alanları), Faz 4 (Enemy AI tabanı), Faz 5 (birleşik dalga sistemi —

@@ -2,22 +2,35 @@ using UnityEngine;
 
 namespace Bloodrush.Arena
 {
-// Dalga/spawn dengesi verisi — HEM WaveManager'in sabit-dalga modelini HEM
-// WaveDirector'in heat-bazli eskalasyon modelini destekleyecek sekilde tek
-// semada birlesir (bkz. BLOODRUSH_YENIDEN_YAPILANDIRMA_PLANI.md, Faz 3).
-//
-// Henuz hicbir sisteme baglanmadi — sadece veri semasi. WaveManager ve
-// WaveDirector birlesip bu veriyi tuketecek sekilde guncellenmesi Faz 5'te.
+// Dalga/spawn dengesi verisi — HEM eski WaveManager'in sabit-dalga modelini
+// HEM eski WaveDirector'in heat-bazli eskalasyon modelini destekleyecek
+// sekilde tek semada birlesir (bkz. BLOODRUSH_YENIDEN_YAPILANDIRMA_PLANI.md,
+// Faz 3/Faz 5). Faz 5'te birlesik Assets/Scripts/Arena/WaveDirector.cs'e
+// baglandi — hangisi calisacagini hasFixedWaveCount belirler.
 [CreateAssetMenu(fileName = "WaveData", menuName = "Bloodrush/Wave Data")]
 public class WaveData : ScriptableObject
 {
-    [Header("Sabit Dalga Modeli (WaveManager tarzı)")]
+    [Header("Mod")]
+    [Tooltip("true: sabit sayida dalga (Arena) — dusmanlar temizlenince yeni dalga baslar, " +
+             "maxWaves sonunda zafer. false: surekli heat-bazli eskalasyon (Ch3 Server Core) " +
+             "— tum terminaller bitince biter.")]
+    public bool hasFixedWaveCount = true;
+
+    [Header("Sabit Dalga Modeli (eski WaveManager tarzı)")]
     public int   maxWaves          = 10;
     public int   baseEnemyCount    = 3;
     public int   enemyCountPerWave = 1;
     public float timeBetweenWaves  = 5f;
 
-    [Header("Heat / Eskalasyon Modeli (WaveDirector tarzı)")]
+    [Header("Sabit Dalga Sesleri")]
+    public AudioClip waveStartClip;
+    [Range(0f, 1f)] public float waveStartVolume = 0.8f;
+    public AudioClip victoryClip;
+    [Range(0f, 1f)] public float victoryVolume = 1f;
+    public AudioClip defeatClip;
+    [Range(0f, 1f)] public float defeatVolume = 1f;
+
+    [Header("Heat / Eskalasyon Modeli (eski WaveDirector tarzı)")]
     public float timeHeatRate      = 0.05f;
     public float terminalHeatStep  = 1.5f;
     public float heatMax           = 10f;

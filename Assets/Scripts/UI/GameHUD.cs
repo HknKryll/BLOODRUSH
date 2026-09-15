@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Bloodrush.Flow;
+using Bloodrush.Arena;
 using Bloodrush.Shared;
 
 // Not: BEDEN (StimulantSystem collapse) ve YÜKLEME (upload) barları kaldırıldı —
@@ -228,7 +229,9 @@ public class GameHUD : MonoBehaviour
         if (veriRow == null) return;
 
         var director = WaveDirector.Instance;
-        bool show = director != null;
+        // Sabit-dalga modunda (Arena) da bir WaveDirector instance'ı var artık —
+        // "VERİ x/y" satırı SADECE heat/terminal modunda (Ch3 Server Core) görünmeli.
+        bool show = director != null && !director.IsFixedWaveMode;
         if (veriRow.activeSelf != show) veriRow.SetActive(show);
         if (!show) return;
 
