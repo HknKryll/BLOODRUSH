@@ -251,11 +251,22 @@ GUID bazlı referans kontrolü yapıldı ve ilk varsayımım yanlış çıktı:
 doğrudan vendor paketinin orijinal prefabına bakıyor. Bu **kırılgan bir
 referans** — `ThirdParty/GabrielAguiarProductions/` klasörü ileride
 güncellenir/silinirse (paket versiyonu değişirse vb.) CH2 sahnesi
-sessizce kırılır. **Öneri**: hiçbir dosyayı silme; CH2.unity'de
-`vfx_Explosion_01` referansını `Prefabs/Weapons/` kopyasına yönlendir
-(Unity Editor'de sahneyi aç, ilgili GameObject'in prefab referansını
-proje-içi kopyaya değiştir). Bu bir "gereksiz dosya" maddesi değil,
-"kırılgan bağımlılık" maddesi — Faz 3'ten çıkarıp ayrı not ediyorum.
+sessizce kırılır. Bir "gereksiz dosya" maddesi değil, "kırılgan
+bağımlılık" maddesi.
+
+> ⛔ **2026-09-15 — metinle düzeltilemedi, Editor gerekiyor**: `CH2.unity`
+> içindeki bu `PrefabInstance` bloğunu inceledim — `m_SourcePrefab`'ı
+> proje-içi kopyanın GUID'iyle değiştirmek tek başına yetmiyor, çünkü
+> blokta **~15 adet `m_Modifications` override kaydı** var ve bunların
+> hepsi ThirdParty prefabının **kendi iç `fileID`'lerine** (`5162910912013668194`,
+> `6084495597062304751` vb.) bağlı. İki ayrı prefab asset'inin iç obje
+> hiyerarşisi fileID'leri birebir aynı olması garanti değil — GUID'i
+> elle değiştirirsem override'lar ya sessizce düşer ya da yanlış
+> objelere uygulanabilir. Bu, `Player.prefab`'daki basit bileşen
+> kaldırmadan farklı — Unity Editor'de sahneyi açıp ilgili GameObject'i
+> seçip prefab referansını `Prefabs/Weapons/vfx_Explosion_01.prefab`'a
+> sürükleyerek (Unity'nin kendi override-remap mantığıyla) yapılmalı.
+> **Bekleyen madde — kullanıcı Editor'de yapacak.**
 
 ### 4.3 `Audio/damage.wav` = `Audio/mixkit-fast-blow-2144.wav` (197 KB) — **DÜZELTME: sil durumu değil**
 GUID taraması yapıldı: ikisi de gerçekten kullanılıyor, farklı
