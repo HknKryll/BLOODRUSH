@@ -9,10 +9,10 @@ namespace Bloodrush.UI.Menu
 {
 // VERITAS pause menusu — ana menuyle ayni dil, daha kompakt.
 //
-// KENDINI KURAR: eski PauseMenu, Player.prefab uzerinde bir bilesendi; bu yuzden yeni
-// menuyu prefab'a eklemek yerine [RuntimeInitializeOnLoadMethod] ile kendimiz
-// olusturuyoruz. Boylece HICBIR sahneye ve prefab'a dokunmak gerekmiyor. Acilista eski
-// PauseMenu bilesenini bulup kapatiyoruz ki ESC'e iki menu birden cevap vermesin.
+// KENDINI KURAR: menuyu prefab'a eklemek yerine [RuntimeInitializeOnLoadMethod] ile
+// kendimiz olusturuyoruz. Boylece HICBIR sahneye ve prefab'a dokunmak gerekmiyor.
+// (Eski, Player.prefab uzerindeki legacy PauseMenu bileseni ve onu kapatan
+// DisableLegacy() mantigi kaldirildi — legacy bilesen artik hic mevcut degil.)
 public class PauseMenuController : MonoBehaviour
 {
     const int SortingOrder = 200;
@@ -43,19 +43,6 @@ public class PauseMenuController : MonoBehaviour
     void Awake()
     {
         theme = MenuTheme.Load();
-        SceneManager.sceneLoaded += (_, __) => DisableLegacy();
-        DisableLegacy();
-    }
-
-    // Eski PauseMenu Player.prefab uzerinde; sahne yuklendikce yeniden gelir.
-    static void DisableLegacy()
-    {
-        var legacy = FindFirstObjectByType<PauseMenu>();
-        if (legacy != null && legacy.enabled)
-        {
-            legacy.enabled = false;
-            Debug.Log("[PauseMenuController] Eski PauseMenu kapatıldı.");
-        }
     }
 
     void Update()
