@@ -543,16 +543,21 @@ iki kez entegrasyon işi yapılmıyor**).
 > klasörü önbelleğe alınıyor (hız için), LFS dosyaları checkout'ta
 > dahil ediliyor.
 >
-> ⚠️ **Senin yapman gereken tek adım**: bu workflow GitHub repo'sunda
-> `UNITY_LICENSE` (ya da `UNITY_EMAIL`+`UNITY_PASSWORD`) secret'ları
-> tanımlanmadan **çalışmaz** (kimlik doğrulama hatasıyla başarısız
-> olur, kod tabanına zarar vermez, sadece kırmızı X görürsün). Bunlar
-> senin Unity hesap bilgilerin olduğu için ben ekleyemem —
-> `game-ci/unity-builder`'ın "Activation" dokümantasyonundaki adımları
-> izleyip GitHub repo → Settings → Secrets and variables → Actions'a
-> eklemen gerekiyor. İstemezsen workflow dosyasını `.github/workflows/`'tan
-> silmen ya da devre dışı bırakman yeterli, projeye başka hiçbir etkisi
-> yok.
+> ❌ **GERİ ALINDI (2026-09-18)**: workflow dosyası silindi, `.github/`
+> klasörü kalmadı. Sebep: `UNITY_LICENSE` secret'ı hiç tanımlanmadı, bu
+> yüzden çalıştırılan üç run'ın üçü de Unity daha açılmadan
+> "Missing Unity License File and no Serial was found" hatasıyla ~42
+> saniyede düştü. Her push'ta kırmızı X + bildirim maili üretmesi dışında
+> bir etkisi olmuyordu; derleme doğrulaması zaten yerelde
+> `dotnet build Assembly-CSharp.csproj` + `Assembly-CSharp-Editor.csproj`
+> ile yapılıyor.
+>
+> Tekrar istenirse: dosyayı ekleyen commit `424b1be`
+> (`git show 424b1be:.github/workflows/unity-build-check.yml`). Geri
+> koymadan önce `game-ci/unity-builder`'ın "Activation" adımlarıyla
+> alınacak `.ulf` dosyasının içeriği GitHub repo → Settings → Secrets and
+> variables → Actions altına `UNITY_LICENSE` olarak eklenmeli — bu
+> kullanıcının Unity hesabına ait olduğu için Claude ekleyemez.
 
 ---
 
