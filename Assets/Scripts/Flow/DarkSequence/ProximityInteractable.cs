@@ -88,7 +88,9 @@ public abstract class ProximityInteractable : MonoBehaviour
         Bounds b   = default;
         foreach (var r in visuals)
         {
-            if (r == null) continue;
+            // Gizli parcalar (ör. kutudaki henuz takilmamis sigortalar) sayilmaz: kapali bir
+            // renderer'in bounds'u guvenilir degil ve hedefi dunya merkezine kaydirabilir.
+            if (r == null || !r.enabled || !r.gameObject.activeInHierarchy) continue;
             if (!any) { b = r.bounds; any = true; }
             else       b.Encapsulate(r.bounds);
         }

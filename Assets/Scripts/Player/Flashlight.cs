@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.HighDefinition;
 using Bloodrush.Shared.Audio;
@@ -60,6 +61,21 @@ public class Flashlight : MonoBehaviour
     [Header("El hissi")]
     [Tooltip("Kamerayı takip gecikmesi. 0 = kafaya kilitli, 12-18 doğal, düşük değer savruk.")]
     [SerializeField] float followLag = 14f;
+
+    [Header("Yakın mesafe kısma")]
+    [Tooltip("AÇIK: fener yakındaki bir yüzeye vurunca gücü mesafenin karesiyle kısılır. Işık " +
+             "mesafenin karesiyle arttığı için 'Full Distance'tan yakın her yüzey o mesafedeki kadar " +
+             "aydınlanır — sabit pozlamalı karanlık sahnede yakındaki kutu/masa beyaza patlamaz, " +
+             "uzağın görünüşü değişmez.")]
+    [SerializeField] bool  nearDimming = true;
+    [Tooltip("Bu mesafe ve ötesinde fener tam güçte (m). Gezinirken duvarların doğru göründüğü mesafe; " +
+             "yakın yüzey hâlâ parlıyorsa ARTIR.")]
+    [SerializeField] float nearFullDistance = 4f;
+    [Tooltip("Kısmanın alt sınırı — burnunu duvara dayayınca fener tamamen sönmesin.")]
+    [Range(0.005f, 1f)]
+    [SerializeField] float nearMinScale = 0.03f;
+    [Tooltip("Kısmanın değişim hızı. Yüksek = anında; düşük = göz alışıyormuş gibi yumuşak.")]
+    [SerializeField] float nearDimSpeed = 10f;
 
     [Header("Ses")]
     [SerializeField] AudioClip clickClip;
@@ -232,6 +248,8 @@ public class Flashlight : MonoBehaviour
 
         if (KeyBindings.DownKey(toggleKey)) Toggle();
 
+        UpdateNearDimming();
+
         // Gecikmeli takip: fener kameranın bakışına yumuşakça yetişir.
         if (followLag > 0f && camTr != null)
         {
@@ -244,6 +262,89 @@ public class Flashlight : MonoBehaviour
     }
 
     public void Toggle() => SetOn(!isOn);
+
+    // ── Yakın mesafe kısma ─────────────────────────────────────────────
+    //
+    // Reflektörlü spot tüm lümeni dar koniye topluyor; x17 ışık çarpanıyla 1.5 m'deki açık renkli
+    // bir yüzey beyazın onlarca katına çıkıyordu. Otomatik pozlama bunu çözemedi: ekranın çoğu
+    // siyah olduğu için ölçüm hep "karanlık" diyordu. Burada fenerin kendisi, baktığı yüzeyin
+    // mesafesine göre kısılır — pozlamaya ve diğer ışıklara dokunulmaz.
+
+    static readonly Vector2[] ProbeDirs =
+    {
+        Vector2.zero, new Vector2(1f, 0f), new Vector2(-1f, 0f), new Vector2(0f, 1f), new Vector2(0f, -1f),
+    };
+
+    float nearScale = 1f;
+    HDAdditionalLightData lampHd, reachHd;
+
+    void UpdateNearDimming()
+    {
+        float target = 1f;
+        if (nearDimming && isOn && camTr != null && nearFullDistance > 0.01f)
+        {
+            float d = ProbeNearestHit();
+            if (d < nearFullDistance)
+                target = Mathf.Max(nearMinScale, (d * d) / (nearFullDistance * nearFullDistance));
+        }
+
+        float k = nearDimSpeed > 0f ? 1f - Mathf.Exp(-nearDimSpeed * Time.deltaTime) : 1f;
+        float next = Mathf.Lerp(nearScale, target, k);
+        if (Mathf.Abs(next - nearScale) < 0.0005f && Mathf.Abs(target - nearScale) < 0.0005f) return;
+        nearScale = next;
+
+        float scale = Bloodrush.Flow.DarkSceneExposure.LightScale * nearScale;
+        if (lampHd == null && lamp != null) lampHd = lamp.GetComponent<HDAdditionalLightData>();
+        if (lampHd != null) lampHd.SetIntensity(lumen * scale, LightUnit.Lumen);
+        if (reachLamp != null)
+        {
+            if (reachHd == null) reachHd = reachLamp.GetComponent<HDAdditionalLightData>();
+            if (reachHd != null) reachHd.SetIntensity(reachLumen * scale, LightUnit.Lumen);
+        }
+    }
+
+    // Koninin merkezi ve iç kısmının dört yanı: kenara giren yakın bir kutu da yakalansın.
+    // En yakın isabet kullanılır. Oyuncunun kendi kapsülü ışının başladığı yerde olduğu için
+    // Raycast onu görmez.
+    float ProbeNearestHit()
+    {
+        Vector3 origin = lamp != null ? lamp.transform.position : camTr.position;
+        float   spread = Mathf.Tan(spotAngle * 0.25f * Mathf.Deg2Rad);
+        float   best   = float.MaxValue;
+        foreach (var o in ProbeDirs)
+        {
+            Vector3 dir = (camTr.forward + camTr.right * (o.x * spread) + camTr.up * (o.y * spread)).normalized;
+            if (Physics.Raycast(origin, dir, out RaycastHit hit, nearFullDistance, ~0, QueryTriggerInteraction.Ignore))
+                best = Mathf.Min(best, hit.distance);
+        }
+        return best;
+    }
+
+    Coroutine flickering;
+
+    // Dis etkiyle kisa kirpisma (ör. yakin patlama). Oyuncunun ac/kapa durumunu DEGISTIRMEZ,
+    // ses ve bildirim yok (SetOn ikisini de yapiyor). Fener kapaliysa dokunmaz.
+    public void Flicker(float duration)
+    {
+        if (lamp == null || !isOn || !isActiveAndEnabled) return;
+        if (flickering != null) StopCoroutine(flickering);
+        flickering = StartCoroutine(FlickerRoutine(duration));
+    }
+
+    IEnumerator FlickerRoutine(float duration)
+    {
+        float end = Time.time + duration;
+        while (Time.time < end)
+        {
+            bool on = Random.value < 0.35f;
+            lamp.enabled = on && isOn;
+            if (reachLamp != null) reachLamp.enabled = on && isOn && enableReachBeam;
+            yield return new WaitForSeconds(Random.Range(0.03f, 0.09f));
+        }
+        lamp.enabled = isOn;
+        if (reachLamp != null) reachLamp.enabled = isOn && enableReachBeam;
+        flickering = null;
+    }
 
     public void SetOn(bool on)
     {

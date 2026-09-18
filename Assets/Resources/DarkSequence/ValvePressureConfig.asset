@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4721f86d3d87d03449d14d00e25cfc47, type: 3}
+  m_Name: ValvePressureConfig
+  m_EditorClassIdentifier: 
+  windowSeconds: 22
+  tiers:
+  - checks: 3
+    zoneStart: 70
+    zoneEnd: 30
+    speedStart: 180
+    speedEnd: 300
+  - checks: 4
+    zoneStart: 60
+    zoneEnd: 26
+    speedStart: 215
+    speedEnd: 360
+  missLockout: 0.6
+  cameraTurnTime: 0.25
+  calmInterval: {x: 5, y: 9}
+  intenseInterval: {x: 2.5, y: 5}
+  bangRatio: 0.55
+  bigExplosionChance: 0.25
+  nearDistance: {x: 3, y: 7}
+  farDistance: {x: 12, y: 25}
+  nearChance: 0.45
+  sneakyChance: 0.35
+  sneakyCooldown: 6
+  shakeNear: 0.22
+  shakeBig: 0.35
+  flickerChance: 0.25
+  flickerCooldown: 14
+  flickerDuration: {x: 0.2, y: 0.45}
+  ceilingDust: 1
+  dustParticles: 60
+  beepIntervalStart: 1.2
+  beepIntervalEnd: 0.4
+  hissLoop: {fileID: 8300000, guid: b305ccbd9607474681206801b908e6f9, type: 3}
+  hissOneShots:
+  - {fileID: 8300000, guid: 0031d1cc0a6542f4a2fd2616a7720083, type: 3}
+  - {fileID: 8300000, guid: 081d46d5ec4c4991a2ecb8c8639915b6, type: 3}
+  - {fileID: 8300000, guid: 3fa23b7a8c4c46bd900410c79353c2c5, type: 3}
+  steamBurst: {fileID: 8300000, guid: f0dc885bf853405e861c9b4bfe1dda30, type: 3}
+  pipeBangs:
+  - {fileID: 8300000, guid: 46f7fd401c424f3dbdede7c188111d14, type: 3}
+  - {fileID: 8300000, guid: de9ba984ce494d2ba75b4a016642e402, type: 3}
+  - {fileID: 8300000, guid: a0147e9422f84c7ca2e579f6bb6cbf36, type: 3}
+  explosionsNear:
+  - {fileID: 8300000, guid: f519fa05146c4430b62892ef1818e69b, type: 3}
+  - {fileID: 8300000, guid: 199debc5c4a942fe9825254de9467666, type: 3}
+  explosionsFar:
+  - {fileID: 8300000, guid: 94c5871b78274d41a06e7ab1bc2d6b8a, type: 3}
+  alarmBeep: {fileID: 8300000, guid: 3b90d41766d34c91beaa153d38dd0d6f, type: 3}
+  turnStep: {fileID: 8300000, guid: 5ec4897aac6f4dde9412777ba58694ce, type: 3}
+  releaseHiss: {fileID: 8300000, guid: 0031d1cc0a6542f4a2fd2616a7720083, type: 3}
+  hissLoopVolume: 0.55
+  hissVolume: 0.8
+  burstVolume: 1
+  bangVolume: 0.9
+  explosionVolume: 1
+  alarmVolume: 0.35
+  turnVolume: 0.9

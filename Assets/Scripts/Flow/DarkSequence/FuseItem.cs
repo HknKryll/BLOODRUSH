@@ -1,19 +1,20 @@
 using UnityEngine;
 using UnityEngine.Events;
-using Bloodrush.UI;
 using Bloodrush.Shared.Audio;
 
 namespace Bloodrush.Flow
 {
-// ADIM 4 — Yerden alınan sigorta. Alınınca kendini kapatır ve panele haber verir.
-// Paneli kendisi bulabilir, böylece sahnede birden fazla sigortayı tek tek bağlamak
-// zorunda kalmazsın.
+// ADIM 4 — Yerden alınan sigorta. Alınınca oyuncunun ELİNE geçer; kutuya takmak ayrı bir
+// adım (FusePanel). Kutuyu tanımaz: FuseSequenceManager'a "alındım" der, gerisi orada.
 public class FuseItem : ProximityInteractable
 {
     [Header("Sigorta")]
     [SerializeField] string displayName = "SİGORTA";
-    [Tooltip("Boşsa sahnedeki ilk FusePanel otomatik bulunur.")]
-    [SerializeField] FusePanel panel;
+    [Tooltip("Boşsa sahnedeki FuseSequenceManager bulunur, o da yoksa kendiliğinden kurulur.")]
+    [SerializeField] FuseSequenceManager manager;
+    [Tooltip("Elde gösterilecek görsel. Boşsa bu objenin kendisi (altındaki placeholder ya da " +
+             "gerçek model) kopyalanır — modeli değiştirince eldeki de kendiliğinden değişir.")]
+    [SerializeField] Transform handVisual;
 
     [Header("Ses")]
     [SerializeField] AudioClip pickupClip;
@@ -26,17 +27,21 @@ public class FuseItem : ProximityInteractable
 
     protected override string PromptText => taken ? null : $"[E] {displayName} Al";
 
+    void Start()
+    {
+        if (manager == null) manager = FuseSequenceManager.FindOrCreate();
+    }
+
     protected override void OnInteract()
     {
         if (taken) return;
         taken = true;
 
         SfxPlayer.PlayAtPoint(pickupClip, transform.position, pickupVolume);
-        Notification.Show($"{displayName} ALINDI");
 
-        if (panel == null) panel = FindFirstObjectByType<FusePanel>();
-        if (panel != null) panel.AddFuse();
-        else Debug.LogWarning("[FuseItem] FusePanel bulunamadı — sigorta sayılmadı.", this);
+        if (manager == null) manager = FuseSequenceManager.FindOrCreate();
+        // Kapatmadan ÖNCE: el modeli bu anda görseli kopyalıyor.
+        manager.Collect(handVisual != null ? handVisual : transform);
 
         onCollected?.Invoke();
         gameObject.SetActive(false);

@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 1a4fdfc7afb2443bae70c1918814a203
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - concreteMat: {fileID: 2100000, guid: 0d2e54faf3bf4c919218f774f5ff4a2e, type: 2}
+  - ceilingPanelMat: {fileID: 2100000, guid: 6d4a9a8c113d4bc091d6fc0e3783418f, type: 2}
+  - metalMat: {fileID: 2100000, guid: fdf49e729dd243d69e9f94e5cbc51a06, type: 2}
+  - cableMat: {fileID: 2100000, guid: bc45ac0baead43f897ce294c93eafd42, type: 2}
+  - copperMat: {fileID: 2100000, guid: b0509f3b012040f181e8b5b5cc9d4077, type: 2}
+  - paperMat: {fileID: 2100000, guid: 37e2da128b74474a84ef6dcd3c0d454d, type: 2}
+  - glassMat: {fileID: 2100000, guid: e5810995e4b04a76ae9bd74350e844a3, type: 2}
+  - sootMat: {fileID: 2100000, guid: d4f6e54bfe14422295bcd9bae16da2ee, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
