@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 74297d2abb7d47e8b6fa5193aaeef18f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - shaftMaterial: {fileID: 2100000, guid: 0d2e54faf3bf4c919218f774f5ff4a2e, type: 2}
+  - capMaterial: {fileID: 2100000, guid: d4f6e54bfe14422295bcd9bae16da2ee, type: 2}
+  - hatchMaterial: {fileID: 2100000, guid: fdf49e729dd243d69e9f94e5cbc51a06, type: 2}
+  - rubbleMaterial: {fileID: 2100000, guid: 0d2e54faf3bf4c919218f774f5ff4a2e, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

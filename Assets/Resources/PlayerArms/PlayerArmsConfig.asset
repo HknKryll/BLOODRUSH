@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d625094be9af4989b15c21001a548f70, type: 3}
+  m_Name: PlayerArmsConfig
+  m_EditorClassIdentifier: 
+  modelPath: PlayerArms/arms_rig
+  bareMaterial: {fileID: 2100000, guid: f1cf832f9f0b4551a83f2c8f3be9b388, type: 2}
+  gloveMaterial: {fileID: 2100000, guid: 6333c6b2912842e78c6accae1868300c, type: 2}
+  useGloves: 0
+  pointFilter: 1
+  eyeHeight: 1.7
+  viewOffset: {x: 0, y: -0.03, z: -0.02}
+  referenceArmWidth: 0.394
+  punchClip: jab
+  parryClip: jab
+  clipStartTime: 0.2
+  playbackSpeed: 1.8
+  parrySpeed: 2.2
+  whooshClip: {fileID: 8300000, guid: 7a88242b99164ada8608ba45722f37c3, type: 3}
+  whooshVolume: 0.7
+  whooshPitch: {x: 0.92, y: 1.08}
+  leftArmWhenArmed: 1
+  alternateWhenUnarmed: 1
+  slideDistance: 0.35
+  slideInTime: 0.05
+  slideOutTime: 0.12

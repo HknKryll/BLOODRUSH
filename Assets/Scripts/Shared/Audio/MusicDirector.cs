@@ -57,6 +57,7 @@ public class MusicDirector : MonoBehaviour
     public static MusicDirector Instance { get; private set; }
 
     Track     active;
+    Track     previous;   // aktiften once calan parca — revert id'si tutmazsa buna donulur
     Coroutine pendingSwitch;
     bool      locked;
 
@@ -65,6 +66,12 @@ public class MusicDirector : MonoBehaviour
     void Awake()
     {
         Instance = this;
+
+        // Start'ta StopNow yetmiyordu: RoomMusic'lerin kendi Start'i bundan SONRA kosarsa
+        // Play On Start yuzunden muzik sahne acilisinda basliyordu (Start sirasi belirsiz).
+        // Awake her Start'tan once kosar — parcalari burada kesin olarak sustur.
+        foreach (var t in tracks)
+            if (t?.music != null) t.music.SuppressPlayOnStart();
     }
 
     void OnDestroy()
@@ -124,6 +131,7 @@ public class MusicDirector : MonoBehaviour
         if (pendingSwitch != null) { StopCoroutine(pendingSwitch); pendingSwitch = null; }
 
         var prev = active;
+        if (prev != null) previous = prev;
         active = next;
 
         bool canAlign = alignToBar && crossfade > 0f &&
@@ -191,8 +199,24 @@ public class MusicDirector : MonoBehaviour
     {
         // Boss oldukten sonra ya da hicbir sey calmiyorken geri donecek bir sey yok.
         if (locked || active == null) return;
-        Play(revertTrackId, revertCrossfade);
+
+        // Revert id'si parca listesinde yoksa (CH2'de "tutorial" yazili, parca "TuturoialDovus")
+        // sessizce hic donulmuyordu — bir onceki parcaya don.
+        var target = Find(revertTrackId);
+        if (target == null && previous != null)
+        {
+            if (!warnedRevert)
+            {
+                Debug.LogWarning($"[MusicDirector] Revert parcasi '{revertTrackId}' yok — bir onceki parcaya " +
+                                 $"('{previous.id}') donuluyor. Inspector'da Revert Track Id'yi duzelt.", this);
+                warnedRevert = true;
+            }
+            target = previous;
+        }
+        if (target != null && target != active) Play(target.id, revertCrossfade);
     }
+
+    bool warnedRevert;
 
     Track Find(string id)
     {

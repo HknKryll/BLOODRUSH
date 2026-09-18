@@ -70,8 +70,15 @@ public class RoomMusic : MonoBehaviour
 
     void Start()
     {
-        if (playOnStart) FadeIn();
+        if (playOnStart && !suppressPlayOnStart) FadeIn();
     }
+
+    bool suppressPlayOnStart;
+
+    // MusicDirector cagirir: parcayi yoneten o, sahne acilisinda kendiliginden calmasin.
+    // Inspector'daki Play On Start acik kalsa bile gecerli (CH2'de ucunde de acikti ve
+    // tutorial muzigi koridorda basliyordu).
+    public void SuppressPlayOnStart() => suppressPlayOnStart = true;
 
     // UnityEvent'ten de cagrilabilir.
     public void FadeIn()

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 826bb613c7a84a82b27333e5de473a79
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - fallWindClip: {fileID: 8300000, guid: 721973fe13714f51ba4257f9c5e47f38, type: 3}
+  - impactClip: {fileID: 8300000, guid: 2abc81586b984f05866d2c934d0b46cf, type: 3}
+  - gruntClip: {fileID: 8300000, guid: 94b1de4955424b819a4995c33ec1652a, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

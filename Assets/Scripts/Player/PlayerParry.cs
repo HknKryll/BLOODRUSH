@@ -25,9 +25,18 @@ public class PlayerParry : MonoBehaviour
 
     SfxPlayer sfx;
 
+    // Gorunum (PlayerArmsView) bunlari dinler; mekanik bunlardan etkilenmez.
+    public event System.Action<bool> Punched;   // arguman: bir dusmana isabet etti mi
+    public event System.Action       Parried;
+
     void Start()
     {
         sfx = SfxPlayer.Create(gameObject, spatialBlend: 0f);
+
+        // Birinci sahis yumruk animasyonu — sahneye/prefab'a bir sey eklemeden kurulur.
+        var arms = GetComponent<PlayerArmsView>();
+        if (arms == null) arms = gameObject.AddComponent<PlayerArmsView>();
+        arms.Bind(this);
     }
 
     void Update()
@@ -45,6 +54,7 @@ public class PlayerParry : MonoBehaviour
                 CameraShake.Shake(0.2f, 0.15f);
                 weaponAnim?.TriggerParry();
                 sfx.Play(parryClip, parryVolume);
+                Parried?.Invoke();
                 return;
             }
         }
@@ -71,13 +81,18 @@ public class PlayerParry : MonoBehaviour
             if (d < bestDist) { bestDist = d; target = enemy; }
         }
 
-        if (target == null) return;
+        if (target == null)
+        {
+            Punched?.Invoke(false);   // bosa yumruk: hasar yok ama kol yine savrulur
+            return;
+        }
 
         target.GetComponent<Health>()?.TakeDamage(punchDamage);
         target.Knockback(target.transform.position - transform.position, punchForce);
         weaponAnim?.TriggerParry();
         CameraShake.Shake(0.08f, 0.1f);
         sfx.Play(punchClip, punchVolume);
+        Punched?.Invoke(true);
     }
 }
 }
