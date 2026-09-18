@@ -9,7 +9,7 @@ using Bloodrush.Player;
 namespace Bloodrush.Enemy
 {
 [RequireComponent(typeof(Rigidbody))]
-public class EnemyAI : EnemyAIBase
+public class EnemyAI : EnemyAIBase, EnemyAnimEvents.IAnimEventReceiver
 {
     // ───── Durum makinesi ─────
     enum State { Patrol, Chase, Attack, Telegraphing, Stunned, RangedFire }
@@ -115,6 +115,7 @@ public class EnemyAI : EnemyAIBase
     // ───── Referanslar ─────
     Rigidbody rb;
     Animator anim;   // opsiyonel — animasyonlu gövdesi olan düşmanlarda (yoksa null, atlanır)
+    EnemyAnimator animator;   // parametreleri hash ile ve sadece değişince yazar
     bool hasStunnedAnimParam;   // Animator'da "Stunned" bool'u var mı (varsa stun klibi oynar, yoksa dondurulur)
 
     EnemyPatrolBehavior   patrol;
@@ -131,13 +132,20 @@ public class EnemyAI : EnemyAIBase
         base.Awake();
 
         anim = GetComponentInChildren<Animator>();   // animasyonlu gövde varsa
+        animator = new EnemyAnimator(anim);          // hash'li, sadece degisince yazan sarmalayici
+
+        // Animation Event köprüsü: Unity event'i SADECE Animator'ın objesine gönderir, AI ise
+        // kökte. Köprüyü elle eklemek gerekmesin diye burada kuruluyor.
+        if (anim != null && anim.GetComponent<EnemyAnimEvents>() == null)
+            anim.gameObject.AddComponent<EnemyAnimEvents>();
+
+        // ROOT MOTION KAPALI: hareketi NavMeshAgent veriyor. Açık kalırsa klip modeli kendi
+        // içinde yürütür ve model kökünden (collider'ından) kopar.
+        if (anim != null) anim.applyRootMotion = false;
 
         // Animator'da "Stunned" bool'u tanımlı mı? Varsa stun'da o klibe geçilir;
         // yoksa fallback: animator DONDURULUR (yumruk ortada kalır — stun okunur).
-        if (anim)
-            foreach (var p in anim.parameters)
-                if (p.type == AnimatorControllerParameterType.Bool && p.name == "Stunned")
-                { hasStunnedAnimParam = true; break; }
+        hasStunnedAnimParam = animator.HasStunParam;
         rb     = GetComponent<Rigidbody>();
         rb.isKinematic = true;   // normalde NavMeshAgent sürer; sadece fırlatma/düşüş sırasında fizik açılır
         rb.useGravity  = false;
@@ -145,8 +153,10 @@ public class EnemyAI : EnemyAIBase
         patrol = new EnemyPatrolBehavior(patrolPoints, patrolWaitTime, sightRange, obstacleMask);
         meleeAttack = new EnemyMeleeAttack(attackRange, meleeVerticalReach, attackDamage, attackCooldown,
             telegraphDuration, playerKnockback, attackIndicator, sfx, attackClip, attackVolume);
+        // Fire parametresi olan bir controller varsa mermiyi Animation Event spawn eder.
         rangedAttack = new EnemyRangedAttack(rangedRange, magSize, fireRate, reloadTime,
             projectileSpeed, projectileDamage, spreadAngle, projectilePrefab, muzzle, sfx, attackClip, attackVolume);
+        rangedAttack.DeferToAnimation = animator.HasFireParam;
         knockbackHandler = new EnemyKnockbackHandler();
         leap = new EnemyLeapBehavior(leapRangeMin, leapRangeMax, leapCooldown, leapSpeed, leapArcHeight);
 
@@ -194,7 +204,7 @@ public class EnemyAI : EnemyAIBase
         if (measured > 50f) measured = animSpeed;
 
         animSpeed = Mathf.Lerp(animSpeed, measured, dt * 10f);
-        anim.SetFloat("Speed", animSpeed);
+        animator.SetSpeed(animSpeed);
     }
 
     // Bake kusurlu ya da bayat olsa bile dusman kendi kendine toparlansin diye sigorta.
@@ -293,6 +303,9 @@ public class EnemyAI : EnemyAIBase
 
         float dist = Vector3.Distance(transform.position, player.position);
 
+        // Üst gövde nişan layer'ı: sarmalayıcı sadece DEĞİŞİNCE yazar, her kare spam yok.
+        animator.SetAiming(state == State.RangedFire);
+
         switch (state)
         {
             case State.Patrol:       DoPatrol(dist);      break;
@@ -389,8 +402,15 @@ public class EnemyAI : EnemyAIBase
             return;
         }
 
-        rangedAttack.TickFire(transform, player);
+        // Atış zamanı geldiyse: mermiyi animasyonun ateş karesi spawn eder (AnimFire).
+        // Klip/rig yoksa EnemyRangedAttack kendi zaman aşımıyla yine de ateşler.
+        if (rangedAttack.TickFire(transform, player)) animator.Fire();
     }
+
+    // ───────────────── Animation Event (EnemyAnimEvents köprüsü) ─────────────────
+
+    public void AnimFire()     => rangedAttack.FireNow(transform, player);
+    public void AnimDodgeEnd() { }   // küçük/menzilli düşmanda dodge yok
 
     // ───────────────── Saldırı ─────────────────
 
@@ -411,7 +431,7 @@ public class EnemyAI : EnemyAIBase
         {
             state = State.Telegraphing;
             meleeAttack.StartTelegraph();
-            if (anim) anim.SetTrigger("Attack");   // yumruk animasyonu (wind-up + vuruş)
+            animator.Attack();   // yumruk animasyonu (wind-up + vuruş)
         }
     }
 
@@ -519,11 +539,12 @@ public class EnemyAI : EnemyAIBase
     {
         if (anim == null) return;
 
-        anim.ResetTrigger("Attack");                    // bekleyen yumruğu iptal et
+        animator.ResetAttack();                         // bekleyen yumruğu iptal et
+        if (on) animator.SetAiming(false);              // stun'da nişan pozunda kalmasın
 
         if (hasStunnedAnimParam)
         {
-            anim.SetBool("Stunned", on);
+            animator.SetStunned(on);
             return;
         }
 

@@ -77,14 +77,49 @@ public class EnemyRangedAttack
         nextShotTime = 0f;
     }
 
-    public void TickFire(Transform enemy, Transform player)
+    // ATEŞ ANI ANİMASYONDAN GELİR (opsiyonel). Animator'da "Fire" parametresi varsa mermi
+    // burada DEĞİL, klibin ateş karesindeki Animation Event'ten (FireNow) çıkar — görsel ile
+    // mekanik senkron olur. Şarjör ve atış aralığı yine burada işler, yani kadans değişmez.
+    //
+    // GÜVENLİK AĞI: event gelmezse (klip yok, event eklenmemiş, model rig'siz) fireTimeout
+    // sonunda mermi yine de atılır. Zırhlı'nın şu an modeli yok — bu olmadan ateş edemezdi.
+    public bool DeferToAnimation { get; set; }
+    public float FireTimeout = 0.35f;
+    public bool  ShotPending { get; private set; }
+    float pendingSince;
+
+    // true dönerse bu karede bir atış BAŞLADI (çağıran taraf Fire trigger'ını atar).
+    public bool TickFire(Transform enemy, Transform player)
     {
-        if (Time.time < nextShotTime) return;
+        if (ShotPending && Time.time - pendingSince >= FireTimeout)
+        {
+            ShotPending = false;
+            FireProjectile(enemy, player);      // event gelmedi → yine de ateşle
+        }
+
+        if (Time.time < nextShotTime) return false;
         if (magLeft <= 0) magLeft = magSize;   // reload bitti, şarjör dolu
 
-        FireProjectile(enemy, player);
         magLeft--;
         nextShotTime = Time.time + (magLeft <= 0 ? reloadTime : fireRate);
+
+        if (DeferToAnimation)
+        {
+            ShotPending  = true;
+            pendingSince = Time.time;
+            return true;
+        }
+
+        FireProjectile(enemy, player);
+        return true;
+    }
+
+    // Animation Event çağırır (EnemyAnimEvents üzerinden).
+    public void FireNow(Transform enemy, Transform player)
+    {
+        if (!ShotPending) return;   // sadece bekleyen atış; event fazladan gelirse mermi yağmaz
+        ShotPending = false;
+        FireProjectile(enemy, player);
     }
 
     void FireProjectile(Transform enemy, Transform player)

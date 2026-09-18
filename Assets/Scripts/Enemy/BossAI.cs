@@ -16,9 +16,9 @@ using Bloodrush.UI;
 
 namespace Bloodrush.Enemy
 {
-public class BossAI : BossAIBase
+public class BossAI : BossAIBase, EnemyAnimEvents.IAnimEventReceiver
 {
-    enum State { Chase, ShotgunAim, MeleeTelegraph, Dash, Blackout, Stunned }
+    enum State { Chase, ShotgunAim, MeleeTelegraph, Dash, Dodge, Blackout, Stunned }
 
     [Header("Hareket")]
     [SerializeField] float moveSpeed = 4.5f;
@@ -45,6 +45,17 @@ public class BossAI : BossAIBase
     [SerializeField] float dashTriggerRange = 12f;
     [SerializeField] float dashTriggerTime  = 2.5f;
     [SerializeField] float dashSpeed        = 22f;
+
+    [Header("Dodge (yana kayma)")]
+    [Tooltip("Yana kayma mesafesi (m). Root motion KAPALI — mesafeyi kod verir, animasyon görsel.")]
+    [SerializeField] float dodgeDistance = 3.5f;
+    [SerializeField] float dodgeDuration = 0.35f;
+    [SerializeField] float dodgeCooldown = 4f;
+    [Tooltip("Oyuncu bu mesafedeyken kaçmayı dener.")]
+    [SerializeField] float dodgeRange    = 14f;
+    [Tooltip("Saniyede bir yapılan denemenin başarı olasılığı.")]
+    [Range(0f, 1f)]
+    [SerializeField] float dodgeChance   = 0.35f;
 
     [Header("Karanlık (faz geçişi)")]
     [SerializeField] float blackoutDuration   = 1.5f;
@@ -77,10 +88,33 @@ public class BossAI : BossAIBase
     BossMeleeAttack       meleeAttack;
     BossBlackoutSequence  blackout;
 
+    EnemyAnimator animator;
+    Vector3 lastAnimPos;
+    float   animSpeed;
+
+    bool    shotPending;        // animasyonun ateş karesi bekleniyor
+    float   shotPendingSince;
+    const float FireEventTimeout = 0.35f;   // event gelmezse yine de ateşle (klip/rig yoksa)
+
+    float   dodgeUntil, dodgeReadyAt, dodgeCheckTimer;
+    Vector3 dodgeDir;
+
     protected override void Awake()
     {
         base.Awake();
         agent.updateRotation = false;   // nişan için elle döneceğiz
+
+        var bodyAnim = GetComponentInChildren<Animator>();
+        animator     = new EnemyAnimator(bodyAnim);
+        lastAnimPos  = transform.position;
+
+        // Animation Event köprüsü kendiliğinden kurulur (Unity event'i Animator'ın objesine yollar).
+        if (bodyAnim != null && bodyAnim.GetComponent<EnemyAnimEvents>() == null)
+            bodyAnim.gameObject.AddComponent<EnemyAnimEvents>();
+
+        // ROOT MOTION KAPALI OLMAK ZORUNDA: hareketi NavMeshAgent veriyor. Açık kalırsa klip
+        // modeli kendi içinde ileri yürütür, model collider'ından/kökünden uzaklaşır.
+        if (bodyAnim != null) bodyAnim.applyRootMotion = false;
 
         shotgunAttack = new BossShotgunAttack(muzzle, shotgunRange, damageNear, damageFar,
             coneAngle, aimTime, obstacleMask, muzzleFlash, sfx, fireClip, fireVolume);
@@ -110,6 +144,13 @@ public class BossAI : BossAIBase
         FacePlayer();
         UpdateDashTimer(dist);
         UpdateHealthBar(dist);
+        UpdateAnimSpeed();
+
+        // Üst gövde nişan layer'ı (sadece değişince yazılır).
+        animator.SetAiming(state == State.ShotgunAim || shotPending);
+
+        // Animation Event gelmediyse (klip yok / event eklenmemiş) atış yine de yapılır.
+        if (shotPending && Time.time - shotPendingSince >= FireEventTimeout) FireShotgun();
 
         logTimer += Time.deltaTime;
         if (logTimer >= 1f)
@@ -129,10 +170,22 @@ public class BossAI : BossAIBase
                 if (shotgunAttack.TickAim())
                 {
                     HideIndicator(aimIndicator);
-                    shotgunAttack.Fire(transform, player, playerHealth);
+                    // Atış anı animasyondan gelir: klipteki ateş karesindeki Animation Event
+                    // (AnimFire) tetikler. Fire parametresi yoksa anında ateşlenir.
+                    if (animator.Fire())
+                    {
+                        shotPending      = true;
+                        shotPendingSince = Time.time;
+                    }
+                    else FireShotgun();
+
                     fireTimer = 0f;
                     state = State.Chase;
                 }
+                break;
+
+            case State.Dodge:
+                DoDodge();
                 break;
 
             case State.MeleeTelegraph:
@@ -180,7 +233,83 @@ public class BossAI : BossAIBase
         // Ateş zamanı
         fireTimer += Time.deltaTime;
         if (fireTimer >= FireInterval && shotgunAttack.HasLineOfSight(transform, player) && dist <= shotgunRange)
+        {
             StartShotgunAim();
+            return;
+        }
+
+        // Saniyede bir yana kayma denemesi.
+        dodgeCheckTimer += Time.deltaTime;
+        if (dodgeCheckTimer >= 1f)
+        {
+            dodgeCheckTimer = 0f;
+            TryStartDodge(dist);
+        }
+    }
+
+    // ───────── Dodge (yana kayma) ─────────
+
+    void TryStartDodge(float dist)
+    {
+        if (Time.time < dodgeReadyAt || dist > dodgeRange) return;
+        if (Random.value > dodgeChance) return;
+
+        dodgeReadyAt = Time.time + dodgeCooldown;
+        dodgeUntil   = Time.time + dodgeDuration;
+        dodgeDir     = Random.value < 0.5f ? -transform.right : transform.right;
+        state        = State.Dodge;
+
+        if (agent.enabled && agent.isOnNavMesh) agent.ResetPath();
+        animator.Dodge();
+    }
+
+    // Root motion KAPALI: mesafeyi kod verir, animasyon sadece görsel.
+    // agent.Move kullanılıyor — NavMesh sınırlarına saygı duyar, ışınlanma yok.
+    // agent.enabled/isStopped ile OYNANMIYOR: ikisi de eski "inactive agent" hatalarının kaynağıydı.
+    void DoDodge()
+    {
+        FacePlayer();
+
+        if (agent.enabled && agent.isOnNavMesh)
+        {
+            float speed = dodgeDistance / Mathf.Max(0.05f, dodgeDuration);
+            agent.Move(dodgeDir * speed * Time.deltaTime);
+        }
+
+        if (Time.time >= dodgeUntil) state = State.Chase;
+    }
+
+    void FireShotgun()
+    {
+        shotPending = false;
+        shotgunAttack.Fire(transform, player, playerHealth);
+    }
+
+    // ───────── Animation Event (EnemyAnimEvents köprüsü) ─────────
+
+    public void AnimFire()
+    {
+        if (shotPending) FireShotgun();
+    }
+
+    public void AnimDodgeEnd()
+    {
+        if (state == State.Dodge) state = State.Chase;
+    }
+
+    // Hız agent.velocity'den DEĞİL gerçek yer değiştirmeden ölçülür — agent bir an NavMesh
+    // dışına düşse bile koşma animasyonu Idle'a snap etmesin (EnemyAI'daki ile aynı yöntem).
+    void UpdateAnimSpeed()
+    {
+        if (!animator.HasAnimator) return;
+
+        float dt = Mathf.Max(Time.deltaTime, 1e-4f);
+        float measured = (transform.position - lastAnimPos).magnitude / dt;
+        lastAnimPos = transform.position;
+
+        if (measured > 50f) measured = animSpeed;   // ışınlanma/blackout sıçraması
+        animSpeed = Mathf.Lerp(animSpeed, measured, dt * 10f);
+        animator.SetSpeed(animSpeed);
     }
 
     // ───────── Dash (anti-revolver) ─────────
