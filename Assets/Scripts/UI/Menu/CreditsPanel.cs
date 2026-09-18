@@ -97,8 +97,10 @@ public class CreditsPanel : MonoBehaviour
     {
         var kb = UnityEngine.InputSystem.Keyboard.current;
         var gp = UnityEngine.InputSystem.Gamepad.current;
-        if ((kb != null && kb.escapeKey.wasPressedThisFrame) ||
-            (gp != null && gp.buttonEast.wasPressedThisFrame))
+        // Diger modallarla ayni kural: ESC hakemden alinir (bkz. InteractionInput).
+        bool esc = kb != null && kb.escapeKey.wasPressedThisFrame &&
+                   Flow.InteractionInput.TryConsumeEscape();
+        if (esc || (gp != null && gp.buttonEast.wasPressedThisFrame))
             Close();
     }
 

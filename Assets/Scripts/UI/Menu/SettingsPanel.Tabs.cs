@@ -267,7 +267,8 @@ public partial class SettingsPanel
     {
         if (rebindIndex < 0) return;
 
-        if (KeyBindings.DownKey(KeyCode.Escape))
+        // ESC atamayi IPTAL eder ve tuketir — ayni karede paneli (ve pause'u) kapatmasin.
+        if (KeyBindings.DownKey(KeyCode.Escape) && Flow.InteractionInput.TryConsumeEscape())
         {
             rebindIndex = -1;
             ShowTab(SettingsSection.Controls);

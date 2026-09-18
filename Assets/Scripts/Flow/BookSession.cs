@@ -68,7 +68,14 @@ public class BookSession : MonoBehaviour
     {
         if (data == null) return;
 
-        if (KeyBindings.DownKey(KeyCode.Escape)) { CloseInternal(); return; }
+        // ESC kitabi kapatir ve TUKETIR. Tuketmeden birakildiginda ayni ESC pause'u da
+        // aciyordu; sonra CloseInternal imleci kilitledigi icin pause menusu kilitli ve
+        // gorunmez bir imlecle kaliyordu.
+        if (KeyBindings.DownKey(KeyCode.Escape) && InteractionInput.TryConsumeEscape())
+        {
+            CloseInternal();
+            return;
+        }
 
         // TryConsume: kapatan/sayfa çeviren E'nin aynı frame'de koltuğu da tetiklemesini önler.
         if (!KeyBindings.DownKey(key) || !InteractionInput.TryConsume()) return;

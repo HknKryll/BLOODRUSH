@@ -21,6 +21,10 @@ public class ConfirmDialog : MonoBehaviour
 
     static ConfirmDialog active;
 
+    // PauseMenuController acikken ESC'yi dinlemesin diye (onay penceresinde ESC hem
+    // pencereyi kapatip hem oyunu devam ettiriyordu).
+    public static bool IsOpen => active != null;
+
     MenuTheme  theme;
     CanvasGroup group;
     GameObject  previousSelection;
@@ -146,8 +150,11 @@ public class ConfirmDialog : MonoBehaviour
     void Update()
     {
         // Esc / gamepad B ile iptal — modal escape (skill: escape-routes).
+        // TryConsumeEscape: bu ESC'nin ayni karede pause'u da kapatip oyunu devam
+        // ettirmesini engeller (bkz. InteractionInput).
         if (UnityEngine.InputSystem.Keyboard.current != null &&
-            UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame)
+            UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame &&
+            Bloodrush.Flow.InteractionInput.TryConsumeEscape())
             Cancel();
         else if (UnityEngine.InputSystem.Gamepad.current != null &&
                  UnityEngine.InputSystem.Gamepad.current.buttonEast.wasPressedThisFrame)

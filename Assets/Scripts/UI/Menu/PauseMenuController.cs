@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using Bloodrush.Flow;
 
 namespace Bloodrush.UI.Menu
 {
@@ -24,6 +25,7 @@ public class PauseMenuController : MonoBehaviour
     RectTransform panel;
     CanvasGroup   group;
     GameObject    backdropGO;
+    PauseBackdrop backdrop;
 
     readonly List<MenuButton> buttons = new List<MenuButton>();
     bool isPaused;
@@ -49,16 +51,26 @@ public class PauseMenuController : MonoBehaviour
     {
         // Ana menude pause olmaz.
         if (SceneManager.GetActiveScene().name == "MainMenu") return;
-        // Ayarlar/krediler/onay acikken ESC onlara ait.
-        if (SettingsPanel.IsOpen) return;
         if (busy) return;
+
+        // UST KATMAN ACIKKEN ESC ONUN. Eskiden sadece SettingsPanel'e bakiliyordu:
+        //  - Onay penceresinde ESC hem pencereyi kapatiyor hem oyunu devam ettiriyordu.
+        //  - Kitap okurken ESC pause'u acip, kitabin kapanisi imleci KILITLIYORDU.
+        // BookSession Flow domain'inde; UI -> Flow bagimliligi projede zaten mevcut
+        // (MainMenuController GameFlow/SceneFadeIn kullaniyor).
+        if (SettingsPanel.IsOpen || ConfirmDialog.IsOpen || BookSession.IsOpen) return;
 
         var kb = UnityEngine.InputSystem.Keyboard.current;
         var gp = UnityEngine.InputSystem.Gamepad.current;
         bool pressed = (kb != null && kb.escapeKey.wasPressedThisFrame) ||
                        (gp != null && gp.startButton.wasPressedThisFrame);
+        if (!pressed) return;
 
-        if (pressed) { if (isPaused) Resume(); else Pause(); }
+        // Update sirasi tanimsiz: bir modal bu karede ONCE kosup ESC'yi alip kapandiysa
+        // IsOpen artik false gorunur — hakem o durumda ESC'yi bize vermez.
+        if (!InteractionInput.TryConsumeEscape()) return;
+
+        if (isPaused) Resume(); else Pause();
     }
 
     // ───────────────── Aç / Kapat ─────────────────
@@ -85,7 +97,12 @@ public class PauseMenuController : MonoBehaviour
 
     IEnumerator ResumeRoutine()
     {
-        yield return MenuUI.FadeOut(group, theme.exitDuration);
+        // Panel ve arka plan AYNI ANDA soner; uzun olan beklenir. Imlec ancak ikisi de
+        // bittikten sonra kilitlenir — menu hala gorunurken fare kaybolmasin.
+        var panelFade = StartCoroutine(MenuUI.FadeOut(group, theme.exitDuration));
+        if (backdrop != null) yield return backdrop.FadeOut();
+        yield return panelFade;
+
         Teardown();
         Time.timeScale   = 1f;
         Cursor.lockState = CursorLockMode.Locked;
@@ -98,7 +115,7 @@ public class PauseMenuController : MonoBehaviour
     {
         if (canvas != null) Destroy(canvas.gameObject);
         if (backdropGO != null) Destroy(backdropGO);
-        canvas = null; backdropGO = null; panel = null; group = null;
+        canvas = null; backdropGO = null; backdrop = null; panel = null; group = null;
         buttons.Clear();
     }
 
@@ -106,13 +123,16 @@ public class PauseMenuController : MonoBehaviour
 
     void Build()
     {
-        canvas = MenuUI.CreateCanvas("PauseCanvas", SortingOrder);
-        canvas.transform.SetParent(transform, false);
-
-        // Bulanık + koyu oyun görüntüsü
+        // Arka plan KENDI canvas'inda (sortingOrder 190) — HUD'un onunde, panelin arkasinda.
+        // Duz renk / sprite / opaklik / fade suresi MenuTheme asset'inden gelir.
         backdropGO = new GameObject("PauseBackdrop");
         backdropGO.transform.SetParent(transform, false);
-        backdropGO.AddComponent<PauseBackdrop>().Build(canvas.transform, theme);
+        backdrop = backdropGO.AddComponent<PauseBackdrop>();
+        backdrop.Build(theme);
+        backdrop.FadeIn();
+
+        canvas = MenuUI.CreateCanvas("PauseCanvas", SortingOrder);
+        canvas.transform.SetParent(transform, false);
 
         panel = MenuUI.Box(canvas.transform, "Panel", new Vector2(0.5f, 0.5f),
                            Vector2.zero, new Vector2(420f, 440f));

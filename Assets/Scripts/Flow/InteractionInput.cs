@@ -18,5 +18,22 @@ public static class InteractionInput
         consumedFrame = Time.frameCount;
         return true;
     }
+
+    // ESC icin ayni hakem. ESC'yi alti ayri yer dinliyor (PauseMenuController,
+    // ConfirmDialog, SettingsPanel ve rebind yakalayicisi, CreditsPanel, BookSession) ve
+    // iki GameObject'in Update sirasi Unity'de TANIMSIZ. Hakem olmadan tek bir ESC ayni
+    // karede birden cok katmani kapatiyordu: onay penceresini kapatan ESC oyunu da devam
+    // ettiriyordu, kitabi kapatan ESC pause'u acip imleci kilitli birakabiliyordu.
+    //
+    // Kullanim: esc && InteractionInput.TryConsumeEscape()
+    // Modallar ESC'yi islemeden once cagirir; pause ise bir modal aciksa hic dinlemez.
+    static int escapeConsumedFrame = -1;
+
+    public static bool TryConsumeEscape()
+    {
+        if (escapeConsumedFrame == Time.frameCount) return false;
+        escapeConsumedFrame = Time.frameCount;
+        return true;
+    }
 }
 }

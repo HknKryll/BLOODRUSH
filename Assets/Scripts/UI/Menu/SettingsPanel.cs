@@ -299,8 +299,14 @@ public partial class SettingsPanel : MonoBehaviour
 
         var kb = UnityEngine.InputSystem.Keyboard.current;
         var gp = UnityEngine.InputSystem.Gamepad.current;
-        if ((kb != null && kb.escapeKey.wasPressedThisFrame) ||
-            (gp != null && gp.buttonEast.wasPressedThisFrame))
+
+        // ESC HAKEMDEN ALINIR. Eskiden CaptureRebind() ESC'de atamayi iptal edip
+        // rebindIndex'i -1 yapiyordu; IsRebinding hemen false olunca AYNI karedeki bu
+        // kontrol de paneli kapatiyordu. Artik iptal ESC'yi tuketiyor, buraya gelmiyor.
+        // Ayni hakem pause'un bu ESC ile oyunu devam ettirmesini de engelliyor.
+        bool esc = kb != null && kb.escapeKey.wasPressedThisFrame &&
+                   Flow.InteractionInput.TryConsumeEscape();
+        if (esc || (gp != null && gp.buttonEast.wasPressedThisFrame))
             Close();
     }
 

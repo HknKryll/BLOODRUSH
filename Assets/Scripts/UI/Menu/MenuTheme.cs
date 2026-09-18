@@ -72,6 +72,22 @@ public class MenuTheme : ScriptableObject
     public Vector2 buttonSize = new Vector2(320f, 48f);
     public Vector2 panelSize  = new Vector2(960f, 620f);
 
+    // PauseMenuController sahnede değil, kodla kuruluyor — kendi Inspector'u yok. Bu yüzden
+    // pause arka planının ayarları menünün tek görsel kaynağı olan bu asset'te duruyor.
+    public enum PauseBackdropMode { SolidColor, Sprite }
+
+    [Header("Pause arka planı")]
+    [Tooltip("Düz renk ya da bir görsel. Görsel modunda sprite boşsa düz renge düşer.")]
+    public PauseBackdropMode pauseBackdropMode = PauseBackdropMode.SolidColor;
+    [Tooltip("Düz renk modunda kullanılan renk.")]
+    public Color pauseBackdropColor = Color.black;
+    [Tooltip("Görsel modunda ekranı bozulmadan KAPLAR (taşan kısım kırpılır).")]
+    public Sprite pauseBackdropSprite;
+    [Tooltip("1 = oyun dünyası hiç görünmez. Düşürürsen dünya soluk şekilde arkadan görünür.")]
+    [Range(0f, 1f)] public float pauseBackdropOpacity = 1f;
+    [Tooltip("Açılış ve kapanış fade süresi (sn). timeScale 0 iken de oynar.")]
+    [Range(0.1f, 0.3f)] public float pauseBackdropFade = 0.18f;
+
     static MenuTheme cached;
 
     // Resources'tan yükler; yoksa varsayılan bir örnek döner (menü yine çalışır).

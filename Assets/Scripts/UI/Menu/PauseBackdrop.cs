@@ -4,88 +4,113 @@ using UnityEngine.UI;
 
 namespace Bloodrush.UI.Menu
 {
-// Pause acilinca arkadaki oyun goruntusunu BULANIK ve KOYU gosterir.
+// Pause acilinca oyun dunyasini ORTEN tam ekran arka plan. Duz renk (varsayilan siyah)
+// ya da bir Sprite — secim, opaklik ve fade suresi MenuTheme asset'inden gelir.
 //
-// NEDEN SHADER YOK: HDRP'de tam ekran bulanıklık normalde bir CustomPass ya da ozel
-// post-process gerektirir — kurulumu kirilgan ve surum bagimli. Bunun yerine kareyi
-// 1/8 cozunurluklu bir RenderTexture'a alip bilinear filtreyle tekrar buyutuyoruz:
-// kucultup buyutmek ZATEN bir kutu bulanıklığıdır. Tek karelik islem, sifir shader,
-// HDRP'de guvenilir.
-//
-// Ustune krem tonlu koyu bir perde biniyor (skill: modal scrim, %40-60 arasi).
+// Eski surum ekrani 1/8 cozunurlukte yakalayip bulanik gosteriyordu (ScreenCapture +
+// RenderTexture); istenen artik opak bir arka plan oldugu icin o yol kaldirildi.
+// Gerekirse git gecmisinde (d960cf1) duruyor.
 public class PauseBackdrop : MonoBehaviour
 {
-    [Tooltip("Bölme katsayısı — büyük = daha bulanık ve daha ucuz.")]
-    const int Downscale = 8;
+    // SIRALAMA: tum HUD'un (en yuksek Notification = 150) ONUNDE, pause panelinin (200),
+    // ayarlarin (300) ve onay penceresinin (400) ARKASINDA. Ayri canvas oldugu icin
+    // siralama acikca belirli ve fade'i panelden bagimsiz.
+    public const int SortingOrder = 190;
 
-    RenderTexture rt;
-    RawImage      image;
-    Image         scrim;
-    MenuTheme     theme;
+    MenuTheme   theme;
+    Canvas      canvas;
+    CanvasGroup group;
+    Coroutine   fade;
 
-    public void Build(Transform parent, MenuTheme theme)
+    static bool warnedMissingSprite;
+
+    public void Build(MenuTheme theme)
     {
         this.theme = theme;
 
-        var rawRT = MenuUI.Stretch(parent, "Backdrop");
-        image = rawRT.gameObject.AddComponent<RawImage>();
-        image.color = new Color(1f, 1f, 1f, 0f);   // yakalanana kadar görünmez
-        image.raycastTarget = true;                // arkadaki dünyaya tıklanmasın
+        canvas = MenuUI.CreateCanvas("PauseBackdropCanvas", SortingOrder);
+        canvas.transform.SetParent(transform, false);
 
-        var scrimRT = MenuUI.Stretch(parent, "Scrim");
-        scrim = scrimRT.gameObject.AddComponent<Image>();
-        // Krem tonlu koyu perde — soğuk siyah yerine tema ile uyumlu.
-        scrim.color = new Color(0.165f, 0.160f, 0.150f, 0f);
-        scrim.raycastTarget = false;
+        var root = MenuUI.Stretch(canvas.transform, "Backdrop");
+        group = root.gameObject.AddComponent<CanvasGroup>();
+        group.alpha          = 0f;
+        group.blocksRaycasts = true;   // arkadaki HUD'a tiklanmasin
+        group.interactable   = false;
 
-        StartCoroutine(Capture());
+        bool useSprite = theme.pauseBackdropMode == MenuTheme.PauseBackdropMode.Sprite;
+        if (useSprite && theme.pauseBackdropSprite == null)
+        {
+            if (!warnedMissingSprite)
+            {
+                Debug.LogWarning("[PauseBackdrop] Mod 'Sprite' ama MenuTheme'de sprite atanmamis — " +
+                                 "duz renge dusuluyor.");
+                warnedMissingSprite = true;
+            }
+            useSprite = false;
+        }
+
+        // TABAN: her iki modda da tam ekran, opak. Sprite modunda SIYAH olur ki gorselde
+        // seffaf piksel varsa bile oyun dunyasi arkadan sizmasin.
+        var baseImg = root.gameObject.AddComponent<Image>();
+        baseImg.color         = useSprite ? Color.black : theme.pauseBackdropColor;
+        baseImg.raycastTarget = true;
+
+        if (useSprite) BuildSprite(root, theme.pauseBackdropSprite);
     }
 
-    IEnumerator Capture()
+    // Gorsel ekrani KAPLAR ama bozulmaz: EnvelopeParent en-boy oranini koruyarak ebeveyni
+    // tamamen doldurur, tasan kisim ekran disinda kalir. 16:9 / 21:9 / 16:10'da ayni sonuc.
+    static void BuildSprite(RectTransform parent, Sprite sprite)
     {
-        // Kareyi ancak cizim bittikten sonra alabiliriz. Time.timeScale 0 olsa bile
-        // WaitForEndOfFrame calisir (zaman tabanli degil, kare tabanli).
-        yield return new WaitForEndOfFrame();
+        var go = new GameObject("Sprite");
+        go.transform.SetParent(parent, false);
 
-        int w = Mathf.Max(16, Screen.width  / Downscale);
-        int h = Mathf.Max(16, Screen.height / Downscale);
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot     = new Vector2(0.5f, 0.5f);
 
-        rt = new RenderTexture(w, h, 0) { filterMode = FilterMode.Bilinear };
-        rt.Create();
+        var img = go.AddComponent<Image>();
+        img.sprite        = sprite;
+        img.raycastTarget = false;
 
-        try
-        {
-            ScreenCapture.CaptureScreenshotIntoRenderTexture(rt);
-            image.texture = rt;
-            image.color   = Color.white;
-        }
-        catch (System.Exception e)
-        {
-            // Yakalama basarisiz olursa sadece koyu perde kalir — menu yine calisir.
-            Debug.LogWarning($"[PauseBackdrop] Ekran yakalanamadı ({e.Message}) — düz perde kullanılıyor.");
-            image.color = new Color(0f, 0f, 0f, 0f);
-        }
+        var fitter = go.AddComponent<AspectRatioFitter>();
+        fitter.aspectMode  = AspectRatioFitter.AspectMode.EnvelopeParent;
+        fitter.aspectRatio = sprite.rect.height > 0f ? sprite.rect.width / sprite.rect.height : 1f;
+    }
 
-        // Perdeyi yumuşakça getir
-        float t = 0f, dur = theme.enterDuration;
+    public void FadeIn()  => StartFade(theme.pauseBackdropOpacity);
+
+    // Kapanis: bitince cagiran (PauseMenuController) yok eder.
+    public IEnumerator FadeOut()
+    {
+        StartFade(0f);
+        while (fade != null) yield return null;
+    }
+
+    // TEK COROUTINE YUVASI: fade bitmeden ESC'ye yeniden basilirsa yenisi MEVCUT alpha'dan
+    // devam eder — iki fade ayni CanvasGroup uzerinde kavga etmez, alpha sicramaz.
+    void StartFade(float target)
+    {
+        if (fade != null) StopCoroutine(fade);
+        fade = StartCoroutine(Fade(target));
+    }
+
+    IEnumerator Fade(float target)
+    {
+        float start = group.alpha;
+        float dur   = Mathf.Max(0.0001f, theme.pauseBackdropFade);
+        float t     = 0f;
+
         while (t < dur)
         {
+            // Pause'da Time.timeScale = 0 — scaled deltaTime ile fade HIC oynamazdi.
             t += Time.unscaledDeltaTime;
-            float p = Mathf.Clamp01(t / dur);
-            var c = scrim.color; c.a = Mathf.Lerp(0f, 0.55f, p); scrim.color = c;
+            group.alpha = Mathf.Lerp(start, target, Mathf.SmoothStep(0f, 1f, t / dur));
             yield return null;
         }
-    }
 
-    void OnDestroy()
-    {
-        if (rt != null)
-        {
-            if (image != null) image.texture = null;
-            rt.Release();
-            Destroy(rt);
-            rt = null;
-        }
+        group.alpha = target;
+        fade = null;
     }
 }
 }
